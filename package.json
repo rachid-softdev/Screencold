@@ -1,0 +1,38 @@
+{
+  "name": "screencold",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.1.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:generate": "pnpm --filter @screencold/db generate",
+    "db:push": "pnpm --filter @screencold/db push",
+    "db:migrate": "pnpm --filter @screencold/db migrate",
+    "db:studio": "pnpm --filter @screencold/db studio",
+    "db:seed": "pnpm --filter @screencold/db seed",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "prettier": "^3.2.5",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageExtensions": {
+    "@next/env": {
+      "external": true
+    }
+  }
+}

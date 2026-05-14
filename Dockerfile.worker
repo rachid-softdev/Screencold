@@ -1,0 +1,54 @@
+# syntax=docker/dockerfile:1
+
+FROM node:20-alpine
+
+# Install system dependencies for Playwright
+RUN apk add --no-cache \
+    chromium \
+    chromium-chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    udev \
+    python3 \
+    make \
+    g++ \
+    wget
+
+# Set Playwright environment variables
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD 1
+ENV PLAYWRIGHT_BROWSERS_PATH /ms-playwright
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
+
+# Install pnpm
+RUN npm install -g pnpm@9.1.0
+
+# Create app directory
+WORKDIR /app
+
+# Copy workspace files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/*/package.json packages/
+COPY apps/*/package.json apps/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Generate Prisma client
+RUN pnpm --filter @screencold/db generate
+
+# Build the worker
+RUN pnpm --filter @screencold/worker build
+
+# Set environment variables
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Start the worker
+CMD ["node", "apps/worker/dist/index.js"]

@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User & Authentication (NextAuth.js)
+// ============================================
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  AGENCY
+}
+
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  name                 String?
+  password             String?
+  image                String?
+  plan                 Plan      @default(FREE)
+  credits              Int       @default(5)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
+  creditsResetsAt      DateTime?
+  googleId             String?   @unique
+  emailVerified        DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  accounts             Account[]
+  sessions             Session[]
+  campaigns            Campaign[]
+  audits               Audit[]
+  creditTransactions   CreditTransaction[]
+
+  @@index([email])
+  @@index([stripeCustomerId])
+  @@index([googleId])
+}
+
+// NextAuth Adapters
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token     String? @db.Text
+  expires_at       Int?
+  token_type       String?
+  scope            String?
+  id_token         String? @db.Text
+  session_state    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// Campaigns & Prospects
+// ============================================
+
+model Campaign {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  prospects String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prospectsList Prospect[]
+
+  @@index([userId])
+}
+
+enum ProspectStatus {
+  PENDING
+  PROCESSING
+  DONE
+  FAILED
+}
+
+model Prospect {
+  id           String         @id @default(cuid())
+  url          String
+  companyName  String?
+  contactName  String?
+  contactEmail String?
+  notes        String?
+  campaignId   String
+  auditId      String?        @unique
+  status       ProspectStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Relations
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  audit    Audit?   @relation(fields: [auditId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([status])
+}
+
+// ============================================
+// Audits
+// ============================================
+
+enum AuditStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
+model Audit {
+  id             String      @id @default(cuid())
+  prospectId     String      @unique
+  userId         String
+  screenshotUrl  String?
+  annotatedUrl   String?
+  mobileUrl      String?
+  issues         Json?
+  siteType       String?
+  overallScore   Int?
+  emailSubject   String?
+  emailBody      String?     @db.Text
+  emailPs        String?
+  status         AuditStatus @default(PROCESSING)
+  errorMessage   String?
+  processingTime Int?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  prospect          Prospect           @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditTransaction CreditTransaction?
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================
+// Credit Transactions
+// ============================================
+
+model CreditTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  type      String
+  auditId   String?  @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audit Audit? @relation(fields: [auditId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([type])
+}

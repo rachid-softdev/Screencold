@@ -1,0 +1,270 @@
+{
+  "slug": "ux-checklist-b2b",
+  "title": "La checklist UX ultime pour les sites B2B",
+  "subtitle": "15 points à vérifier pour doubler votre taux de conversion",
+  "excerpt": "Un audit UX complet peut sembler complexe. Cette checklist vous donne les 15 points essentiels à vérifier sur n'importe quel site B2B.",
+  "author": "ScreenCold Team",
+  "authorRole": "Experts UX & Conversion",
+  "publishedAt": "2026-02-20T10:00:00Z",
+  "updatedAt": "2026-02-20T10:00:00Z",
+  "category": "ux-design",
+  "tags": ["UX", "B2B", "conversion", "checklist"],
+  "readingTime": 10,
+  "featured": false,
+  "coverImage": "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1200",
+  "content": [
+    {
+      "type": "paragraph",
+      "content": "Un site web B2B efficace doit simultaneously servir les objectifs business et les besoins des utilisateurs. Cette checklist de 15 points couvre les éléments fondamentaux qui impactent directement votre taux de conversion et l'expérience utilisateur."
+    },
+    {
+      "type": "paragraph",
+      "content": "Que vous lanciez un nouveau site ou optimisez une présence existante, ces vérifications vous aident à identifier les problèmes avant qu'ils ne coûtent des clients."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "1. Navigation et architecture de l'information"
+    },
+    {
+      "type": "paragraph",
+      "content": "La navigation est le skeleton de votre site. Les utilisateurs B2B sont pressés et veulent trouver l'information rapidement. Une navigation confuse aumenta le taux de rebond de 60%."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Le menu principal est visible en moins de 3 secondes après le chargement",
+        "Les catégories sont logiquement organisées (pas plus de 7 items au premier niveau)",
+        "La navigation mobile est fonctionnelle et facile à utiliser",
+        "Un moteur de recherche interne est disponible et fonctionnel",
+        "Le fil d'Ariane (breadcrumb) est présent sur les pages profondes"
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "tip",
+      "title": "Conseil pro",
+      "content": "Testez votre navigation avec des utilisateurs réels. Demandez-leur de trouver un produit ou service spécifique et chronométrez le temps nécessaire."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "2. Vitesse de chargement et performance"
+    },
+    {
+      "type": "paragraph",
+      "content": "La vitesse est cruciale. Chaque seconde de retard decrease conversion rate by 7%. Pour les sites B2B, le temps de chargement idéal est inférieur à 2 secondes sur mobile."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Le First Contentful Paint (FCP) est inférieur à 1,8 seconde",
+        "Le Largest Contentful Paint (LCP) est inférieur à 2,5 secondes",
+        "Le Cumulative Layout Shift (CLS) est inférieur à 0,1",
+        "Les images sont optimisées (WebP, lazy loading)",
+        "Le JavaScript est minimisé et différé si possible"
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "info",
+      "title": "Outil recommandé",
+      "content": "Utilisez Google PageSpeed Insights ou Lighthouse pour auditer la performance. Visez un score de 90+ pour mobile et desktop."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "3. Hierarchy visuelle et CTAs"
+    },
+    {
+      "type": "paragraph",
+      "content": "Les visiteurs scannent votre site en quelques secondes. La hierarchy visuelle doit guider leur regard vers les éléments les plus importants, notamment vos Call-to-Action."
+    },
+    {
+      "type": "list",
+      "items": [
+        "La hiérarchie est claire : titre > sous-titre > corps de texte",
+        "Les CTAs sont contrastés et utilisent une couleur distinctive",
+        "Les CTAs utilisent un langage orienté bénéfice (pas 'Soumettre' mais 'Démarrer votre essai gratuit')",
+        "Un CTA principal par section/page (pas plus de 2)",
+        "Les CTAs sont positionnés au-dessus de la ligne de flottaison sur mobile"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "4. Cohérence visuelle et identité de marque"
+    },
+    {
+      "type": "paragraph",
+      "content": "La cohérence builds trust. Un site avec des éléments visuels incohérents semble peu professionnel et peut faire fuir les prospects B2B qui cherchent un partenaire fiable."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Les couleurs de la palette sont utilisées de manière cohérente",
+        "La typographie est uniforme (max 3 polices)",
+        "Les boutons et formulaires ont un style cohérent",
+        "L'espacement (marges, padding) est régulier",
+        "Le design est responsive sans cassures visibles"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "5. Formulaires et capture de leads"
+    },
+    {
+      "type": "paragraph",
+      "content": "Les formulaires sont le point de friction principal. Chaque champ supplémentaire reduce conversion rate by 4-7%. Gardez vos formulaires aussi courts que possible."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Maximum 3-5 champs pour les formulaires de contact",
+        "Les labels sont visibles (pas seulement des placeholders)",
+        "Les messages d'erreur sont clairs et helps full",
+        "La validation se fait en temps réel",
+        "Le bouton CTA est explicite et visible"
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "warning",
+      "title": "Attention aux formulaires',
+      "content": "Évitez de demander le numéro de téléphone sauf si c'est absolument nécessaire. Sur mobile, les utilisateurs hésitent à le saisir."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "6. Preuve sociale et confiance"
+    },
+    {
+      "type": "paragraph",
+      "content": "Les décideurs B2B ont besoin de preuves avant de s'engager. La preuve sociale reduce les objections et accélère le cycle de décision."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Les témoignages clients sont visibles sur la page d'accueil",
+        "Les logos clients sont affichés de manière professionnelle",
+        "Les certifications et prix sont mis en avant",
+        "Les coordonnées (adresse, téléphone) sont visibles",
+        "Un lien vers la politique de confidentialité est présent"
+      ]
+    },
+    {
+      "type": "quote",
+      "content": "Les sites avec des témoignages vidéo augmentent le taux de conversion de 80% par rapport aux sites sans.",
+      "author": "Étude VWO 2025"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "7. Accessibilité et conformité"
+    },
+    {
+      "type": "paragraph",
+      "content": "L'accessibilité n'est plus optionnelle. Elle est requise par la loi dans de nombreux pays et améliore l'expérience pour tous les utilisateurs, pas seulement ceux avec des handicaps."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Le contraste texte/fond respecte les normes WCAG (ratio 4.5:1 minimum)",
+        "Tous les images ont un texte alternatif (alt)",
+        "La navigation au clavier est possible (tab, enter)",
+        "Les formulaires ont des labels associés",
+        "Les vidéos ont des sous-titres"
+      ]
+    },
+    {
+      "type": "callout",
+      "variant": "important",
+      "title": "Obligation légale",
+      "content": "En France, le RGAA (Référentiel Général d'Amélioration de l'Accessibilité) est obligatoire pour les sites publics et sera bientôt étendu aux sites commerciaux."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "8. Contenu et copie"
+    },
+    {
+      "type": "paragraph",
+      "content": "Le contenu doit speak to your audience. Les visiteurs B2B cherchent des réponses spécifiques à leurs problèmes business. Votre copie doit répondre directement à leurs besoins."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Le titre H1 est clair et décrit exactement la proposition de valeur",
+        "Le premier paragraphe répond à la question 'Quoi, pour qui, pourquoi'",
+        "Le contenu utilise des puces pour la lisibilité",
+        "Le jargon technique est évité ou EXPLAINED",
+        "Les pages importantes ont au moins 300 mots"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "9. Mobile-first et responsive design"
+    },
+    {
+      "type": "paragraph",
+      "content": "Plus de 60% du traffic B2B vient désormais des appareils mobiles. Un site qui ne fonctionne pas parfaitement sur mobile lose la majorité des prospects."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Le contenu est lisible sans zoom",
+        "Les boutons sont assez grands (min 44x44px)",
+        "Les liens ne sont pas trop proches les uns des autres",
+        "Le menu mobile est fonctionnel et rapide",
+        "Les formulaires sont optimisés pour le touchscreen"
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "content": "10. SEO et découverte"
+    },
+    {
+      "type": "paragraph",
+      "content": "Un beau site qui n'est pas trouvé ne sert à rien. L'optimisation SEO on-page garantit que vos pages apparaissent dans les résultats de recherche pertinents."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Chaque page a un title tag unique (50-60 caractères)",
+        "Chaque page a une meta description unique (150-160 caractères)",
+        "Les URLs sont nettoyées et descriptives",
+        "Les headings (H1, H2, H3) sont structurés logiquement",
+        "Les images ont des noms de fichier et alt text descriptifs"
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "Audit gratuit de votre site B2B",
+      "description": "Testez votre site avec ScreenCold et recevez un rapport complet sur les 15 points de cette checklist.",
+      "url": "/audit",
+      "label": "Commencer mon audit gratuit"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "paragraph",
+      "content": "Cette checklist couvre les fondamentaux. Pour un audit complet incluant l'analyse Heatmap et le test utilisateur, utilisez notre outil d'audit gratuit. Chaque point.checked représente une opportunité d'amélioration de votre taux de conversion."
+    }
+  ],
+  "seo": {
+    "metaTitle": "Checklist UX B2B : 15 Points Essentiels pour Doubler vos Conversions | ScreenCold",
+    "metaDescription": "La checklist ultime pour audit UX de votre site B2B. 15 points à vérifier pour améliorer conversion et expérience utilisateur.",
+    "ogImage": "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1200",
+    "canonicalUrl": "https://screencold.com/blog/ux-checklist-b2b"
+  },
+  "meta": {
+    "views": 2150,
+    "likes": 78,
+    "shares": 23,
+    "featuredInNewsletter": false
+  }
+}
