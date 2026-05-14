@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "cold-outreach-stats-2026",
+    "title": "Cold Outreach en 2026 : les statistiques qui changent tout",
+    "subtitle": "Ce que les données révèle sur les taux de réponse en 2026",
+    "excerpt": "Les stratégies de cold outreach évoluent. Découvrez les statistiques clés qui vont transformer votre approche en 2026.",
+    "author": "ScreenCold Team",
+    "publishedAt": "2026-01-15T10:00:00Z",
+    "updatedAt": "2026-01-15T10:00:00Z",
+    "category": "cold-outreach",
+    "tags": ["cold email", "B2B", "statistiques", "2026"],
+    "readingTime": 8,
+    "featured": true,
+    "coverImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200"
+  },
+  {
+    "slug": "ux-checklist-b2b",
+    "title": "La checklist UX ultime pour les sites B2B",
+    "subtitle": "15 points à vérifier pour doubler votre taux de conversion",
+    "excerpt": "Un audit UX complet peut sembler complexe. Cette checklist vous donne les 15 points essentiels à vérifier sur n'importe quel site B2B.",
+    "author": "ScreenCold Team",
+    "publishedAt": "2026-02-20T10:00:00Z",
+    "updatedAt": "2026-02-20T10:00:00Z",
+    "category": "ux-design",
+    "tags": ["UX", "B2B", "conversion", "checklist"],
+    "readingTime": 10,
+    "featured": false,
+    "coverImage": "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1200"
+  },
+  {
+    "slug": "email-personnalisation-guide",
+    "title": "Personnalisation d'emails : le guide complet",
+    "subtitle": "Techniques avancées pour des taux de réponse x3",
+    "excerpt": "La personnalisation est le nerf de la guerre du cold outreach. Voici les techniques qui fonctionnent vraiment en 2026.",
+    "author": "ScreenCold Team",
+    "publishedAt": "2026-03-10T10:00:00Z",
+    "updatedAt": "2026-03-10T10:00:00Z",
+    "category": "cold-outreach",
+    "tags": ["email", "personnalisation", "B2B", "conversion"],
+    "readingTime": 12,
+    "featured": false,
+    "coverImage": "https://images.unsplash.com/photo-1557200134-90327ee9fafa?w=1200"
+  }
+]

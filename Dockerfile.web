@@ -1,0 +1,81 @@
+# syntax=docker/dockerfile:1
+
+# Stage 1: Dependencies
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat python3 make g++
+WORKDIR /app
+
+# Install pnpm globally
+RUN npm install -g pnpm@9.1.0
+
+# Copy workspace files for dependency installation
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/*/package.json packages/
+COPY apps/*/package.json apps/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code for build
+COPY . .
+
+# Stage 2: Build
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app .
+
+# Set environment variables for build
+ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV production
+
+# Generate Prisma client
+RUN pnpm --filter @screencold/db generate
+
+# Build the application
+RUN pnpm --filter @screencold/web build
+
+# Stage 3: Runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Install Playwright browsers
+RUN apk add --no-cache wget && \
+    mkdir -p /ms-playwright && \
+    wget -q https://playwright.azureedge.net/builds/playwright/1.44.0/playwright-1.44.0-alpine-x64.tar.gz && \
+    tar -xzf playwright-1.44.0-alpine-x64.tar.gz -C /ms-playwright && \
+    rm playwright-1.44.0-alpine-x64.tar.gz && \
+    wget -q https://playwright.azureedge.net/builds/browsers/playwright-1.44.0-bullseye-arm64.tgz && \
+    mkdir -p /ms-playwright && \
+    tar -xzf playwright-1.44.0-bullseye-arm64.tgz -C /ms-playwright && \
+    rm playwright-1.44.0-bullseye-arm64.tgz && \
+    rm -rf /var/cache/apk/*
+
+ENV PLAYWRIGHT_BROWSERS_PATH /ms-playwright
+
+# Set permissions for Next.js
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+USER nextjs
+
+# Copy necessary artifacts
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./.next/static
+COPY --from=builder /app/packages/db/node_modules/.prisma ./node_modules/.prisma
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]
