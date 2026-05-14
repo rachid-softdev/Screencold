@@ -2,39 +2,75 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, Building, Trash2 } from "lucide-react";
+import { User, Mail, Building, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast";
 
+interface UserProfile {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+  plan: string;
+  credits: number;
+  createdAt: string;
+}
+
 function SettingsPage() {
   const router = useRouter();
   const { addToast } = useToast();
+  const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   // Form state
-  const [name, setName] = React.useState("Jean Dupont");
-  const [email, setEmail] = React.useState("jean@example.com");
-  const [company, setCompany] = React.useState("Mon Agence");
-  const [errors, setErrors] = React.useState<{ name?: string; email?: string }>({});
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [errors, setErrors] = React.useState<{ name?: string }>({});
+
+  // Fetch profile on mount
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("/api/user/profile");
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement du profil");
+        }
+        const data: UserProfile = await response.json();
+        setName(data.name || "");
+        setEmail(data.email);
+      } catch (err) {
+        addToast("Erreur lors du chargement du profil", "error");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [addToast]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: typeof errors = {};
-    if (!name.trim()) newErrors.name = "Le nom est requis";
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Email invalide";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (!name.trim()) {
+      setErrors({ name: "Le nom est requis" });
       return;
     }
 
     setIsSaving(true);
     try {
-      // Simulate save
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la sauvegarde");
+      }
+
       addToast("Paramètres enregistrés", "success");
       setErrors({});
     } catch (err) {
@@ -44,12 +80,37 @@ function SettingsPage() {
     }
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
+  const handleDeleteAccount = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+
       addToast("Compte supprimé", "success");
       router.push("/");
+    } catch (err) {
+      addToast("Erreur lors de la suppression", "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -86,21 +147,13 @@ function SettingsPage() {
               <Input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 placeholder="votre@email.com"
-                error={errors.email}
                 className="pl-10"
+                disabled
               />
-            </div>
-            <div className="relative">
-              <Building className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <Input
-                type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Nom de votre entreprise"
-                className="pl-10"
-              />
+              <p className="mt-1 text-xs text-gray-400">
+                L'email ne peut pas être modifié
+              </p>
             </div>
           </CardContent>
           <CardFooter>
@@ -111,7 +164,7 @@ function SettingsPage() {
         </form>
       </Card>
 
-      {/* Integrations */}
+      {/* Integrations - Placeholder */}
       <Card>
         <CardHeader>
           <CardTitle>Intégrations</CardTitle>
@@ -126,14 +179,14 @@ function SettingsPage() {
                 <p className="font-medium text-gray-900">Zapier</p>
                 <p className="text-sm text-gray-500">Automatisez vos workflows</p>
               </div>
-              <Button variant="secondary" size="sm">Connecter</Button>
+              <Button variant="secondary" size="sm" disabled>Coming soon</Button>
             </div>
             <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
               <div>
                 <p className="font-medium text-gray-900">HubSpot</p>
                 <p className="text-sm text-gray-500">Synchronisez vos contacts</p>
               </div>
-              <Button variant="secondary" size="sm">Connecter</Button>
+              <Button variant="secondary" size="sm" disabled>Coming soon</Button>
             </div>
           </div>
         </CardContent>
@@ -154,7 +207,12 @@ function SettingsPage() {
           </p>
         </CardContent>
         <CardFooter>
-          <Button variant="destructive" onClick={handleDeleteAccount} leftIcon={<Trash2 className="h-4 w-4" />}>
+          <Button 
+            variant="destructive" 
+            onClick={handleDeleteAccount} 
+            leftIcon={<Trash2 className="h-4 w-4" />}
+            loading={isDeleting}
+          >
             Supprimer mon compte
           </Button>
         </CardFooter>

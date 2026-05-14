@@ -21,13 +21,13 @@ const features = [
   {
     icon: <CheckCircle className="h-6 w-6" />,
     title: "Facile à utiliser",
-    description: "Interface intuitive, aucunスキル requise. Concentrez-vous sur vos ventes.",
+    description: "Interface intuitive, aucune compétence requise. Concentrez-vous sur vos ventes.",
   },
 ];
 
 const testimonials = [
   {
-    quote: "ScreenCold m'a fait gagner des heures chaque semaine. Mes audits sont теперь automatiques !",
+    quote: "ScreenCold m'a fait gagner des heures chaque semaine. Mes audits sont maintenant automatiques !",
     author: "Marie L.",
     role: "Fondatrice, Agence SEO",
     company: "WebBoost",

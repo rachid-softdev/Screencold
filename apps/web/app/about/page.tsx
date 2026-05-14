@@ -58,7 +58,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-gray-900 mt-8">Notre histoire</h2>
             <p className="text-gray-600">
               Fondée en 2024 par une équipe d'experts en IA et en vente B2B, ScreenCold 
-              est née d'une frustration commune : perdre demasiado de temps à analyser 
+              est née d'une frustration commune : perdre trop de temps à analyser 
               manuellement les sites web des prospects. Nous avons décidé de créer un outil 
               qui automatise ce processus tout en générant des emails de prospection personnalisés.
             </p>

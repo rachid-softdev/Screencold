@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { Copy, RefreshCw, Check, Download } from "lucide-react";
+import { Copy, RefreshCw, Check, Download, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -14,7 +14,9 @@ interface EmailEditorProps {
   onSubjectChange?: (subject: string) => void;
   onBodyChange?: (body: string) => void;
   onPsChange?: (ps: string) => void;
+  onSave?: () => Promise<void>;
   isRegenerating?: boolean;
+  isSaving?: boolean;
 }
 
 function EmailEditor({
@@ -25,7 +27,9 @@ function EmailEditor({
   onSubjectChange,
   onBodyChange,
   onPsChange,
+  onSave,
   isRegenerating = false,
+  isSaving = false,
 }: EmailEditorProps) {
   const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -120,6 +124,16 @@ function EmailEditor({
 
       {/* Actions */}
       <div className="flex flex-wrap gap-2 pt-2">
+        {onSave && (
+          <Button
+            onClick={onSave}
+            loading={isSaving}
+            leftIcon={<Save className="h-4 w-4" />}
+          >
+            Sauvegarder
+          </Button>
+        )}
+
         <Button
           onClick={handleCopy}
           leftIcon={

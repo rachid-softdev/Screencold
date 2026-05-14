@@ -53,19 +53,55 @@ Provide your analysis in JSON format with the following structure:
   ]
 }`;
 
+interface AnalyzeWithAIOptions {
+  pageUrl?: string;
+  screenshotBase64?: string;
+  mobileScreenshotBase64?: string;
+  annotatedScreenshotBase64?: string;
+}
+
 export async function analyzeWithAI(
   screenshotUrl: string,
-  annotatedScreenshotUrl?: string,
-  pageUrl?: string
+  options: AnalyzeWithAIOptions = {}
 ): Promise<AnalyzeResult> {
   const startTime = Date.now();
+  const { pageUrl, screenshotBase64, mobileScreenshotBase64, annotatedScreenshotBase64 } = options;
 
   try {
     logger.info("Analyzing website with Claude AI", { pageUrl });
 
-    // Prepare image content
-    // In production, you'd fetch the screenshot from S3 and encode it
-    // For now, we'll use a placeholder approach
+    // Build the content array with text and images
+    const content: Anthropic.MessageParam[] = [];
+
+    // Add text prompt
+    content.push({
+      type: "text" as const,
+      text: `Please analyze this website${pageUrl ? ` (${pageUrl})` : ""}. Provide detailed UX findings with specific issues and recommendations. Include a score from 0-100 where 100 is perfect UX. Look at both desktop and mobile screenshots if provided.`,
+    });
+
+    // Add desktop screenshot if provided
+    if (screenshotBase64) {
+      content.push({
+        type: "image" as const,
+        source: {
+          type: "base64" as const,
+          media_type: "image/png" as const,
+          data: screenshotBase64,
+        },
+      });
+    }
+
+    // Add mobile screenshot if provided
+    if (mobileScreenshotBase64) {
+      content.push({
+        type: "image" as const,
+        source: {
+          type: "base64" as const,
+          media_type: "image/png" as const,
+          data: mobileScreenshotBase64,
+        },
+      });
+    }
 
     const message = await anthropic.messages.create({
       model: "claude-opus-4-20251114",
@@ -74,21 +110,7 @@ export async function analyzeWithAI(
       messages: [
         {
           role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Please analyze this website${pageUrl ? ` (${pageUrl})` : ""}. Provide detailed UX findings with specific issues and recommendations. Include a score from 0-100 where 100 is perfect UX.`,
-            },
-            // In production, you would include actual screenshot data:
-            // {
-            //   type: "image",
-            //   source: {
-            //     type: "base64",
-            //     media_type: "image/png",
-            //     data: base64ScreenshotData,
-            //   },
-            // },
-          ],
+          content,
         },
       ],
     });
@@ -140,7 +162,7 @@ export async function analyzeWithAI(
       description: issue.description,
       recommendation: issue.recommendation,
       zone: issue.zone,
-      screenshotUrl: annotatedScreenshotUrl,
+      screenshotUrl: annotatedScreenshotBase64 ? "annotated" : undefined,
     }));
 
     const analysisTime = Date.now() - startTime;
@@ -191,7 +213,7 @@ export async function analyzeMultiple(
 ): Promise<AnalyzeResult[]> {
   return await Promise.all(
     screenshots.map((screenshot) =>
-      analyzeWithAI(screenshot.url, undefined, screenshot.pageUrl)
+      analyzeWithAI(screenshot.url, { pageUrl: screenshot.pageUrl })
     )
   );
 }

@@ -95,7 +95,7 @@ const faqs = [
 
 const testimonials = [
   {
-    quote: "ScreenCold m'a fait gagner des heures chaque semaine. Mes audits sont теперь automatiques !",
+    quote: "ScreenCold m'a fait gagner des heures chaque semaine. Mes audits sont maintenant automatiques !",
     author: "Marie L.",
     role: "Fondatrice, Agence SEO",
   },

@@ -1,0 +1,23 @@
+# Robots.txt for ScreenCold
+
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /pricing
+Allow: /faq
+Allow: /about
+Allow: /contact
+Allow: /login
+Allow: /register
+
+# Disallow dashboard routes
+Disallow: /dashboard
+Disallow: /audits
+Disallow: /campaigns
+Disallow: /settings
+
+# Sitemap
+Sitemap: https://screencold.com/sitemap.xml
+
+# Crawl-delay (optional, for politeness)
+Crawl-delay: 1
