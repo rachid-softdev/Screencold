@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { ToastProvider } from "@/components/ui/toast";
@@ -13,31 +14,12 @@ interface DashboardLayoutProps {
 
 function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  // Mock user data - replace with actual auth check
-  const user = {
-    name: "Jean Dupont",
-    email: "jean@example.com",
-    plan: "PRO" as const,
-  };
-
-  useEffect(() => {
-    // In production, check auth status here
-    // For now, we'll simulate authenticated state
-    const checkAuth = async () => {
-      // Simulate auth check delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setIsAuthenticated(true);
-    };
-
-    checkAuth();
-  }, [router]);
 
   // Show loading state while checking auth
-  if (isAuthenticated === null) {
+  if (status === "loading") {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-4">
@@ -49,16 +31,26 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated) {
+  if (status === "unauthenticated") {
     router.push("/login");
     return null;
   }
+
+  const user = {
+    name: session?.user?.name || "Utilisateur",
+    email: session?.user?.email || "",
+    plan: (session?.user?.plan as string) || "FREE",
+  };
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/login" });
+  };
 
   const userMenuItems = [
     { label: "Mon profil", href: "/settings" },
     { label: "Paramètres", href: "/settings" },
     { label: "", separator: true },
-    { label: "Se déconnecter", onClick: () => router.push("/login") },
+    { label: "Se déconnecter", onClick: handleLogout },
   ];
 
   return (

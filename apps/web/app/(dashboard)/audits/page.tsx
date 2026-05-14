@@ -15,49 +15,39 @@ interface Audit {
   overallScore?: number | null;
   status: string;
   createdAt: string;
+  prospect?: {
+    url: string;
+  };
 }
 
 function AuditsPage() {
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [audits, setAudits] = React.useState<Audit[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [total, setTotal] = React.useState(0);
 
-  // Mock data - replace with actual data fetching
-  const audits: Audit[] = [
-    {
-      id: "1",
-      companyName: "Acme Corp",
-      screenshotUrl: null,
-      overallScore: 72,
-      status: "READY",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      companyName: "TechStart SAS",
-      screenshotUrl: null,
-      overallScore: 45,
-      status: "READY",
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      id: "3",
-      companyName: "Design Studio",
-      screenshotUrl: null,
-      overallScore: null,
-      status: "PROCESSING",
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      id: "4",
-      companyName: "Marketing Pro",
-      screenshotUrl: null,
-      overallScore: 88,
-      status: "READY",
-      createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    },
-  ];
+  const fetchAudits = async (page = 1) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/audits?page=${page}&limit=20`);
+      if (!response.ok) throw new Error("Failed to fetch");
+      const data = await response.json();
+      setAudits(data.audits);
+      setTotal(data.pagination.total);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAudits();
+  }, []);
 
   const filteredAudits = audits.filter((audit) =>
-    audit.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
+    audit.companyName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    audit.prospect?.url?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getScoreVariant = (score: number | null) => {
@@ -81,7 +71,7 @@ function AuditsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
-            {audits.length} audit{audits.length !== 1 ? "s" : ""}
+            {total} audit{total !== 1 ? "s" : ""}
           </h2>
           <p className="text-sm text-gray-500">
             Tous vos audits réalisés
@@ -112,7 +102,11 @@ function AuditsPage() {
       </div>
 
       {/* Audits Grid */}
-      {filteredAudits.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        </div>
+      ) : filteredAudits.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
           <p className="text-gray-500">
             {searchQuery ? "Aucun audit ne correspond à votre recherche" : "Aucun audit pour le moment"}
