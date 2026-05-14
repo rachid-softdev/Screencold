@@ -39,8 +39,16 @@ function ContactPage() {
     setIsLoading(true);
     
     try {
-      // TODO: Send to API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'envoi");
+      }
+      
       addToast("Message envoyé avec succès !", "success");
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (err) {

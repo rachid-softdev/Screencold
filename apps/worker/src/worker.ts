@@ -79,11 +79,19 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
     // Step 3: Analyze with AI (unless capture only mode)
     let analysisResult: AnalyzeResult | null = null;
     if (!captureOnly) {
-      jobLogger.info("Analyzing with AI...");
+      jobLogger.info("Analyzing with AI with screenshots...");
+      
+      // Extract base64 data from screenshots (already captured)
+      const desktopBase64 = captureResult.screenshots.desktop.path;
+      const mobileBase64 = captureResult.screenshots.mobile?.path;
+      
       analysisResult = await analyzeWithAI(
         captureResult.screenshots.desktop.url,
-        captureResult.screenshots.annotated?.url,
-        url
+        {
+          pageUrl: url,
+          screenshotBase64: desktopBase64,
+          mobileScreenshotBase64: mobileBase64,
+        }
       );
 
       if (!analysisResult.success) {
