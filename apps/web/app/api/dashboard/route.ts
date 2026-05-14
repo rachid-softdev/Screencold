@@ -1,0 +1,135 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import prisma from '@/lib/prisma';
+
+export async function GET(request: NextRequest) {
+  try {
+    // Get user from session
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: 'UNAUTHORIZED', message: 'Non autorisé' },
+        { status: 401 }
+      );
+    }
+
+    const userId = token.id as string;
+
+    // Get user with credits
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        plan: true,
+        credits: true,
+        creditsResetsAt: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'USER_NOT_FOUND', message: 'Utilisateur non trouvé' },
+        { status: 404 }
+      );
+    }
+
+    // Get stats
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    // This month's audits
+    const thisMonthAudits = await prisma.audit.count({
+      where: {
+        userId,
+        createdAt: { gte: startOfMonth },
+      },
+    });
+
+    // Last month's audits (for comparison)
+    const lastMonthAudits = await prisma.audit.count({
+      where: {
+        userId,
+        createdAt: {
+          gte: startOfLastMonth,
+          lte: endOfLastMonth,
+        },
+      },
+    });
+
+    // Total audits
+    const totalAudits = await prisma.audit.count({
+      where: { userId },
+    });
+
+    // Recent audits
+    const recentAudits = await prisma.audit.findMany({
+      where: { userId },
+      include: {
+        prospect: {
+          select: {
+            id: true,
+            url: true,
+            companyName: true,
+            contactName: true,
+            status: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+
+    // Credits used this month
+    const creditsUsed = await prisma.creditTransaction.aggregate({
+      where: {
+        userId,
+        createdAt: { gte: startOfMonth },
+        type: 'audit',
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        plan: user.plan,
+        credits: user.credits,
+        creditsResetsAt: user.creditsResetsAt,
+        memberSince: user.createdAt,
+      },
+      stats: {
+        thisMonthAudits,
+        lastMonthAudits,
+        totalAudits,
+        auditsChange: lastMonthAudits > 0 
+          ? Math.round(((thisMonthAudits - lastMonthAudits) / lastMonthAudits) * 100) 
+          : 0,
+        creditsUsed: creditsUsed._sum.amount || 0,
+      },
+      recentAudits: recentAudits.map((audit) => ({
+        id: audit.id,
+        status: audit.status,
+        overallScore: audit.overallScore,
+        screenshotUrl: audit.screenshotUrl,
+        createdAt: audit.createdAt,
+        prospect: audit.prospect,
+      })),
+    });
+  } catch (error) {
+    console.error('[Dashboard] Error:', error);
+    return NextResponse.json(
+      { error: 'INTERNAL_ERROR', message: 'Une erreur est survenue' },
+      { status: 500 }
+    );
+  }
+}

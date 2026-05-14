@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Check, Zap, CreditCard, ArrowUpRight } from "lucide-react";
+import { Check, Zap, CreditCard, ArrowUpRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
@@ -90,21 +90,76 @@ const plans = [
   },
 ];
 
+interface UserData {
+  plan: string;
+  credits: number;
+  creditsResetsAt: string | null;
+  stripeCustomerId: string | null;
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  type: string;
+  createdAt: string;
+}
+
 function BillingPage() {
   const { addToast } = useToast();
   const [isUpgrading, setIsUpgrading] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [userData, setUserData] = React.useState<UserData | null>(null);
+  const [creditsUsed, setCreditsUsed] = React.useState(0);
+  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
 
-  // Mock current plan
-  const currentPlan = "starter";
-  const creditsUsed = 23;
-  const creditsTotal = 50;
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/dashboard");
+        if (response.ok) {
+          const data = await response.json();
+          setUserData({
+            plan: data.user.plan,
+            credits: data.user.credits,
+            creditsResetsAt: data.user.creditsResetsAt,
+            stripeCustomerId: null,
+          });
+          setCreditsUsed(data.stats.creditsUsed);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getCreditsForPlan = (plan: string) => {
+    const planData = plans.find(p => p.id === plan.toLowerCase());
+    return planData?.price === 0 ? 5 : planData?.price === 29 ? 50 : planData?.price === 79 ? 200 : 500;
+  };
+
+  const currentPlanId = userData?.plan?.toLowerCase() || "free";
+  const creditsTotal = getCreditsForPlan(currentPlanId);
 
   const handleUpgrade = async (planId: string) => {
     setIsUpgrading(planId);
     try {
-      // Simulate Stripe checkout
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      addToast(`Redirection vers le paiement ${planId}...`, "info");
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        addToast("Fonctionnalité en cours de développement", "info");
+      }
     } catch (err) {
       addToast("Erreur lors de la redirection", "error");
     } finally {
@@ -113,7 +168,7 @@ function BillingPage() {
   };
 
   const handleBuyCredits = async () => {
-    addToast("Redirection vers l'achat de crédits...", "info");
+    addToast("Achat de crédits -coming soon", "info");
   };
 
   return (

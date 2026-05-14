@@ -3,7 +3,8 @@
 import * as React from "react";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { useToast } from "@/components/ui/toast";
 
 function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const { addToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,22 +45,27 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Simulate login - replace with actual auth logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-      // In production, this would call your auth provider
-      addToast("Connexion réussie", "success");
-      router.push("/dashboard");
+      if (result?.error) {
+        addToast("Email ou mot de passe incorrect", "error");
+      } else {
+        addToast("Connexion réussie", "success");
+        router.push(callbackUrl);
+      }
     } catch (error) {
-      addToast("Email ou mot de passe incorrect", "error");
+      addToast("Une erreur est survenue", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    // Simulate Google OAuth
-    addToast("Redirection vers Google...", "info");
+  const handleGoogleLogin = () => {
+    signIn("google", { callbackUrl });
   };
 
   return (

@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,11 +54,34 @@ function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Simulate registration - replace with actual auth logic
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Create account
+      const registerResponse = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-      addToast("Compte créé avec succès !", "success");
-      router.push("/dashboard");
+      const registerData = await registerResponse.json();
+
+      if (!registerResponse.ok) {
+        addToast(registerData.message || "Une erreur est survenue", "error");
+        setIsLoading(false);
+        return;
+      }
+
+      // Auto sign in after registration
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        addToast("Compte créé, mais erreur de connexion", "error");
+      } else {
+        addToast("Compte créé avec succès !", "success");
+        router.push("/dashboard");
+      }
     } catch (error) {
       addToast("Une erreur est survenue lors de l'inscription", "error");
     } finally {
