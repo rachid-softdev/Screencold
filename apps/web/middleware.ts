@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import crypto from 'crypto';
+import prisma from '@/lib/prisma';
 
 export interface MiddlewareOptions {
   requireAuth?: boolean;
   requireCredits?: boolean;
+  requireApiKey?: boolean; // For API key authentication
 }
 
 export interface MiddlewareResult {
@@ -16,16 +19,83 @@ export interface MiddlewareResult {
     plan: string;
     credits: number;
   };
+  isApiKey?: boolean;
   errorResponse?: NextResponse;
+}
+
+// Hash function for API key validation
+function hashKey(key: string): string {
+  return crypto.createHash('sha256').update(key).digest('hex');
+}
+
+// Validate API key
+async function validateApiKey(request: NextRequest): Promise<{ valid: boolean; userId?: string; error?: string }> {
+  const authHeader = request.headers.get('authorization');
+  
+  if (!authHeader || !authHeader.startsWith('Bearer sk_')) {
+    return { valid: false, error: 'Invalid authorization header' };
+  }
+
+  const apiKey = authHeader.replace('Bearer ', '');
+  const hashedKey = hashKey(apiKey);
+
+  const keyRecord = await prisma.apiKey.findUnique({
+    where: { key: hashedKey },
+    include: { user: true },
+  });
+
+  if (!keyRecord) {
+    return { valid: false, error: 'Invalid API key' };
+  }
+
+  if (keyRecord.expiresAt && keyRecord.expiresAt < new Date()) {
+    return { valid: false, error: 'API key expired' };
+  }
+
+  // Update last used
+  await prisma.apiKey.update({
+    where: { id: keyRecord.id },
+    data: { lastUsedAt: new Date() },
+  });
+
+  return { valid: true, userId: keyRecord.userId };
 }
 
 export async function apiMiddleware(
   request: NextRequest,
   options: MiddlewareOptions = {}
 ): Promise<MiddlewareResult> {
-  const { requireAuth = false, requireCredits = false } = options;
+  const { requireAuth = false, requireCredits = false, requireApiKey = false } = options;
 
-  // Get session token
+  // First, try API key authentication if header is present
+  const authHeader = request.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer sk_')) {
+    const apiKeyValidation = await validateApiKey(request);
+    
+    if (apiKeyValidation.valid && apiKeyValidation.userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: apiKeyValidation.userId },
+        select: { id: true, email: true, name: true, plan: true, credits: true },
+      });
+
+      if (user) {
+        return {
+          authorized: true,
+          userId: user.id,
+          isApiKey: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            plan: user.plan,
+            credits: user.credits,
+          },
+        };
+      }
+    }
+  }
+
+  // Otherwise, try JWT/session authentication
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,

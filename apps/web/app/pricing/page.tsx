@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Check, Zap, ArrowRight, Star, Users, BarChart3 } from "lucide-react";
+import { Check, Zap, ArrowRight, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { OrganizationSchema, ProductSchema, FAQSchema } from "@/components/seo/schema";
+import { OrganizationSchema, FAQSchema } from "@/components/seo/schema";
+import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
 
 export const metadata = {
   title: 'Tarifs ScreenCold - Plans pour agences et freelances',
-  description: 'Choisissez le plan adapté à vos besoins : Gratuit, Starter (29€/mois), Pro (79€/mois), ou Agency (199€/mois). Essai gratuit 14 jours, sans engagement.',
+  description: 'Choisissez le plan adapté à vos besoins : Gratuit, Starter (49€/mois), Pro (149€/mois), ou Agency (399€/mois). Essai gratuit 14 jours, sans engagement.',
   keywords: ['tarifs', 'pricing', 'abonnement', 'crédits', 'agence', 'freelance', 'essai gratuit'],
   openGraph: {
     title: 'Tarifs ScreenCold',
@@ -21,73 +22,43 @@ export const metadata = {
   },
 };
 
-const plans = [
-  {
-    id: "free",
-    name: "Gratuit",
-    price: 0,
-    description: "Pour découvrir ScreenCold",
-    features: [
-      "5 crédits/mois",
-      "1 utilisateur",
-      "Audits basiques",
-      "Email de prospection",
-    ],
-    cta: "Commencer gratuitement",
-    popular: false,
-  },
-  {
-    id: "starter",
-    name: "Starter",
-    price: 29,
-    description: "Pour les freelances et petites agences",
-    features: [
-      "50 crédits/mois",
-      "1 utilisateur",
-      "Audits avancés",
-      "Email + P.S. personnalisé",
-      "Export CSV",
-      "Support prioritaire",
-    ],
-    cta: "Essai gratuit 14 jours",
-    popular: true,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 79,
-    description: "Pour les agences en croissance",
-    features: [
-      "200 crédits/mois",
-      "5 utilisateurs",
-      "Audits premium",
-      "Email + P.S. personnalisé",
-      "Export CSV avancé",
-      "Campagnes illimitées",
-      "API access",
-    ],
-    cta: "Essai gratuit 14 jours",
-    popular: false,
-  },
-  {
-    id: "agency",
-    name: "Agency",
-    price: 199,
-    description: "Pour les grandes agences",
-    features: [
-      "500 crédits/mois",
-      "Utilisateurs illimités",
-      "Audits premium",
-      "Email + P.S. personnalisé",
-      "Export CSV avancé",
-      "Campagnes illimitées",
-      "API access",
-      "Support dédié 24/7",
-    ],
-    cta: "Contacter les ventes",
-    popular: false,
-  },
-];
+const planOrder: Plan[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
+
+const planFeatures: Record<Plan, string[]> = {
+  FREE: [
+    "5 crédits/mois",
+    "1 utilisateur",
+    "Audits basiques",
+    "Email de prospection",
+  ],
+  STARTER: [
+    "50 crédits/mois",
+    "1 utilisateur",
+    "Audits avancés",
+    "Email + P.S. personnalisé",
+    "Export CSV",
+    "Support par email",
+  ],
+  PRO: [
+    "500 crédits/mois",
+    "5 utilisateurs",
+    "Audits premium",
+    "Email + P.S. personnalisé",
+    "Export CSV avancé",
+    "Campagnes illimitées",
+    "API access",
+  ],
+  AGENCY: [
+    "Crédits illimités",
+    "Utilisateurs illimités",
+    "Audits premium",
+    "Email + P.S. personnalisé",
+    "Export CSV avancé",
+    "Campagnes illimitées",
+    "API access",
+    "Support dédié 24/7",
+  ],
+};
 
 const faqs = [
   {
@@ -124,17 +95,21 @@ const testimonials = [
 function PricingPage() {
   const [isAnnual, setIsAnnual] = React.useState(false);
 
-  const getPrice = (monthlyPrice: number) => {
-    if (isAnnual) {
-      return Math.round(monthlyPrice * 0.8); // 20% discount
-    }
+  const getPrice = (plan: PlanInfo) => {
+    const monthlyPrice = isAnnual ? plan.yearlyPrice : plan.monthlyPrice;
     return monthlyPrice;
   };
 
+  const getAnnualSavings = (plan: PlanInfo) => {
+    const annualTotal = plan.monthlyPrice * 12;
+    const yearlyTotal = plan.yearlyPrice;
+    return annualTotal - yearlyTotal;
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
-      <header className="border-b border-gray-100">
+      <header className="border-b border-gray-100 dark:border-gray-800">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
@@ -150,10 +125,10 @@ function PricingPage() {
                 <line x1="12" y1="17" x2="12" y2="21" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900">ScreenCold</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">ScreenCold</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
               Se connecter
             </Link>
             <Link href="/register">
@@ -166,27 +141,27 @@ function PricingPage() {
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
-          <Badge variant="default" className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100">
+          <Badge variant="default" className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-300">
             <Zap className="mr-1 h-3 w-3" />
-           tarifs simples et transparents
+            tarifs simples et transparents
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-            Trouvez le plan idéal pour votre agence
+          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl dark:text-white">
+            Trouvez le plan idéal pour votre agency
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
-            Des audits de site automatisés aux emails de prospection personnalisés,
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+            Des audits de site automatisés aux emails de prospection personnalises,
             ScreenCold vous fait gagner du temps et augmenter vos conversions.
           </p>
           
           {/* Billing Toggle */}
           <div className="mt-8 flex items-center justify-center gap-4">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
               Mensuel
             </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isAnnual ? 'bg-blue-600' : 'bg-gray-200'
+                isAnnual ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
               }`}
               role="switch"
               aria-checked={isAnnual}
@@ -197,11 +172,11 @@ function PricingPage() {
                 }`}
               />
             </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
               Annuel
             </span>
             {isAnnual && (
-              <Badge variant="default" className="bg-green-100 text-green-700">
+              <Badge variant="default" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
                 -20%
               </Badge>
             )}
@@ -212,62 +187,69 @@ function PricingPage() {
       {/* Pricing Cards */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-2xl border p-6 ${
-                plan.popular
-                  ? "border-blue-500 bg-blue-50 shadow-lg shadow-blue-100"
-                  : "border-gray-200 bg-white"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-blue-600 text-white hover:bg-blue-600">
-                    <Star className="mr-1 h-3 w-3" />
-                    Populaire
-                  </Badge>
-                </div>
-              )}
+          {planOrder.map((planKey) => {
+            const plan = PLANS[planKey];
+            const isPopular = planKey === 'STARTER';
+            const price = getPrice(plan);
+            const features = planFeatures[planKey];
 
-              <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
-              <p className="mt-1 text-sm text-gray-500">{plan.description}</p>
-
-              <div className="mt-4">
-                <span className="text-4xl font-bold text-gray-900">
-                  {getPrice(plan.price)}€
-                </span>
-                <span className="text-gray-500">/mois</span>
-                {isAnnual && (
-                  <span className="ml-2 text-sm text-green-600">
-                    facturé {getPrice(plan.price) * 12}€/an
-                  </span>
+            return (
+              <div
+                key={planKey}
+                className={`relative rounded-2xl border p-6 ${
+                  isPopular
+                    ? "border-blue-500 bg-blue-50 shadow-lg shadow-blue-100 dark:bg-blue-900/20 dark:border-blue-500"
+                    : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
+                }`}
+              >
+                {isPopular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-blue-600 text-white hover:bg-blue-600">
+                      <Star className="mr-1 h-3 w-3" />
+                      Populaire
+                    </Badge>
+                  </div>
                 )}
+
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{plan.description}</p>
+
+                <div className="mt-4">
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                    {price}€
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">/mois</span>
+                  {isAnnual && plan.monthlyPrice > 0 && (
+                    <span className="ml-2 text-sm text-green-600 dark:text-green-400">
+                      (-{getAnnualSavings(plan)}€/an)
+                    </span>
+                  )}
+                </div>
+
+                <ul className="mt-6 space-y-3">
+                  {features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <Check className="h-5 w-5 text-green-500 shrink-0" />
+                      <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href="/register" className="mt-6 block">
+                  <Button
+                    className="w-full"
+                    variant={isPopular ? "default" : "secondary"}
+                  >
+                    {planKey === 'AGENCY' ? 'Contacter les ventes' : isAnnual ? 'Essai gratuit 14 jours' : 'Commencer'}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-
-              <ul className="mt-6 space-y-3">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0" />
-                    <span className="text-sm text-gray-600">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link href="/register" className="mt-6 block">
-                <Button
-                  className="w-full"
-                  variant={plan.popular ? "default" : "secondary"}
-                >
-                  {plan.cta}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-500">
+        <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
           Tous les plans incluent un essai gratuit de 14 jours. Sans carte bancaire.
         </p>
       </section>
@@ -275,8 +257,8 @@ function PricingPage() {
       {/* Social Proof */}
       <section className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm font-medium text-gray-500">
-            Utilisé par 500+ agences et freelances
+          <p className="text-center text-sm font-medium text-gray-500 dark:text-gray-400">
+            Utilise par 500+ agences et freelances
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale">
             {["WebBoost", "DigitalPro", "StudioUX", "AgenceSEO", "PixelCraft"].map((name) => (
@@ -289,21 +271,21 @@ function PricingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 py-20 dark:bg-gray-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900">
+          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
             Ce que disent nos clients
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="rounded-xl bg-white p-6 shadow-sm"
+                className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-700"
               >
-                <p className="text-gray-600">&ldquo;{testimonial.quote}&rdquo;</p>
+                <p className="text-gray-600 dark:text-gray-300">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div className="mt-4">
-                  <p className="font-medium text-gray-900">{testimonial.author}</p>
-                  <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{testimonial.author}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
                 </div>
               </div>
             ))}
@@ -314,49 +296,49 @@ function PricingPage() {
       {/* Features comparison */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900">
-            Comparaison des fonctionnalités
+          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+            Comparaison des fonctionnalites
           </h2>
           <div className="mt-10 overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="py-4 text-left text-sm font-medium text-gray-900">
-                    Fonctionnalité
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="py-4 text-left text-sm font-medium text-gray-900 dark:text-white">
+                    Fonctionnalite
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900">
+                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
                     Gratuit
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900">
+                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
                     Starter
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900">
+                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
                     Pro
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900">
+                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
                     Agency
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 <tr>
-                  <td className="py-4 text-sm text-gray-600">Crédits/mois</td>
-                  <td className="py-4 text-center text-sm text-gray-600">5</td>
-                  <td className="py-4 text-center text-sm text-gray-600">50</td>
-                  <td className="py-4 text-center text-sm text-gray-600">200</td>
-                  <td className="py-4 text-center text-sm text-gray-600">500</td>
+                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Credits/mois</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">5</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">50</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">500</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">Illimites</td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600">Utilisateurs</td>
-                  <td className="py-4 text-center text-sm text-gray-600">1</td>
-                  <td className="py-4 text-center text-sm text-gray-600">1</td>
-                  <td className="py-4 text-center text-sm text-gray-600">5</td>
-                  <td className="py-4 text-center text-sm text-gray-600">
-                    <Users className="mx-auto h-4 w-4 text-gray-600" />
+                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Utilisateurs</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">1</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">1</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">5</td>
+                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">
+                    <Users className="mx-auto h-4 w-4 text-gray-600 dark:text-gray-300" />
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600">Campagnes</td>
+                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Campagnes</td>
                   <td className="py-4 text-center">
                     <span className="text-gray-400">—</span>
                   </td>
@@ -371,7 +353,7 @@ function PricingPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600">Export CSV</td>
+                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Export CSV</td>
                   <td className="py-4 text-center">
                     <span className="text-gray-400">—</span>
                   </td>
@@ -386,7 +368,7 @@ function PricingPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600">API Access</td>
+                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">API Access</td>
                   <td className="py-4 text-center">
                     <span className="text-gray-400">—</span>
                   </td>
@@ -407,16 +389,16 @@ function PricingPage() {
       </section>
 
       {/* FAQs */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 py-20 dark:bg-gray-800">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900">
-            Questions fréquentes
+          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+            Questions frequentes
           </h2>
           <div className="mt-10 space-y-6">
             {faqs.map((faq, index) => (
-              <div key={index} className="rounded-xl bg-white p-6 shadow-sm">
-                <h3 className="font-medium text-gray-900">{faq.q}</h3>
-                <p className="mt-2 text-sm text-gray-600">{faq.a}</p>
+              <div key={index} className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-700">
+                <h3 className="font-medium text-gray-900 dark:text-white">{faq.q}</h3>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -426,17 +408,17 @@ function PricingPage() {
       {/* CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Prêt à transformer votre prospection ?
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Pret a transformer votre prospection ?
           </h2>
-          <p className="mt-4 text-gray-600">
-            Commencez gratuitement et découvrez comment ScreenCold peut vous faire
+          <p className="mt-4 text-gray-600 dark:text-gray-300">
+            Commencez gratuitement et decouvrez comment ScreenCold peut vous faire
             gagner du temps.
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Link href="/register">
               <Button size="lg">
-                Créer un compte gratuit
+                Creer un compte gratuit
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -450,7 +432,7 @@ function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12">
+      <footer className="border-t border-gray-200 py-12 dark:border-gray-700">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
@@ -467,10 +449,10 @@ function PricingPage() {
                   <line x1="12" y1="17" x2="12" y2="21" />
                 </svg>
               </div>
-              <span className="text-lg font-bold text-gray-900">ScreenCold</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">ScreenCold</span>
             </div>
-            <p className="text-sm text-gray-500">
-              © 2024 ScreenCold. Tous droits réservés.
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              2024 ScreenCold. Tous droits reserves.
             </p>
           </div>
         </div>
@@ -479,7 +461,7 @@ function PricingPage() {
       {/* SEO Schema */}
       <OrganizationSchema 
         url={process.env.NEXT_PUBLIC_APP_URL || 'https://screencold.com'} 
-        description="ScreenCold automatise les audits de sites web et génère des emails de prospection personnalisés par IA."
+        description="ScreenCold automatise les audits de sites web et genere des emails de prospection personnalises par IA."
       />
       <FAQSchema faqs={faqs.map(f => ({ question: f.q, answer: f.a }))} />
     </div>

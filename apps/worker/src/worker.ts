@@ -5,7 +5,7 @@ import { prisma } from "./db";
 import { s3Client, uploadScreenshots } from "./services/s3";
 import { captureWebsite } from "./services/playwright";
 import { analyzeWithAI } from "./services/claude";
-import { generateEmail } from "./services/email";
+import { generateEmail, sendEmail } from "./services/email";
 import type { AuditJobData, ProspectJobData, EmailJobData } from "@screencold/types";
 import {
   type CaptureResult,
@@ -181,21 +181,41 @@ async function processEmailJob(job: Job<EmailJobData>): Promise<void> {
       customMessage,
     });
 
-    if (!emailResult.success) {
-      throw new Error(emailResult.error ?? "Email generation failed");
-    }
+if (!emailResult.success) {
+        throw new Error(emailResult.error ?? "Email generation failed");
+      }
 
-    jobLogger.info("Email generated successfully", {
-      subject: emailResult.subject,
-    });
+      jobLogger.info("Email generated successfully", {
+        subject: emailResult.subject,
+      });
 
-    // Here you would typically send the email via your email service
-    // For now, we'll just log it and update the audit
-    jobLogger.info("Email would be sent", {
-      to: contactEmail,
-      subject: emailResult.subject,
-      body: emailResult.body,
-    });
+      // Send the email via Resend
+      const emailSendResult = await sendEmail({
+        to: contactEmail,
+        subject: emailResult.subject,
+        html: emailResult.body + (emailResult.ps ? `<p style="margin-top: 20px; font-style: italic; color: #666;">P.S. ${emailResult.ps}</p>` : ''),
+      });
+
+      if (!emailSendResult.success) {
+        jobLogger.warn("Failed to send email, but audit completed", {
+          error: emailSendResult.error,
+        });
+      } else {
+        jobLogger.info("Email sent successfully", {
+          to: contactEmail,
+          messageId: emailSendResult.data?.id,
+        });
+      }
+
+      // Update audit with email content
+      await prisma.audit.update({
+        where: { id: auditId },
+        data: {
+          emailSubject: emailResult.subject,
+          emailBody: emailResult.body,
+          emailPs: emailResult.ps ?? null,
+        },
+      });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
