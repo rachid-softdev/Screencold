@@ -258,3 +258,136 @@ model AuditEvent {
   @@index([action])
   @@index([createdAt])
 }
+
+// ============================================
+// API Keys (for Pro & Agency plans)
+// ============================================
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  key         String    @unique // Hashed key
+  keyPrefix   String    // First 8 chars for display (ex: sk_live_xxxx)
+  name        String
+  userId      String
+  plan        Plan      @default(FREE)
+  rateLimit   Int       @default(100) // req/min
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([key])
+}
+
+// ============================================
+// Team Management
+// ============================================
+
+enum TeamRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  plan      Plan     @default(FREE)
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner       User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invitations TeamInvitation[]
+
+  @@index([ownerId])
+}
+
+model TeamMember {
+  id        String    @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamRole  @default(MEMBER)
+  joinedAt  DateTime  @default(now())
+
+  // Relations
+  team Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model TeamInvitation {
+  id        String    @id @default(cuid())
+  teamId    String
+  email     String
+  role      TeamRole  @default(MEMBER)
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  // Relations
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([email])
+}
+
+// ============================================
+// Email Templates
+// ============================================
+
+model EmailTemplate {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  subject     String    // Template de sujet avec variables
+  body        String    @db.Text // Template de corps avec variables
+  variables   Json      // ["contactName", "companyName", "score", etc.]
+  isDefault   Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  userId      String?   // Null = template global
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+enum SentEmailStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+model SentEmail {
+  id          String           @id @default(cuid())
+  auditId     String
+  userId      String
+  to          String
+  subject     String
+  body        String           @db.Text
+  status      SentEmailStatus  @default(PENDING)
+  messageId   String?          // Resend message ID
+  sentAt      DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+
+  // Relations
+  audit Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([sentAt])
+}

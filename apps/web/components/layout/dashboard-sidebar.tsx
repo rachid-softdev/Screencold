@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { clsx } from "clsx";
 import {
   LayoutDashboard,
@@ -13,6 +14,8 @@ import {
   LogOut,
   User,
   CreditCard,
+  Key,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dropdown } from "@/components/ui/dropdown-menu";
@@ -61,7 +64,9 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
   const pathname = usePathname();
 
   const userMenuItems = [
-    { label: "Profil", href: "/settings", icon: <User className="w-4 h-4" /> },
+    { label: "Mon compte", href: "/settings", icon: <User className="w-4 h-4" /> },
+    { label: "Équipes", href: "/settings/teams", icon: <Users className="w-4 h-4" /> },
+    { label: "Clés API", href: "/settings/api-keys", icon: <Key className="w-4 h-4" /> },
     { label: "Facturation", href: "/settings/billing", icon: <CreditCard className="w-4 h-4" /> },
     { label: "", separator: true },
     { label: "Se déconnecter", onClick: () => signOut() },
