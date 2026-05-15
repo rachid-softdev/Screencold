@@ -5,6 +5,21 @@ import Link from "next/link";
 import { Check, Zap, ArrowRight, Star, Users, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { OrganizationSchema, ProductSchema, FAQSchema } from "@/components/seo/schema";
+
+export const metadata = {
+  title: 'Tarifs ScreenCold - Plans pour agences et freelances',
+  description: 'Choisissez le plan adapté à vos besoins : Gratuit, Starter (29€/mois), Pro (79€/mois), ou Agency (199€/mois). Essai gratuit 14 jours, sans engagement.',
+  keywords: ['tarifs', 'pricing', 'abonnement', 'crédits', 'agence', 'freelance', 'essai gratuit'],
+  openGraph: {
+    title: 'Tarifs ScreenCold',
+    description: 'Choisissez le plan adapté à vos besoins',
+    url: '/pricing',
+    siteName: 'ScreenCold',
+    locale: 'fr_FR',
+    type: 'website',
+  },
+};
 
 const plans = [
   {
@@ -107,6 +122,15 @@ const testimonials = [
 ];
 
 function PricingPage() {
+  const [isAnnual, setIsAnnual] = React.useState(false);
+
+  const getPrice = (monthlyPrice: number) => {
+    if (isAnnual) {
+      return Math.round(monthlyPrice * 0.8); // 20% discount
+    }
+    return monthlyPrice;
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -153,6 +177,35 @@ function PricingPage() {
             Des audits de site automatisés aux emails de prospection personnalisés,
             ScreenCold vous fait gagner du temps et augmenter vos conversions.
           </p>
+          
+          {/* Billing Toggle */}
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Mensuel
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                isAnnual ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
+              role="switch"
+              aria-checked={isAnnual}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isAnnual ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Annuel
+            </span>
+            {isAnnual && (
+              <Badge variant="default" className="bg-green-100 text-green-700">
+                -20%
+              </Badge>
+            )}
+          </div>
         </div>
       </section>
 
@@ -182,9 +235,14 @@ function PricingPage() {
 
               <div className="mt-4">
                 <span className="text-4xl font-bold text-gray-900">
-                  {plan.price}€
+                  {getPrice(plan.price)}€
                 </span>
                 <span className="text-gray-500">/mois</span>
+                {isAnnual && (
+                  <span className="ml-2 text-sm text-green-600">
+                    facturé {getPrice(plan.price) * 12}€/an
+                  </span>
+                )}
               </div>
 
               <ul className="mt-6 space-y-3">
@@ -212,6 +270,22 @@ function PricingPage() {
         <p className="mt-8 text-center text-sm text-gray-500">
           Tous les plans incluent un essai gratuit de 14 jours. Sans carte bancaire.
         </p>
+      </section>
+
+      {/* Social Proof */}
+      <section className="py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm font-medium text-gray-500">
+            Utilisé par 500+ agences et freelances
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale">
+            {["WebBoost", "DigitalPro", "StudioUX", "AgenceSEO", "PixelCraft"].map((name) => (
+              <span key={name} className="text-lg font-bold text-gray-400">
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Testimonials */}
@@ -401,6 +475,13 @@ function PricingPage() {
           </div>
         </div>
       </footer>
+
+      {/* SEO Schema */}
+      <OrganizationSchema 
+        url={process.env.NEXT_PUBLIC_APP_URL || 'https://screencold.com'} 
+        description="ScreenCold automatise les audits de sites web et génère des emails de prospection personnalisés par IA."
+      />
+      <FAQSchema faqs={faqs.map(f => ({ question: f.q, answer: f.a }))} />
     </div>
   );
 }

@@ -1,6 +1,39 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Zap, Target, Mail } from 'lucide-react';
+import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/schema';
+
+export const metadata: Metadata = {
+  title: 'ScreenCold - Audit de sites et emails de prospection automatisés par IA',
+  description: 'Analysez n\'importe quel site web et générez automatiquement des emails de prospection personnalisés. Gagnez du temps et augmentez vos conversions avec notre IA. Essai gratuit.',
+  keywords: ['audit de site web', 'prospection B2B', 'cold email', 'IA', 'automation', 'conversion', 'email personnalisé', 'générateur d\'emails'],
+  openGraph: {
+    title: 'ScreenCold - Audit de sites et emails de prospection automatisés',
+    description: 'Analysez n\'importe quel site web et générez automatiquement des emails de prospection personnalisés. Gagnez du temps et augmentez vos conversions.',
+    url: '/',
+    siteName: 'ScreenCold',
+    locale: 'fr_FR',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'ScreenCold - Automatisez vos audits et votre prospection',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ScreenCold - Audit de sites et emails de prospection',
+    description: 'Analysez n\'importe quel site web et générez automatiquement des emails de prospection personnalisés.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 const features = [
   {
@@ -128,6 +161,22 @@ export default function HomePage() {
                   {feature.description}
                 </p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof - Logos */}
+      <section className="py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm font-medium uppercase tracking-wide text-gray-500">
+            Utilisé par des agences et freelances en France et en Europe
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-8 opacity-60 grayscale">
+            {["WebBoost", "DigitalPro", "StudioUX", "AgenceSEO", "PixelCraft"].map((name) => (
+              <span key={name} className="text-xl font-bold text-gray-400">
+                {name}
+              </span>
             ))}
           </div>
         </div>
@@ -263,6 +312,14 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* SEO Schema */}
+      <OrganizationSchema 
+        url={process.env.NEXT_PUBLIC_APP_URL || 'https://screencold.com'} 
+        description="ScreenCold automatise les audits de sites web et génère des emails de prospection personnalisés par IA."
+      />
+      <WebSiteSchema url={process.env.NEXT_PUBLIC_APP_URL || 'https://screencold.com'} />
+      <SoftwareApplicationSchema />
     </div>
   );
 }

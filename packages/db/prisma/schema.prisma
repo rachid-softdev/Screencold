@@ -219,3 +219,42 @@ model Notification {
   @@index([userId])
   @@index([userId, read])
 }
+
+// ============================================
+// Audit Events (Security & Compliance)
+// ============================================
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  PLAN_CHANGE
+  CREDIT_PURCHASE
+  AUDIT_CREATED
+  AUDIT_COMPLETED
+  AUDIT_FAILED
+  CAMPAIGN_CREATED
+  CSV_IMPORTED
+  DATA_EXPORT
+  ACCOUNT_DELETE
+  SETTINGS_UPDATE
+}
+
+model AuditEvent {
+  id        String       @id @default(cuid())
+  userId    String
+  action    AuditAction
+  resource  String?
+  details   Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime     @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
