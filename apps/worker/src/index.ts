@@ -1,8 +1,113 @@
 import { createWorker } from "./worker";
 import { createLogger } from "./utils/logger";
+import { checkHealth, isAlive, isReady } from "./health";
+import * as Sentry from "@sentry/node";
+
+// ============================================
+// Sentry Configuration
+// ============================================
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN_WORKER,
+  environment: process.env.NODE_ENV || "development",
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+  release: `worker@${process.env.WORKER_VERSION || "1.0.0"}`,
+  // Performance monitoring
+  integrations: [
+    // Add monitoring for unhandled rejections
+    Sentry.onFinishScope(() => {}),
+  ],
+  beforeSend(event, hint) {
+    // Filter out noisy errors in development
+    if (process.env.NODE_ENV === "development") {
+      return null;
+    }
+    
+    // Filter specific noisy errors
+    const error = hint.originalException;
+    if (error instanceof Error) {
+      // Ignore DNS resolution errors that are common
+      if (error.message?.includes("ENOTFOUND") || error.message?.includes("DNS")) {
+        return null;
+      }
+      // Ignore connection reset errors
+      if (error.message?.includes("ECONNRESET")) {
+        return null;
+      }
+    }
+    
+    return event;
+  },
+});
+
+// ============================================
+// Health Check HTTP Server
+// ============================================
+
+function createHealthServer() {
+  const http = require('http');
+  
+  const server = http.createServer(async (req, res) => {
+    const url = req.url || '';
+    
+    // CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+    
+    try {
+      if (url === '/health' || url === '/health/liveness') {
+        // Liveness probe - just check if process is running
+        const alive = isAlive();
+        res.writeHead(alive ? 200 : 503);
+        res.end(JSON.stringify({ status: alive ? 'ok' : 'error' }));
+        return;
+      }
+      
+      if (url === '/health/readiness') {
+        // Readiness probe - check if worker can handle jobs
+        const ready = await isReady();
+        res.writeHead(ready ? 200 : 503);
+        res.end(JSON.stringify({ status: ready ? 'ok' : 'error' }));
+        return;
+      }
+      
+      if (url === '/health/full') {
+        // Full health check
+        const health = await checkHealth();
+        const statusCode = health.status === 'healthy' ? 200 : 503;
+        res.writeHead(statusCode);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(health, null, 2));
+        return;
+      }
+      
+      // 404 for unknown routes
+      res.writeHead(404);
+      res.end(JSON.stringify({ error: 'Not found' }));
+    } catch (error) {
+      res.writeHead(500);
+      res.end(JSON.stringify({ 
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }));
+    }
+  });
+  
+  return server;
+}
+
+// ============================================
+// Main Function
+// ============================================
 
 async function main() {
-  // Create logger
   const logger = createLogger();
 
   logger.info("Starting ScreenCold worker...");
@@ -28,6 +133,14 @@ async function main() {
       process.exit(1);
     }
 
+    // Start health check server on port 3001
+    const healthPort = parseInt(process.env.HEALTH_PORT || '3001', 10);
+    const healthServer = createHealthServer();
+    
+    healthServer.listen(healthPort, () => {
+      logger.info(`Health check server running on port ${healthPort}`);
+    });
+
     // Create and start the worker
     const worker = await createWorker();
 
@@ -35,6 +148,7 @@ async function main() {
       pid: process.pid,
       nodeVersion: process.version,
       env: process.env.NODE_ENV ?? "development",
+      healthPort,
     });
 
     // Graceful shutdown handlers
@@ -42,6 +156,11 @@ async function main() {
       logger.info(`Received ${signal}, shutting down gracefully...`);
 
       try {
+        // Close health server
+        await new Promise((resolve) => {
+          healthServer.close(resolve);
+        });
+        
         // Close worker connections
         await worker.close();
 
@@ -63,12 +182,18 @@ async function main() {
     // Handle uncaught exceptions
     process.on("uncaughtException", (error) => {
       logger.error("Uncaught exception", { error: error.message, stack: error.stack });
+      Sentry.captureException(error);
       process.exit(1);
     });
 
     // Handle unhandled rejections
     process.on("unhandledRejection", (reason, promise) => {
       logger.error("Unhandled rejection", { reason, promise });
+      Sentry.captureEvent({
+        level: 'error',
+        message: 'Unhandled rejection',
+        extra: { reason: String(reason) },
+      });
     });
 
   } catch (error) {
@@ -76,6 +201,7 @@ async function main() {
       error: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
     });
+    Sentry.captureException(error);
     process.exit(1);
   }
 }
