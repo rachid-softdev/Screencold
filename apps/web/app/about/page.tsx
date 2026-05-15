@@ -2,8 +2,17 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'À propos - ScreenCold',
-  description: 'Découvrez comment ScreenCold transforme la prospection B2B avec des audits automatisés.',
+  title: 'À propos - ScreenCold - L\'IA au service de la prospection B2B',
+  description: 'Découvrez comment ScreenCold utilise l\'IA pour automatiser les audits de sites web et générer des emails de prospection personnalisés. Fondée en 2024 par des experts en IA et B2B.',
+  keywords: ['prospection B2B', 'audit de site', 'IA', 'cold outreach', 'automatisation', 'email personnalisé'],
+  openGraph: {
+    title: 'À propos - ScreenCold',
+    description: 'Découvrez comment ScreenCold transforme la prospection B2B avec des audits automatisés.',
+    url: '/about',
+    siteName: 'ScreenCold',
+    locale: 'fr_FR',
+    type: 'website',
+  },
 };
 
 export default function AboutPage() {

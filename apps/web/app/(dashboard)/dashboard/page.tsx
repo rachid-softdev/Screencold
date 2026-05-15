@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Search, TrendingUp, Zap } from "lucide-react";
+import { Search, TrendingUp, Zap, ArrowRight, BarChart3, Mail } from "lucide-react";
 import { CreditCounter } from "@/components/dashboard/credit-counter";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { QuickAuditForm } from "@/components/dashboard/quick-audit-form";
 import { RecentAudits } from "@/components/dashboard/recent-audits";
+import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
+import { Button } from "@/components/ui/button";
 
 interface DashboardData {
   user: {
@@ -118,13 +120,20 @@ function DashboardPage() {
     createdAt: audit.createdAt,
   }));
 
+  const isEmpty = recentAudits.length === 0 && stats.totalAudits === 0;
+
   return (
     <div className="space-y-8">
+      {/* Onboarding Tour */}
+      <OnboardingTour />
+
       {/* Credit Counter */}
       <CreditCounter credits={user.credits} plan={user.plan} />
 
       {/* Quick Audit Form */}
-      <QuickAuditForm />
+      <div data-tour="quick-audit-form">
+        <QuickAuditForm />
+      </div>
 
       {/* Stats Row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -133,8 +142,38 @@ function DashboardPage() {
         ))}
       </div>
 
-      {/* Recent Audits */}
-      <RecentAudits audits={auditsForComponent} />
+      {/* Recent Audits or Empty State */}
+      {isEmpty ? (
+        <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <BarChart3 className="h-8 w-8 text-blue-600" />
+          </div>
+          <h3 className="mt-4 text-lg font-semibold text-gray-900">
+            Aucun audit pour le moment
+          </h3>
+          <p className="mt-2 text-sm text-gray-600">
+            Commencez par analyser le site web d'un prospect. C'est rapide et
+            gratuit avec vos 5 crédits.
+          </p>
+          <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link href="/audits/new">
+              <Button>
+                <Search className="mr-2 h-4 w-4" />
+                Faire mon premier audit
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/campaigns/new">
+              <Button variant="secondary">
+                <Mail className="mr-2 h-4 w-4" />
+                Importer un CSV
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <RecentAudits audits={auditsForComponent} />
+      )}
     </div>
   );
 }

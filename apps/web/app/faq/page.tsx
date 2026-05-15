@@ -1,10 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { FAQSchema } from '@/components/seo/schema';
 
 export const metadata: Metadata = {
-  title: 'FAQ - ScreenCold',
-  description: 'Questions fréquentes sur ScreenCold',
+  title: 'FAQ - Questions fréquentes sur ScreenCold',
+  description: 'Trouvez les réponses à vos questions sur ScreenCold : fonctionnement, tarifs, audits, sécurité, intégrations et plus encore.',
+  keywords: ['FAQ', 'questions fréquentes', 'ScreenCold', 'comment ça marche', 'tarifs', 'crédits', 'audit de site'],
+  openGraph: {
+    title: 'FAQ - Questions fréquentes',
+    description: 'Trouvez les réponses à vos questions sur ScreenCold.',
+    url: '/faq',
+    siteName: 'ScreenCold',
+    locale: 'fr_FR',
+    type: 'website',
+  },
 };
 
 const faqs = [
@@ -116,6 +126,9 @@ export default function FAQPage() {
           <p className="text-sm text-gray-500">© 2024 ScreenCold. Tous droits réservés.</p>
         </div>
       </footer>
+
+      {/* FAQ Schema for SEO */}
+      <FAQSchema faqs={faqs.map(f => ({ question: f.question, answer: f.answer }))} />
     </div>
   );
 }
