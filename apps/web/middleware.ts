@@ -3,6 +3,86 @@ import { getToken } from 'next-auth/jwt';
 import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 
+// ============================================
+// Security Headers
+// ============================================
+
+/**
+ * Add security headers to response
+ * Includes CSP, X-Frame-Options, X-Content-Type-Options, etc.
+ */
+export function addSecurityHeaders(response: NextResponse, request: NextRequest): void {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  
+  // Content-Security-Policy
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://js.screencold.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' blob: data: https:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://api.stripe.com https://api.resend.dev https://api.screencold.com wss://*.screencold.com",
+    "frame-src https://js.stripe.com https://hooks.stripe.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ');
+  
+  response.headers.set('Content-Security-Policy', csp);
+  
+  // X-Frame-Options - prevent clickjacking
+  response.headers.set('X-Frame-Options', 'DENY');
+  
+  // X-Content-Type-Options - prevent MIME sniffing
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  
+  // Referrer-Policy
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Permissions-Policy
+  response.headers.set(
+    'Permissions-Policy', 
+    'camera=(), microphone=(), geolocation=(), payment=()'
+  );
+  
+  // Strict-Transport-Security (only in production)
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set(
+      'Strict-Transport-Security', 
+      'max-age=31536000; includeSubDomains'
+    );
+  }
+}
+
+/**
+ * Verify CSRF token for state-changing operations
+ */
+export async function verifyCsrfToken(request: NextRequest): Promise<boolean> {
+  // Only check for mutation methods
+  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+    return true;
+  }
+  
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  
+  // Allow same-origin requests
+  if (origin === appUrl || (referer && referer.startsWith(appUrl))) {
+    return true;
+  }
+  
+  // For API routes, also check the Origin header
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    if (!origin) {
+      // Without Origin header, check referer
+      return referer ? referer.startsWith(appUrl) : false;
+    }
+  }
+  
+  return true;
+}
+
 export interface MiddlewareOptions {
   requireAuth?: boolean;
   requireCredits?: boolean;

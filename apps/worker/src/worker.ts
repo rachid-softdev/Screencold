@@ -18,7 +18,41 @@ const QUEUES = {
   AUDIT: "audit",
   EMAIL: "email",
   CAMPAIGN: "campaign",
+  // Dead Letter Queues
+  AUDIT_DLQ: "audit-dlq",
+  EMAIL_DLQ: "email-dlq",
+  CAMPAIGN_DLQ: "campaign-dlq",
 } as const;
+
+// Get or create DLQ for a given queue
+async function getDLQ(queueName: string): Promise<Queue> {
+  const dlqName = `${queueName}-dlq`;
+  return new Queue(dlqName, { connection: redisConnection });
+}
+
+// Move failed job to DLQ
+async function moveToDLQ(job: Job, queueName: string, reason: string): Promise<void> {
+  const dlq = await getDLQ(queueName);
+  
+  await dlq.add('failed-job', {
+    originalQueue: queueName,
+    originalJobId: job.id,
+    data: job.data,
+    reason: reason,
+    failedAt: new Date().toISOString(),
+    attempts: job.attemptsMade,
+    stacktrace: job.stacktrace,
+  }, {
+    jobId: `dlq-${job.id}`,
+  });
+  
+  logger.error(`Job moved to DLQ`, {
+    queue: queueName,
+    jobId: job.id,
+    reason,
+    attempts: job.attemptsMade,
+  });
+}
 
 // Redis connection configuration
 const redisConnection = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379", {
@@ -321,8 +355,13 @@ export async function createWorker() {
     logger.debug("Audit job completed", { jobId: job.id, auditId: job.data.auditId });
   });
 
-  auditWorker.on("failed", (job, error) => {
+  auditWorker.on("failed", async (job, error) => {
     logger.error("Audit job failed", { jobId: job?.id, error: error.message });
+    
+    // Move to DLQ if all retries exhausted
+    if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
+      await moveToDLQ(job, QUEUES.AUDIT, error.message);
+    }
   });
 
   auditWorker.on("progress", (job, progress) => {
@@ -345,8 +384,12 @@ export async function createWorker() {
     logger.debug("Email job completed", { jobId: job.id });
   });
 
-  emailWorker.on("failed", (job, error) => {
+  emailWorker.on("failed", async (job, error) => {
     logger.error("Email job failed", { jobId: job?.id, error: error.message });
+    
+    if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
+      await moveToDLQ(job, QUEUES.EMAIL, error.message);
+    }
   });
 
   // Campaign queue worker
@@ -365,8 +408,12 @@ export async function createWorker() {
     logger.debug("Campaign job completed", { jobId: job.id });
   });
 
-  campaignWorker.on("failed", (job, error) => {
+  campaignWorker.on("failed", async (job, error) => {
     logger.error("Campaign job failed", { jobId: job?.id, error: error.message });
+    
+    if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
+      await moveToDLQ(job, QUEUES.CAMPAIGN, error.message);
+    }
   });
 
   logger.info("All workers created successfully");
