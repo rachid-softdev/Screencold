@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BlogArticle } from '@screencold/types';
 import { ArticleCard } from '@/components/blog/article-card';
 
@@ -80,10 +81,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
             <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="grid md:grid-cols-2">
                 <div className="aspect-video md:aspect-auto bg-gray-200">
-                  <img
+                  <Image
                     src={featuredArticle.coverImage}
                     alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="w-full h-full object-cover"
+                    priority
                   />
                 </div>
                 <div className="p-8 flex flex-col justify-center">

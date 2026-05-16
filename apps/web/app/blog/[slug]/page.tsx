@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BlogArticle } from '@screencold/types';
 import { ArticleContent } from '@/components/blog/article-content';
 import { TableOfContents } from '@/components/blog/table-of-contents';
@@ -73,10 +74,13 @@ export default async function ArticlePage({ params }: PageProps) {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-96 bg-gray-900">
-        <img
+        <Image
           src={article.coverImage}
           alt=""
+          fill
+          sizes="100vw"
           className="w-full h-full object-cover opacity-60"
+          priority
         />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-4xl mx-auto px-4 pb-12 w-full">

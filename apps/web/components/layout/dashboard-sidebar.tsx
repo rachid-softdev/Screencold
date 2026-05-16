@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { clsx } from "clsx";
@@ -151,9 +152,11 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600">
                   {user.image ? (
-                    <img
+                    <Image
                       src={user.image}
                       alt={user.name || ""}
+                      width={32}
+                      height={32}
                       className="h-full w-full rounded-full object-cover"
                     />
                   ) : (

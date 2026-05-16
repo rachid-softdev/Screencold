@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { clsx } from "clsx";
@@ -20,7 +21,7 @@ interface RecentAuditsProps {
   audits: Audit[];
 }
 
-function ScoreBadge({ score }: { score: number | null | undefined }) {
+const ScoreBadge = memo(function ScoreBadge({ score }: { score: number | null | undefined }) {
   if (score === null || score === undefined) {
     return <Badge variant="outline">En attente</Badge>;
   }
@@ -29,8 +30,9 @@ function ScoreBadge({ score }: { score: number | null | undefined }) {
     score >= 70 ? "success" : score >= 40 ? "warning" : "destructive";
 
   return <Badge variant={variant}>{score}/100</Badge>;
-}
+});
 
+// Simple date formatter - no need for memoization as it's just string manipulation
 function formatDate(dateString: string) {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat("fr-FR", {
@@ -40,7 +42,7 @@ function formatDate(dateString: string) {
   }).format(date);
 }
 
-function RecentAudits({ audits }: RecentAuditsProps) {
+const RecentAudits = memo(function RecentAudits({ audits }: RecentAuditsProps) {
   if (audits.length === 0) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
@@ -143,6 +145,6 @@ function RecentAudits({ audits }: RecentAuditsProps) {
       </div>
     </div>
   );
-}
+});
 
 export { RecentAudits };
