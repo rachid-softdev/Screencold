@@ -38,7 +38,23 @@ export async function GET(request: NextRequest) {
         credits: true,
         creditsResetsAt: true,
         createdAt: true,
+        stripeCustomerId: true,
+        stripeSubscriptionId: true,
       },
+    });
+
+    // Get credits used this month
+    const thisMonthStart = new Date();
+    thisMonthStart.setDate(1);
+    thisMonthStart.setHours(0, 0, 0, 0);
+
+    const usedCredits = await prisma.creditTransaction.aggregate({
+      where: {
+        userId,
+        createdAt: { gte: thisMonthStart },
+        type: 'DEBIT',
+      },
+      _sum: { amount: true },
     });
 
     if (!profile) {
@@ -48,7 +64,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(profile);
+    return NextResponse.json({
+      ...profile,
+      creditsUsed: usedCredits._sum.amount || 0,
+    });
   } catch (error) {
     console.error('[Profile] GET error:', error);
     return NextResponse.json(

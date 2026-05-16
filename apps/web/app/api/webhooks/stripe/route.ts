@@ -33,34 +33,60 @@ export async function POST(req: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
+        const metadata = session.metadata || {};
 
         // Find user by stripe customer id
         const user = await prisma.user.findFirst({
           where: { stripeCustomerId: customerId },
         });
 
-        if (user && session.metadata) {
-          const plan = session.metadata.plan || 'STARTER';
-          const credits = parseInt(session.metadata.credits || '50', 10);
+        if (user && metadata) {
+          // Handle credits purchase (one-time payment)
+          if (metadata.type === 'CREDITS_PURCHASE') {
+            const credits = parseInt(metadata.credits || '0', 10);
+            
+            if (credits > 0) {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  credits: { increment: credits },
+                },
+              });
 
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              plan: plan as any,
-              stripeSubscriptionId: subscriptionId,
-              credits: { increment: credits },
-              creditsResetsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            },
-          });
+              // Record transaction
+              await prisma.creditTransaction.create({
+                data: {
+                  userId: user.id,
+                  amount: credits,
+                  type: 'PURCHASE',
+                },
+              });
+            }
+          } 
+          // Handle subscription (plan upgrade)
+          else {
+            const plan = metadata.plan || 'STARTER';
+            const credits = parseInt(metadata.credits || '50', 10);
 
-          // Record transaction
-          await prisma.creditTransaction.create({
-            data: {
-              userId: user.id,
-              amount: credits,
-              type: 'PURCHASE',
-            },
-          });
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                plan: plan as any,
+                stripeSubscriptionId: subscriptionId,
+                credits: { increment: credits },
+                creditsResetsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              },
+            });
+
+            // Record transaction
+            await prisma.creditTransaction.create({
+              data: {
+                userId: user.id,
+                amount: credits,
+                type: 'PURCHASE',
+              },
+            });
+          }
         }
         break;
       }

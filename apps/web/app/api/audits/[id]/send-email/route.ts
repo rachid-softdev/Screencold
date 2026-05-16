@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { apiMiddleware } from '@/middleware';
-import { sendEmail } from '@/lib/email';
+import { sendEmail as sendResendEmail } from '@/lib/email';
+import { sendEmail as sendGmailEmail, isGmailConnected } from '@/lib/gmail';
 
 // ============================================
 // Validation Schema
@@ -13,6 +14,7 @@ const sendEmailSchema = z.object({
   subject: z.string().min(1, 'Sujet requis'),
   body: z.string().min(1, 'Corps du message requis'),
   ps: z.string().optional(),
+  useGmail: z.boolean().optional().default(false),
 });
 
 // ============================================
@@ -78,18 +80,49 @@ export async function POST(
       );
     }
 
-    const { to, subject, body: emailBody, ps } = validationResult.data;
+    const { to, subject, body: emailBody, ps, useGmail } = validationResult.data;
 
     // Build full email content
     const fullBody = ps ? `${emailBody}\n\n${ps}` : emailBody;
 
-    // Send the email
-    const result = await sendEmail({
-      to,
-      subject,
-      html: `<pre style="white-space: pre-wrap; font-family: system-ui, sans-serif;">${fullBody}</pre>`,
-      text: fullBody,
-    });
+    // Determine which email service to use
+    const gmailConnected = await isGmailConnected(userId);
+    const shouldUseGmail = useGmail && gmailConnected;
+
+    let result;
+    let emailService: 'gmail' | 'resend' = 'resend';
+
+    if (shouldUseGmail) {
+      // Try Gmail first if requested and connected
+      emailService = 'gmail';
+      result = await sendGmailEmail(userId, {
+        to,
+        subject,
+        body: fullBody,
+        htmlBody: `<pre style="white-space: pre-wrap; font-family: system-ui, sans-serif;">${fullBody}</pre>`,
+        fromName: audit.user.name || undefined,
+      });
+
+      // Fallback to Resend if Gmail failed
+      if (!result.success) {
+        console.warn('[SendEmail] Gmail failed, falling back to Resend:', result.error);
+        result = await sendResendEmail({
+          to,
+          subject,
+          html: `<pre style="white-space: pre-wrap; font-family: system-ui, sans-serif;">${fullBody}</pre>`,
+          text: fullBody,
+        });
+        emailService = 'resend';
+      }
+    } else {
+      // Use Resend
+      result = await sendResendEmail({
+        to,
+        subject,
+        html: `<pre style="white-space: pre-wrap; font-family: system-ui, sans-serif;">${fullBody}</pre>`,
+        text: fullBody,
+      });
+    }
 
     if (!result.success) {
       return NextResponse.json(
@@ -98,13 +131,27 @@ export async function POST(
       );
     }
 
-    // Log the send (in production, you'd store this in a tracking table)
-    console.log(`[Email] Sent outreach email to ${to} for audit ${id}`);
+    // Store in sent emails table
+    await prisma.sentEmail.create({
+      data: {
+        auditId: audit.id,
+        userId: userId,
+        to,
+        subject,
+        body: fullBody,
+        status: 'SENT',
+        messageId: result.messageId,
+        sentAt: new Date(),
+      },
+    });
+
+    console.log(`[Email] Sent outreach email to ${to} for audit ${id} via ${emailService}`);
 
     return NextResponse.json({
       success: true,
       message: 'Email envoyé avec succès',
       recipient: to,
+      service: emailService,
     });
   } catch (error) {
     console.error('[SendEmail] POST error:', error);
