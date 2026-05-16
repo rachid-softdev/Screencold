@@ -1,119 +1,68 @@
-"use client";
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Search, TrendingUp, Zap, ArrowRight, BarChart3, Mail } from 'lucide-react';
+import { getDashboardData, DashboardData } from '@/lib/dashboard';
+import { CreditCounter } from '@/components/dashboard/credit-counter';
+import { StatsCard } from '@/components/dashboard/stats-card';
+import { QuickAuditForm } from '@/components/dashboard/quick-audit-form';
+import { RecentAudits } from '@/components/dashboard/recent-audits';
+import dynamic from 'next/dynamic';
+import { Button } from '@/components/ui/button';
 
-import * as React from "react";
-import Link from "next/link";
-import { Search, TrendingUp, Zap, ArrowRight, BarChart3, Mail } from "lucide-react";
-import { CreditCounter } from "@/components/dashboard/credit-counter";
-import { StatsCard } from "@/components/dashboard/stats-card";
-import { QuickAuditForm } from "@/components/dashboard/quick-audit-form";
-import { RecentAudits } from "@/components/dashboard/recent-audits";
-import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
-import { Button } from "@/components/ui/button";
+// Dynamic import for client components to reduce initial bundle
+const OnboardingTour = dynamic(() => import('@/components/onboarding/onboarding-tour').then(mod => ({ default: mod.OnboardingTour })), {
+  ssr: false,
+  loading: () => null,
+});
 
-interface DashboardData {
-  user: {
-    id: string;
-    name: string | null;
-    email: string;
-    plan: string;
-    credits: number;
-    creditsResetsAt: string | null;
-    memberSince: string;
-  };
-  stats: {
-    thisMonthAudits: number;
-    lastMonthAudits: number;
-    totalAudits: number;
-    auditsChange: number;
-    creditsUsed: number;
-  };
-  recentAudits: Array<{
-    id: string;
-    status: string;
-    overallScore: number | null;
-    screenshotUrl: string | null;
-    createdAt: string;
-    prospect: {
-      id: string;
-      url: string;
-      companyName: string | null;
-      contactName: string | null;
-      status: string;
-    };
-  }>;
+interface PageProps {
+  params: Promise<void>;
 }
 
-function DashboardPage() {
-  const [data, setData] = React.useState<DashboardData | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+export const metadata = {
+  title: 'Dashboard | ScreenCold',
+  description: 'Votre tableau de bord ScreenCold',
+};
 
-  React.useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const response = await fetch("/api/dashboard");
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard");
-        }
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError("Erreur lors du chargement des données");
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+export default async function DashboardPage({}: PageProps) {
+  // Server-side parallel data fetching
+  const data = await getDashboardData();
 
-    fetchDashboard();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600">{error || "Une erreur est survenue"}</p>
-      </div>
-    );
+  // Redirect if not authenticated
+  if (!data) {
+    redirect('/login');
   }
 
   const { user, stats, recentAudits } = data;
 
   const statsCards = [
     {
-      title: "Audits ce mois",
+      title: 'Audits ce mois',
       value: stats.thisMonthAudits.toString(),
       change: { value: stats.auditsChange, isPositive: stats.auditsChange >= 0 },
       icon: <Search className="h-5 w-5" />,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "Total audits",
+      title: 'Total audits',
       value: stats.totalAudits.toString(),
       change: null,
       icon: <TrendingUp className="h-5 w-5" />,
-      variant: "success" as const,
+      variant: 'success' as const,
     },
     {
-      title: "Crédits utilisés",
+      title: 'Crédits utilisés',
       value: stats.creditsUsed.toString(),
       change: null,
       icon: <Zap className="h-5 w-5" />,
-      variant: "warning" as const,
+      variant: 'warning' as const,
     },
   ];
 
   // Map audits for component
   const auditsForComponent = recentAudits.map((audit) => ({
     id: audit.id,
-    companyName: audit.prospect.companyName || "Entreprise",
+    companyName: audit.prospect.companyName || 'Entreprise',
     screenshotUrl: audit.screenshotUrl,
     overallScore: audit.overallScore,
     status: audit.status,
@@ -124,7 +73,7 @@ function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Onboarding Tour */}
+      {/* Onboarding Tour - loaded dynamically to avoid hydration */}
       <OnboardingTour />
 
       {/* Credit Counter */}
@@ -177,5 +126,3 @@ function DashboardPage() {
     </div>
   );
 }
-
-export default DashboardPage;

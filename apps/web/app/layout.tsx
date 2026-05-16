@@ -1,7 +1,16 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import { ToastProvider } from '@/components/ui/toast';
 import { Providers } from '@/components/providers';
 import './globals.css';
+
+// Optimize font loading - zero layout shift, preconnect to Google
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: 'ScreenCold - Audit de sites et emails de prospection',
@@ -17,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
-      <body className="min-h-screen bg-gray-50 antialiased">
+    <html lang="fr" className={inter.variable}>
+      <body className="min-h-screen bg-gray-50 antialiased font-sans">
         <Providers>
           <ToastProvider>
             {children}

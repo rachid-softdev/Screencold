@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { memo } from "react";
 import { clsx } from "clsx";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
@@ -15,7 +16,7 @@ interface StatsCardProps {
   variant?: "default" | "success" | "warning";
 }
 
-function StatsCard({
+const StatsCard = memo(function StatsCard({
   title,
   value,
   change,
@@ -73,6 +74,6 @@ function StatsCard({
       </div>
     </div>
   );
-}
+});
 
 export { StatsCard };

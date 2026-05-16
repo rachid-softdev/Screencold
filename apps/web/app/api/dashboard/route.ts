@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import prisma from '@/lib/prisma';
 
+// Cache control for client-side fallback - 30 seconds stale-while-revalidate
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Get user from session
@@ -124,6 +127,10 @@ export async function GET(request: NextRequest) {
         createdAt: audit.createdAt,
         prospect: audit.prospect,
       })),
+    }, {
+      headers: {
+        'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+      },
     });
   } catch (error) {
     console.error('[Dashboard] Error:', error);
