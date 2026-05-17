@@ -6,7 +6,8 @@ import { s3Client, uploadScreenshots } from "./services/s3";
 import { captureWebsite } from "./services/playwright";
 import { analyzeWithAI } from "./services/claude";
 import { generateEmail, sendEmail } from "./services/email";
-import type { AuditJobData, ProspectJobData, EmailJobData } from "@screencold/types";
+import { annotateScreenshot } from "./services/annotate";
+import type { AuditJobData, ProspectJobData, EmailJobData, EmailRegenJobData } from "@screencold/types";
 import {
   type CaptureResult,
   type AnalyzeResult,
@@ -17,10 +18,12 @@ import {
 const QUEUES = {
   AUDIT: "audit",
   EMAIL: "email",
+  EMAIL_GENERATION: "email-generation",
   CAMPAIGN: "campaign",
   // Dead Letter Queues
   AUDIT_DLQ: "audit-dlq",
   EMAIL_DLQ: "email-dlq",
+  EMAIL_GENERATION_DLQ: "email-generation-dlq",
   CAMPAIGN_DLQ: "campaign-dlq",
 } as const;
 
@@ -105,13 +108,16 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
       mobile: captureResult.screenshots.mobile
         ? Buffer.from(captureResult.screenshots.mobile.path, "base64")
         : undefined,
-      annotated: captureResult.screenshots.annotated
-        ? Buffer.from(captureResult.screenshots.annotated.path, "base64")
-        : undefined,
+      // Use the generated annotated screenshot if available, otherwise fallback to desktop
+      annotated: annotatedScreenshotBuffer || 
+        (captureResult.screenshots.annotated 
+          ? Buffer.from(captureResult.screenshots.annotated.path, "base64")
+          : undefined),
     });
 
     // Step 3: Analyze with AI (unless capture only mode)
     let analysisResult: AnalyzeResult | null = null;
+    let annotatedScreenshotBuffer: Buffer | null = null;
     if (!captureOnly) {
       jobLogger.info("Analyzing with AI with screenshots...");
       
@@ -130,6 +136,29 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
 
       if (!analysisResult.success) {
         throw new Error(analysisResult.error ?? "AI analysis failed");
+      }
+
+      // Step 3.5: Generate visual annotations
+      if (analysisResult.issues && analysisResult.issues.length > 0) {
+        jobLogger.info("Generating visual annotations...", {
+          issuesCount: analysisResult.issues.length,
+        });
+        
+        try {
+          const desktopBuffer = Buffer.from(captureResult.screenshots.desktop.path, 'base64');
+          annotatedScreenshotBuffer = await annotateScreenshot({
+            screenshotBuffer: desktopBuffer,
+            issues: analysisResult.issues,
+            width: 1440,
+            height: 900,
+          });
+          jobLogger.info("Annotations generated successfully");
+        } catch (annotateError) {
+          jobLogger.warn("Failed to generate annotations, continuing without", {
+            error: annotateError instanceof Error ? annotateError.message : 'Unknown',
+          });
+          // Don't fail the job - continue without annotations
+        }
       }
     }
 
@@ -416,6 +445,30 @@ export async function createWorker() {
     }
   });
 
+  // Email generation queue worker (for email regeneration)
+  const emailGenWorker = new Worker<EmailRegenJobData>(
+    QUEUES.EMAIL_GENERATION,
+    async (job) => {
+      await processEmailRegenJob(job);
+    },
+    {
+      connection: redisConnection,
+      concurrency: parseInt(process.env.EMAIL_CONCURRENCY ?? "5", 10),
+    }
+  );
+
+  emailGenWorker.on("completed", (job) => {
+    logger.debug("Email regeneration job completed", { jobId: job.id, auditId: job.data.auditId });
+  });
+
+  emailGenWorker.on("failed", async (job, error) => {
+    logger.error("Email regeneration job failed", { jobId: job?.id, error: error.message });
+    
+    if (job && job.attemptsMade >= (job.opts.attempts || 3)) {
+      await moveToDLQ(job, QUEUES.EMAIL_GENERATION, error.message);
+    }
+  });
+
   logger.info("All workers created successfully");
 
   // Return worker manager for graceful shutdown
@@ -427,6 +480,7 @@ export async function createWorker() {
         auditWorker.close(),
         emailWorker.close(),
         campaignWorker.close(),
+        emailGenWorker.close(),
       ]);
 
       // Close all queues

@@ -54,8 +54,8 @@ function IntegrationsPage() {
       // Check Gmail connection
       const userResponse = await fetch("/api/dashboard");
       if (userResponse.ok) {
-        // For now, we'll just show the UI and let user connect
-        setGmailConnected(false); // Will need server endpoint to check properly
+        const userData = await userResponse.json();
+        setGmailConnected(userData.user?.gmailConnected ?? false);
       }
 
       // Fetch API keys

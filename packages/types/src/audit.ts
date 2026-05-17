@@ -133,6 +133,19 @@ export interface EmailJobData {
   customMessage?: string;
 }
 
+export interface EmailRegenJobData {
+  auditId: string;
+  userId: string;
+  prospectId?: string;
+  url: string;
+  companyName?: string;
+  contactName?: string;
+  contactEmail?: string;
+  siteType?: string;
+  overallScore?: number;
+  issues: UXIssue[];
+}
+
 // Job result types
 export interface JobResult {
   success: boolean;

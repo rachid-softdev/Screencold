@@ -34,6 +34,7 @@ const CREDIT_PACKAGES = [
 
 function BillingPage() {
   const { addToast } = useToast();
+  const [isAnnual, setIsAnnual] = React.useState(false);
   const [isUpgrading, setIsUpgrading] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [userData, setUserData] = React.useState<UserData | null>(null);
@@ -84,7 +85,10 @@ function BillingPage() {
       const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planId }),
+        body: JSON.stringify({ 
+          plan: planId,
+          annual: isAnnual,
+        }),
       });
       
       const data = await response.json();
@@ -226,6 +230,35 @@ function BillingPage() {
         </div>
       </div>
 
+      {/* Billing Toggle */}
+      <div className="flex items-center justify-center gap-4 mb-6">
+        <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+          Mensuel
+        </span>
+        <button
+          onClick={() => setIsAnnual(!isAnnual)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            isAnnual ? 'bg-blue-600' : 'bg-gray-200'
+          }`}
+          role="switch"
+          aria-checked={isAnnual}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              isAnnual ? 'translate-x-6' : 'translate-x-1'
+            }`}
+          />
+        </button>
+        <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+          Annuel
+        </span>
+        {isAnnual && (
+          <Badge variant="default" className="bg-green-100 text-green-700">
+            -20%
+          </Badge>
+        )}
+      </div>
+
       {/* Plans Comparison */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -256,9 +289,14 @@ function BillingPage() {
 
                 <div className="mt-4">
                   <span className="text-3xl font-bold text-gray-900">
-                    {plan.monthlyPrice === 0 ? '0' : plan.monthlyPrice}€
+                    {plan.monthlyPrice === 0 ? '0' : (isAnnual ? plan.yearlyPrice : plan.monthlyPrice)}€
                   </span>
                   <span className="text-gray-500">/mois</span>
+                  {isAnnual && plan.monthlyPrice > 0 && (
+                    <span className="ml-2 text-xs text-green-600">
+                      (économisez 20%)
+                    </span>
+                  )}
                 </div>
 
                 <ul className="mt-6 space-y-3">
