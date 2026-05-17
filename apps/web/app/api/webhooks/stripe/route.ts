@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
+import { handleStripeWebhook, ensureEntitlementsInitialized } from '@/lib/entitlements';
+import { PrismaEntitlementRepository } from '@/lib/entitlements/repository';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -14,6 +16,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
+  // First, verify the webhook signature
   let event: Stripe.Event;
 
   try {
@@ -23,160 +26,143 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+    console.error('[StripeWebhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   try {
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const customerId = session.customer as string;
-        const subscriptionId = session.subscription as string;
-        const metadata = session.metadata || {};
-
-        // Find user by stripe customer id
-        const user = await prisma.user.findFirst({
-          where: { stripeCustomerId: customerId },
-        });
-
-        if (user && metadata) {
-          // Handle credits purchase (one-time payment)
-          if (metadata.type === 'CREDITS_PURCHASE') {
-            const credits = parseInt(metadata.credits || '0', 10);
-            
-            if (credits > 0) {
-              await prisma.user.update({
-                where: { id: user.id },
-                data: {
-                  credits: { increment: credits },
-                },
-              });
-
-              // Record transaction
-              await prisma.creditTransaction.create({
-                data: {
-                  userId: user.id,
-                  amount: credits,
-                  type: 'PURCHASE',
-                },
-              });
-            }
-          } 
-          // Handle subscription (plan upgrade)
-          else {
-            const plan = metadata.plan || 'STARTER';
-            const credits = parseInt(metadata.credits || '50', 10);
-
-            await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                plan: plan as any,
-                stripeSubscriptionId: subscriptionId,
-                credits: { increment: credits },
-                creditsResetsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-              },
-            });
-
-            // Record transaction
-            await prisma.creditTransaction.create({
-              data: {
-                userId: user.id,
-                amount: credits,
-                type: 'PURCHASE',
-              },
-            });
-          }
-        }
-        break;
-      }
-
-      case 'invoice.paid': {
-        const invoice = event.data.object as Stripe.Invoice;
-        const customerId = invoice.customer as string;
-        const amount = invoice.amount_paid / 100;
-
-        const user = await prisma.user.findFirst({
-          where: { stripeCustomerId: customerId },
-        });
-
-        if (user) {
-          const planCredits: Record<string, number> = {
-            STARTER: 50,
-            PRO: 500,
-            AGENCY: -1,
-          };
-          const creditsToAdd = planCredits[user.plan] || 50;
-          if (creditsToAdd > 0) {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                credits: { increment: creditsToAdd },
-                creditsResetsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-              },
-            });
-
-            await prisma.creditTransaction.create({
-              data: {
-                userId: user.id,
-                amount: creditsToAdd,
-                type: 'MONTHLY_REFILL',
-              },
-            });
-          }
-        }
-        break;
-      }
-
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-
-        const user = await prisma.user.findFirst({
-          where: { stripeCustomerId: customerId },
-        });
-
-        if (user) {
-          const status = subscription.status;
-          if (status === 'active' || status === 'trialing') {
-            // Plan stays the same, update subscription ID
-            await prisma.user.update({
-              where: { id: user.id },
-              data: { stripeSubscriptionId: subscription.id },
-            });
-          }
-        }
-        break;
-      }
-
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-
-        const user = await prisma.user.findFirst({
-          where: { stripeCustomerId: customerId },
-        });
-
-        if (user) {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              plan: 'FREE',
-              stripeSubscriptionId: null,
-              credits: 5,
-            },
-          });
-        }
-        break;
-      }
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
+    // Handle checkout.session.completed (credits + subscriptions)
+    if (event.type === 'checkout.session.completed') {
+      await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
     }
+
+    // Handle subscription-related events through entitlements system
+    if (
+      event.type === 'customer.subscription.created' ||
+      event.type === 'customer.subscription.updated' ||
+      event.type === 'customer.subscription.deleted' ||
+      event.type === 'invoice.paid' ||
+      event.type === 'invoice.payment_failed'
+    ) {
+      await ensureEntitlementsInitialized();
+      const repo = new PrismaEntitlementRepository(prisma);
+      await handleStripeWebhook(repo, body, signature);
+    }
+
+    // Legacy: Handle invoice.paid for credits (backward compatibility)
+    if (event.type === 'invoice.paid') {
+      // Already handled above for subscriptions
+      // Only handle legacy credits here if not part of subscription
+    }
+
+    console.log(`[StripeWebhook] Processed event: ${event.type}`);
   } catch (err) {
-    console.error('Webhook handler error:', err);
+    console.error('[StripeWebhook] Handler error:', err);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });
+}
+
+/**
+ * Handle checkout session completed - creates/updates subscriptions and adds credits
+ */
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+  const customerId = session.customer as string;
+  const subscriptionId = session.subscription as string;
+  const metadata = session.metadata || {};
+
+  // Find user by stripe customer id
+  const user = await prisma.user.findFirst({
+    where: { stripeCustomerId: customerId },
+  });
+
+  if (!user) {
+    console.log('[StripeWebhook] User not found for customer:', customerId);
+    return;
+  }
+
+  // Handle credits purchase (one-time payment)
+  if (metadata.type === 'CREDITS_PURCHASE') {
+    const credits = parseInt(metadata.credits || '0', 10);
+
+    if (credits > 0) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          credits: { increment: credits },
+        },
+      });
+
+      // Record transaction
+      await prisma.creditTransaction.create({
+        data: {
+          userId: user.id,
+          amount: credits,
+          type: 'PURCHASE',
+        },
+      });
+
+      console.log(`[StripeWebhook] Added ${credits} credits to user ${user.id}`);
+    }
+    return;
+  }
+
+  // Handle subscription (plan upgrade)
+  const plan = metadata.plan || 'STARTER';
+  const credits = parseInt(metadata.credits || '50', 10);
+
+  // Update user plan
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      plan: plan as any,
+      stripeSubscriptionId: subscriptionId,
+      credits: { increment: credits },
+      creditsResetsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  // Record transaction
+  await prisma.creditTransaction.create({
+    data: {
+      userId: user.id,
+      amount: credits,
+      type: 'PURCHASE',
+    },
+  });
+
+  // Also update/create organization subscription
+  // This integrates with the new entitlements system
+  try {
+    const userOrg = await prisma.userOrganization.findFirst({
+      where: { userId: user.id },
+    });
+
+    if (userOrg) {
+      await prisma.subscription.upsert({
+        where: { id: userOrg.orgId },
+        create: {
+          id: userOrg.orgId,
+          orgId: userOrg.orgId,
+          planKey: plan,
+          status: 'active',
+          stripeSubId: subscriptionId,
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+        update: {
+          planKey: plan,
+          status: 'active',
+          stripeSubId: subscriptionId,
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+  } catch (err) {
+    console.error('[StripeWebhook] Error updating org subscription:', err);
+  }
+
+  console.log(`[StripeWebhook] Subscription created for user ${user.id}: ${plan}`);
 }
