@@ -3,6 +3,7 @@ export * from "./audit";
 export * from "./campaign";
 export * from "./user";
 export * from "./blog";
+export * from "./entitlements";
 
 // Primitive types for job queues
 export interface QueueJob {

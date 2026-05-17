@@ -427,3 +427,192 @@ model UserIntegration {
   @@unique([userId, type])
   @@index([userId])
 }
+
+// ============================================
+// Feature Flags & Entitlements System
+// ============================================
+
+// Feature type enum
+enum FeatureType {
+  BOOLEAN   // true/false feature flag
+  LIMIT     // numeric quota
+  EXPERIMENT // A/B test experiment
+}
+
+// Downgrade strategy enum
+enum DowngradeStrategy {
+  GRACEFUL  // Keep access until period_end, then cut
+  IMMEDIATE // Cut access immediately on webhook
+  FREEZE    // Block new actions, keep existing data
+}
+
+// Plan definition
+model Plan {
+  id            String   @id @default(cuid())
+  key           String   @unique // FREE, STARTER, PRO, AGENCY
+  name          String
+  priceMonthly  Decimal  @db.Decimal(10, 2)
+  priceYearly   Decimal? @db.Decimal(10, 2)
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  features PlanFeature[]
+
+  @@index([isActive])
+  @@index([key])
+}
+
+// Feature definition
+model Feature {
+  id              String       @id @default(cuid())
+  key             String       @unique // EXPORT_PDF, AI_SUMMARY, etc.
+  description     String?
+  type            FeatureType  @default(BOOLEAN)
+  defaultConfig   Json?        // Default configuration for the feature
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  planFeatures PlanFeature[]
+
+  @@index([isActive])
+  @@index([key])
+}
+
+// Plan-Feature mapping with specific configuration
+model PlanFeature {
+  id              String           @id @default(cuid())
+  planId          String
+  featureId       String
+  enabled         Boolean          @default(false)
+  limitValue      Int?             // For LIMIT type features (-1 = unlimited)
+  configJson      Json?            // Additional config (e.g., experiment percentage)
+  downgradeStrategy DowngradeStrategy @default(GRACEFUL)
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, featureId])
+  @@index([planId])
+  @@index([featureId])
+}
+
+// Organization (maps to Team for now, can be extended)
+model Organization {
+  id                String   @id @default(cuid())
+  name              String
+  stripeCustomerId  String?  @unique
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  subscriptions        Subscription[]
+  entitlementOverrides EntitlementOverride[]
+  usageTrackings      UsageTracking[]
+
+  @@index([stripeCustomerId])
+  @@index([isActive])
+}
+
+// Subscription with billing period tracking
+model Subscription {
+  id                   String    @id @default(cuid())
+  orgId                String
+  planKey              String    @default("FREE")
+  status               String    @default("inactive") // active, trialing, past_due, canceled
+  stripeSubId          String?   @unique
+  stripePriceId        String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([status])
+  @@index([stripeSubId])
+}
+
+// Entitlement overrides (user or org level)
+enum OverrideScope {
+  USER
+  ORG
+}
+
+model EntitlementOverride {
+  id          String         @id @default(cuid())
+  scope       OverrideScope // user or org
+  scopeId     String         // userId or orgId
+  featureKey  String
+  enabled     Boolean        @default(false)
+  limitValue  Int?
+  expiresAt   DateTime?
+  reason      String?        // Required for audit
+  createdBy   String?        // admin user id
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([scope, scopeId, featureKey])
+  @@index([scope, scopeId])
+  @@index([featureKey])
+  @@index([expiresAt])
+}
+
+// Usage tracking for limit features
+model UsageTracking {
+  id            String    @id @default(cuid())
+  orgId         String
+  featureKey    String
+  usageCount    Int       @default(0)
+  periodStart   DateTime
+  periodEnd     DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, featureKey, periodStart])
+  @@index([orgId, featureKey])
+  @@index([periodEnd])
+}
+
+// Stripe webhook event log for idempotency
+model StripeEvent {
+  id        String   @id @default(cuid())
+  eventId   String   @unique // Stripe event ID
+  type      String
+  data      Json     // Full event payload
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([processed])
+  @@index([eventId])
+}
+
+// User-Organization mapping (for user-based entitlements)
+model UserOrganization {
+  id          String   @id @default(cuid())
+  userId      String
+  orgId       String
+  role        String   @default("MEMBER") // OWNER, ADMIN, MEMBER
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, orgId])
+  @@index([userId])
+  @@index([orgId])
+}
