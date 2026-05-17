@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-04-30.basil',
+});
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Le nom est requis'),
@@ -42,6 +47,22 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Create Stripe customer
+    let stripeCustomerId: string | null = null;
+    try {
+      const customer = await stripe.customers.create({
+        email: email.toLowerCase(),
+        name: name,
+        metadata: {
+          source: 'screencold_registration',
+        },
+      });
+      stripeCustomerId = customer.id;
+    } catch (stripeError) {
+      console.error('[Register] Failed to create Stripe customer:', stripeError);
+      // Continue without Stripe customer - not critical for registration
+    }
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -50,6 +71,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         plan: 'FREE',
         credits: 5,
+        stripeCustomerId,
       },
     });
 

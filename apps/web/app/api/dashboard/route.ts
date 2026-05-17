@@ -30,6 +30,10 @@ export async function GET(request: NextRequest) {
         credits: true,
         creditsResetsAt: true,
         createdAt: true,
+        integrations: {
+          where: { type: 'GMAIL' },
+          select: { id: true, status: true },
+        },
       },
     });
 
@@ -100,6 +104,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Check if Gmail is connected
+    const gmailIntegration = user.integrations?.[0];
+    const gmailConnected = gmailIntegration?.status === 'ACTIVE';
+
     return NextResponse.json({
       user: {
         id: user.id,
@@ -109,6 +117,7 @@ export async function GET(request: NextRequest) {
         credits: user.credits,
         creditsResetsAt: user.creditsResetsAt,
         memberSince: user.createdAt,
+        gmailConnected,
       },
       stats: {
         thisMonthAudits,
