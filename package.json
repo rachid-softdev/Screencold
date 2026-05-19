@@ -12,8 +12,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "turbo run typecheck",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck",
     "db:generate": "pnpm --filter @screencold/db generate",
     "db:push": "pnpm --filter @screencold/db push",
     "db:migrate": "pnpm --filter @screencold/db migrate",
@@ -49,6 +50,9 @@
     "push-env": "pnpm --filter @screencold/web push-env"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
     "@types/node": "^20.12.0",
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.57.0",
@@ -69,8 +73,15 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
-    "*.{js,json,md}": ["prettier --write"],
-    "*.prisma": ["prisma format"]
+    "*": [
+      "biome format --write --no-errors-on-unmatched --files-ignore-unknown=true"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "pnpm typecheck"
+    ],
+    "*.prisma": [
+      "prisma format"
+    ]
   }
 }
