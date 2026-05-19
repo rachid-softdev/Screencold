@@ -1,3 +1,15 @@
+# =============================================
+# SCREENCOLD-DESKTOP - Git Ignore
+# =============================================
+
+# Dependencies
 node_modules/
 dist/
 build/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
