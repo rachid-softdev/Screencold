@@ -44,7 +44,9 @@
     "extension:build": "pnpm --filter @screencold/extension build",
     "extension:test": "pnpm --filter @screencold/extension test",
     "extension:lint": "pnpm --filter @screencold/extension lint",
-    "extension:typecheck": "pnpm --filter @screencold/extension typecheck"
+    "extension:typecheck": "pnpm --filter @screencold/extension typecheck",
+    "check-env": "pnpm --filter @screencold/web check-env",
+    "push-env": "pnpm --filter @screencold/web push-env"
   },
   "devDependencies": {
     "@types/node": "^20.12.0",

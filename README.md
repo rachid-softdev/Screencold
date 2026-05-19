@@ -197,6 +197,30 @@ pnpm typecheck              # Vérification TypeScript
 
 # Qualité
 pnpm format                 # Formatter le code (Prettier)
+
+# Commandes préfixées (par application)
+pnpm web:dev       # Lancer le serveur web
+pnpm web:build     # Build de production
+pnpm web:start     # Démarrer en production
+pnpm web:test      # Lancer les tests
+pnpm web:lint      # Linter le code
+pnpm web:typecheck # Vérifier les types
+
+pnpm desktop:dev
+pnpm desktop:build
+pnpm desktop:test
+
+pnpm mobile:dev
+pnpm mobile:build
+pnpm mobile:test
+
+pnpm extension:dev
+pnpm extension:build
+pnpm extension:test
+
+# Environment
+pnpm check-env     # Valider les variables d'environnement
+pnpm push-env      # Pousser les variables vers Vercel
 ```
 
 ---
