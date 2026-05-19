@@ -1,0 +1,57 @@
+# =============================================
+# SCREENCOLD-WEB - Git Ignore
+# =============================================
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Testing
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Environment files (gitignored)
+.env
+.env.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.env*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Turbo
+.turbo/
+
+# Sentry
+.sentry/
+
+# Misc
+*.log
+.vercel
