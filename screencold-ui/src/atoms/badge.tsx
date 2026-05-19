@@ -1,9 +1,9 @@
 import * as React from "react";
 import { clsx } from "clsx";
 
-type BadgeVariant = "default" | "success" | "warning" | "destructive" | "outline";
+export type BadgeVariant = "default" | "success" | "warning" | "destructive" | "outline";
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
   children: React.ReactNode;
 }

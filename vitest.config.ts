@@ -10,9 +10,27 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './apps/web'),
+      '@': path.resolve(__dirname, './screencold-web'),
       '@screencold/types': path.resolve(__dirname, './packages/types/src'),
       '@screencold/db': path.resolve(__dirname, './packages/db/src'),
     },
+  },
+  coverage: {
+    provider: 'v8',
+    reporter: ['text', 'json', 'html'],
+    include: [
+      'screencold-web/lib/**/*.ts',
+      'screencold-web/hooks/**/*.ts',
+      'screencold-web/components/**/*.tsx',
+      'screencold-worker/**/*.ts',
+      'packages/types/src/**/*.ts',
+    ],
+    exclude: [
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.next/**',
+    ],
   },
 });
