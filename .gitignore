@@ -60,3 +60,9 @@ playwright/.cache/
 # Misc
 *.log
 .vercel
+
+# Biome
+.biome/
+
+# Husky
+.husky/
