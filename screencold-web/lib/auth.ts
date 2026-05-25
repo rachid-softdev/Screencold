@@ -21,6 +21,7 @@ type ExtendedSession = Session & {
     image: string | null;
     plan: string;
     credits: number;
+    role: string;
   };
 };
 
@@ -28,6 +29,7 @@ type ExtendedSession = Session & {
 type ExtendedUser = User & {
   id: string;
   plan: string;
+  role: string;
   credits: number;
 };
 
@@ -104,6 +106,7 @@ const authConfig: NextAuthConfig = {
           image: user.image,
           plan: user.plan,
           credits: user.credits,
+          role: user.role,
         } as ExtendedUser;
       },
     }),
@@ -118,6 +121,7 @@ const authConfig: NextAuthConfig = {
         token.id = extUser.id;
         token.plan = extUser.plan;
         token.credits = extUser.credits;
+        token.role = extUser.role;
       }
 
       // Handle session update (e.g., after credits are used)
@@ -138,6 +142,7 @@ const authConfig: NextAuthConfig = {
           id: token.id as string,
           plan: token.plan as string,
           credits: token.credits as number,
+          role: token.role as string,
         },
       } as ExtendedSession;
     },

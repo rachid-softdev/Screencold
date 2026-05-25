@@ -11,6 +11,11 @@ datasource db {
 // User & Authentication (NextAuth.js)
 // ============================================
 
+enum Role {
+  USER
+  ADMIN
+}
+
 enum Plan {
   FREE
   STARTER
@@ -31,6 +36,7 @@ model User {
   creditsResetsAt      DateTime?
   googleId             String?   @unique
   emailVerified        DateTime?
+  role                 Role      @default(USER)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
