@@ -4,19 +4,11 @@ import { getFeatureGateService, ensureEntitlementsInitialized } from '@/lib/enti
 import { DowngradeService } from '@/lib/entitlements';
 import { PrismaEntitlementRepository } from '@/lib/entitlements/repository';
 import { z } from 'zod';
+import { requireAdmin, AuthError } from '@/lib/auth/require-admin';
 
 // ============================================
 // Admin Entitlements Routes
 // ============================================
-
-// Helper to check admin role
-async function requireAdmin(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { plan: true },
-  });
-  return user?.plan === 'AGENCY' || user?.plan === 'PRO';
-}
 
 // Pagination helper
 function getPagination(page = 1, limit = 20) {
@@ -342,6 +334,15 @@ export async function POST_CACHE_INVALIDATE(request: NextRequest, { params }: { 
 
 // Route dispatcher
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+  try {
+    await requireAdmin();
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+  }
+
   const pathParts = params.path;
 
   if (pathParts[0] === 'plans') {
@@ -361,6 +362,15 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
 }
 
 export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
+  try {
+    await requireAdmin();
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+  }
+
   const pathParts = params.path;
 
   if (pathParts[0] === 'plan-features') {
@@ -377,6 +387,15 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { path: string[] } }) {
+  try {
+    await requireAdmin();
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+  }
+
   const pathParts = params.path;
 
   if (pathParts[0] === 'overrides') {
