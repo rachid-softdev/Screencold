@@ -13,6 +13,12 @@ import {
   type AnalyzeResult,
   type EmailResult,
 } from "@screencold/types";
+import {
+  recordJobStart,
+  recordJobEnd,
+  recordJobError,
+  getMetrics,
+} from "../lib/metrics";
 
 // Queue names
 const QUEUES = {
@@ -76,6 +82,57 @@ redisConnection.on("reconnecting", () => {
 });
 
 const logger = createLogger();
+
+// ============================================
+// RED Metrics — wrap job handlers with tracking
+// ============================================
+
+let metricsJobCounter = 0;
+let metricsLogInterval: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Wraps a job handler function with RED metrics tracking.
+ * Records start, end (on success), and error (on failure).
+ */
+function withMetrics<T>(jobType: string, handler: (job: Job<T>) => Promise<void>) {
+  return async (job: Job<T>) => {
+    const startTime = Date.now();
+    recordJobStart(jobType);
+    try {
+      await handler(job);
+      recordJobEnd(jobType, Date.now() - startTime);
+      maybeLogMetrics();
+    } catch (error) {
+      recordJobError(jobType, error instanceof Error ? error.message : "Unknown");
+      maybeLogMetrics();
+      throw error;
+    }
+  };
+}
+
+/**
+ * Log RED metrics snapshot every 100 jobs or every 5 minutes.
+ */
+function maybeLogMetrics(): void {
+  metricsJobCounter++;
+
+  if (metricsJobCounter % 100 === 0) {
+    const metrics = getMetrics();
+    logger.info("RED metrics snapshot (100 jobs)", metrics);
+  }
+}
+
+function startMetricsLogInterval(): void {
+  if (metricsLogInterval) return;
+  metricsLogInterval = setInterval(() => {
+    const metrics = getMetrics();
+    logger.info("RED metrics snapshot (5 min)", metrics);
+  }, 5 * 60 * 1000);
+  // Allow the process to exit even if this interval is still running
+  if (metricsLogInterval && typeof metricsLogInterval === "object" && "unref" in metricsLogInterval) {
+    metricsLogInterval.unref();
+  }
+}
 
 // Job processors
 async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
@@ -376,12 +433,12 @@ async function getQueue(name: string): Promise<Queue> {
 export async function createWorker() {
   logger.info("Creating BullMQ workers...");
 
+  startMetricsLogInterval();
+
   // Audit queue worker
   const auditWorker = new Worker<AuditJobData>(
     QUEUES.AUDIT,
-    async (job) => {
-      await processAuditJob(job);
-    },
+    withMetrics("audit", processAuditJob),
     {
       connection: redisConnection,
       concurrency: parseInt(process.env.AUDIT_CONCURRENCY ?? "2", 10),
@@ -412,9 +469,7 @@ export async function createWorker() {
   // Email queue worker
   const emailWorker = new Worker<EmailJobData>(
     QUEUES.EMAIL,
-    async (job) => {
-      await processEmailJob(job);
-    },
+    withMetrics("email", processEmailJob),
     {
       connection: redisConnection,
       concurrency: parseInt(process.env.EMAIL_CONCURRENCY ?? "5", 10),
@@ -436,9 +491,7 @@ export async function createWorker() {
   // Campaign queue worker
   const campaignWorker = new Worker<ProspectJobData>(
     QUEUES.CAMPAIGN,
-    async (job) => {
-      await processCampaignJob(job);
-    },
+    withMetrics("campaign", processCampaignJob),
     {
       connection: redisConnection,
       concurrency: parseInt(process.env.CAMPAIGN_CONCURRENCY ?? "3", 10),
@@ -460,9 +513,7 @@ export async function createWorker() {
   // Email generation queue worker (for email regeneration)
   const emailGenWorker = new Worker<EmailRegenJobData>(
     QUEUES.EMAIL_GENERATION,
-    async (job) => {
-      await processEmailRegenJob(job);
-    },
+    withMetrics("email-gen", processEmailRegenJob),
     {
       connection: redisConnection,
       concurrency: parseInt(process.env.EMAIL_CONCURRENCY ?? "5", 10),
