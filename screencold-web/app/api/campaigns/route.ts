@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { apiMiddleware } from '@/middleware';
+import {
+  parsePaginationParams,
+  paginatedResponse,
+} from '@/lib/pagination';
 
 // ============================================
 // Types
@@ -45,29 +49,23 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '20', 10);
+    const { cursor, limit } = parsePaginationParams(searchParams);
 
-    // Fetch campaigns with prospect stats
-    const campaigns = await prisma.campaign.findMany({
-      where: { userId },
-      include: {
-        prospectsList: {
-          select: {
-            status: true,
-          },
+    const baseInclude = {
+      prospectsList: {
+        select: {
+          status: true,
         },
       },
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    } as const;
 
-    // Count total for pagination
-    const total = await prisma.campaign.count({ where: { userId } });
-
-    // Transform to include stats
-    const campaignsWithStats: CampaignWithStats[] = campaigns.map((campaign) => {
+    const toCampaignWithStats = (campaign: {
+      id: string;
+      name: string;
+      createdAt: Date;
+      updatedAt: Date;
+      prospectsList: Array<{ status: string }>;
+    }): CampaignWithStats => {
       const stats = {
         total: campaign.prospectsList.length,
         pending: campaign.prospectsList.filter((p) => p.status === 'PENDING').length,
@@ -83,10 +81,42 @@ export async function GET(request: NextRequest) {
         updatedAt: campaign.updatedAt,
         stats,
       };
+    };
+
+    if (cursor) {
+      // Cursor-based pagination
+      const campaigns = await prisma.campaign.findMany({
+        where: { userId },
+        include: baseInclude,
+        orderBy: { createdAt: 'desc' },
+        take: limit + 1,
+        cursor: { id: cursor },
+        skip: 1,
+      });
+
+      const { data, pagination } = paginatedResponse(campaigns, limit);
+
+      return NextResponse.json({
+        data: data.map(toCampaignWithStats),
+        pagination,
+      });
+    }
+
+    // Legacy offset-based pagination (backward compatibility)
+    const page = parseInt(searchParams.get('page') || '1', 10);
+
+    const campaigns = await prisma.campaign.findMany({
+      where: { userId },
+      include: baseInclude,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
+    const total = await prisma.campaign.count({ where: { userId } });
+
     return NextResponse.json({
-      campaigns: campaignsWithStats,
+      campaigns: campaigns.map(toCampaignWithStats),
       pagination: {
         page,
         limit,

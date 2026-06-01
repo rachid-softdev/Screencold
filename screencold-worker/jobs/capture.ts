@@ -6,6 +6,12 @@
 import { chromium, Browser, Page, ViewportSize } from "playwright";
 import { logger } from "../lib/logger";
 import { validateUrl } from "../lib/ssrf";
+import {
+  markJobStarted,
+  markJobCompleted,
+  markJobFailed,
+  isJobAlreadyProcessed,
+} from "../lib/job-tracker";
 
 /**
  * Capture result containing all screenshot data and metadata
@@ -36,11 +42,30 @@ const CAPTURE_TIMEOUT = 30000;
 /**
  * Captures screenshots with Playwright
  * @param url - The URL to capture
+ * @param jobId - BullMQ job ID for idempotency tracking
+ * @param auditId - Audit record ID for idempotency tracking
  * @returns CaptureResult with screenshots and metadata
  */
-export async function captureWebsite(url: string): Promise<CaptureResult> {
+export async function captureWebsite(url: string, jobId?: string, auditId?: string): Promise<CaptureResult> {
   const startTime = Date.now();
   let browser: Browser | null = null;
+
+  // Idempotency check: skip if this capture was already completed
+  if (jobId && auditId) {
+    await markJobStarted(jobId, auditId, "capture");
+
+    if (await isJobAlreadyProcessed(jobId, auditId, "capture")) {
+      logger.info({ jobId, auditId }, "Capture already processed, skipping");
+      return {
+        desktopBuffer: Buffer.alloc(0),
+        mobileBuffer: Buffer.alloc(0),
+        pageTitle: "",
+        pageDescription: "",
+        loadTime: 0,
+        hasSSL: url.startsWith("https"),
+      };
+    }
+  }
 
   // Validate URL for SSRF protection
   await validateUrl(url);
@@ -134,7 +159,7 @@ export async function captureWebsite(url: string): Promise<CaptureResult> {
       "Screenshot capture completed"
     );
 
-    return {
+    const result: CaptureResult = {
       desktopBuffer: Buffer.from(desktopBuffer),
       mobileBuffer: Buffer.from(mobileBuffer),
       pageTitle: metadata.title,
@@ -144,6 +169,17 @@ export async function captureWebsite(url: string): Promise<CaptureResult> {
       faviconUrl: metadata.favicon,
       ogImageUrl: metadata.ogImage,
     };
+
+    // Mark job as completed
+    if (jobId && auditId) {
+      await markJobCompleted(jobId, auditId, "capture", {
+        loadTime,
+        hasSSL: metadata.hasSSL,
+        pageTitle: metadata.title,
+      });
+    }
+
+    return result;
   } catch (error) {
     // Ensure cleanup on error
     if (browser) {
@@ -158,6 +194,11 @@ export async function captureWebsite(url: string): Promise<CaptureResult> {
       error instanceof Error ? error.message : "Unknown capture error";
 
     logger.error({ url, error: errorMessage }, "Screenshot capture failed");
+
+    // Mark job as failed (don't mark as completed)
+    if (jobId && auditId) {
+      await markJobFailed(jobId, auditId, "capture", errorMessage);
+    }
 
     // Return error info instead of throwing to allow graceful handling
     return {

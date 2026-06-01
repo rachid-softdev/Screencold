@@ -609,6 +609,34 @@ model UsageTracking {
   @@index([periodEnd])
 }
 
+// ============================================
+// Job Tracking for Worker Idempotency
+// ============================================
+
+enum JobStepStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model JobTracking {
+  id        String         @id @default(cuid())
+  jobId     String
+  auditId   String
+  step      String         // 'capture', 'analyze', 'annotate'
+  status    JobStepStatus  @default(PENDING)
+  result    Json?
+  error     String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([jobId, auditId, step])
+  @@index([status])
+  @@index([auditId])
+  @@index([jobId])
+}
+
 // Stripe webhook event log for idempotency
 model StripeEvent {
   id        String   @id @default(cuid())

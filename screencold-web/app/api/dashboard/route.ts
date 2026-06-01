@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import prisma from '@/lib/prisma';
+import {
+  parsePaginationParams,
+  paginatedResponse,
+} from '@/lib/pagination';
 
 // Cache control for client-side fallback - 30 seconds stale-while-revalidate
 export const dynamic = 'force-dynamic';
@@ -74,23 +78,64 @@ export async function GET(request: NextRequest) {
       where: { userId },
     });
 
-    // Recent audits
-    const recentAudits = await prisma.audit.findMany({
-      where: { userId },
-      include: {
-        prospect: {
-          select: {
-            id: true,
-            url: true,
-            companyName: true,
-            contactName: true,
-            status: true,
-          },
+    // Recent audits with optional cursor-based pagination
+    const { searchParams } = new URL(request.url);
+    const recentCursor = searchParams.get('recentCursor');
+    const recentLimitParam = parseInt(searchParams.get('recentLimit') || '10', 10);
+    const recentLimit = Math.min(Math.max(recentLimitParam, 1), 100);
+
+    const auditInclude = {
+      prospect: {
+        select: {
+          id: true,
+          url: true,
+          companyName: true,
+          contactName: true,
+          status: true,
         },
       },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
+    };
+
+    const mapRecentAudit = (audit: {
+      id: string;
+      status: string;
+      overallScore: number | null;
+      screenshotUrl: string | null;
+      createdAt: Date;
+      prospect: Record<string, unknown>;
+    }) => ({
+      id: audit.id,
+      status: audit.status,
+      overallScore: audit.overallScore,
+      screenshotUrl: audit.screenshotUrl,
+      createdAt: audit.createdAt,
+      prospect: audit.prospect,
     });
+
+    let recentAudits;
+    let recentPagination: Record<string, unknown> | undefined;
+
+    if (recentCursor) {
+      recentAudits = await prisma.audit.findMany({
+        where: { userId },
+        include: auditInclude,
+        orderBy: { createdAt: 'desc' },
+        take: recentLimit + 1,
+        cursor: { id: recentCursor },
+        skip: 1,
+      });
+
+      const result = paginatedResponse(recentAudits, recentLimit);
+      recentAudits = result.data;
+      recentPagination = result.pagination as unknown as Record<string, unknown>;
+    } else {
+      recentAudits = await prisma.audit.findMany({
+        where: { userId },
+        include: auditInclude,
+        orderBy: { createdAt: 'desc' },
+        take: recentLimit,
+      });
+    }
 
     // Credits used this month
     const creditsUsed = await prisma.creditTransaction.aggregate({
@@ -128,14 +173,8 @@ export async function GET(request: NextRequest) {
           : 0,
         creditsUsed: creditsUsed._sum.amount || 0,
       },
-      recentAudits: recentAudits.map((audit) => ({
-        id: audit.id,
-        status: audit.status,
-        overallScore: audit.overallScore,
-        screenshotUrl: audit.screenshotUrl,
-        createdAt: audit.createdAt,
-        prospect: audit.prospect,
-      })),
+      recentAudits: recentAudits.map(mapRecentAudit),
+      recentPagination,
     }, {
       headers: {
         'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',

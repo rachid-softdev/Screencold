@@ -11,6 +11,11 @@ import prisma from '@/lib/prisma';
 import { checkCredits, debitCredits } from '@/lib/credits';
 import { checkApiKeyRateLimit } from '@/lib/rate-limit';
 import { canUseAPI } from '@/lib/plans';
+import {
+  parsePaginationParams,
+  paginatedResponse,
+} from '@/lib/pagination';
+import { getCorrelationId } from '@/lib/correlation-id';
 
 // ============================================
 // Validation Schemas
@@ -167,8 +172,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const cursor = searchParams.get('cursor');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
+    const { cursor, limit } = parsePaginationParams(searchParams);
     const status = searchParams.get('status');
 
     const where: Record<string, unknown> = { userId };
@@ -176,90 +180,78 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    let audits;
+    const baseInclude = {
+      prospect: {
+        select: {
+          id: true,
+          url: true,
+          companyName: true,
+          contactName: true,
+          status: true,
+        },
+      },
+    };
+
+    const mapAudit = (audit: {
+      id: string;
+      status: string;
+      siteType: string | null;
+      overallScore: number | null;
+      emailSubject: string | null;
+      emailBody: string | null;
+      emailPs: string | null;
+      createdAt: Date;
+      screenshotUrl: string | null;
+      annotatedUrl: string | null;
+      prospect: Record<string, unknown>;
+    }) => ({
+      id: audit.id,
+      status: audit.status,
+      siteType: audit.siteType,
+      overallScore: audit.overallScore,
+      emailSubject: audit.emailSubject,
+      emailBody: audit.emailBody,
+      emailPs: audit.emailPs,
+      createdAt: audit.createdAt,
+      prospect: audit.prospect,
+      screenshotUrl: audit.screenshotUrl,
+      annotatedUrl: audit.annotatedUrl,
+    });
 
     if (cursor) {
-      where.id = { lt: cursor };
-
-      audits = await prisma.audit.findMany({
+      // Cursor-based pagination
+      const audits = await prisma.audit.findMany({
         where,
-        include: {
-          prospect: {
-            select: {
-              id: true,
-              url: true,
-              companyName: true,
-              contactName: true,
-              status: true,
-            },
-          },
-        },
+        include: baseInclude,
         orderBy: { createdAt: 'desc' },
         take: limit + 1,
+        cursor: { id: cursor },
+        skip: 1,
       });
 
-      const hasMore = audits.length > limit;
-      const items = hasMore ? audits.slice(0, -1) : audits;
-      const nextCursor = hasMore ? items[items.length - 1].id : null;
-
-      return NextResponse.json({
-        data: items.map((audit) => ({
-          id: audit.id,
-          status: audit.status,
-          siteType: audit.siteType,
-          overallScore: audit.overallScore,
-          emailSubject: audit.emailSubject,
-          emailBody: audit.emailBody,
-          emailPs: audit.emailPs,
-          createdAt: audit.createdAt,
-          prospect: audit.prospect,
-          screenshotUrl: audit.screenshotUrl,
-          annotatedUrl: audit.annotatedUrl,
-        })),
-        pagination: {
-          cursor: nextCursor,
-          hasMore,
-          limit,
-        },
-      });
-    } else {
-      audits = await prisma.audit.findMany({
-        where,
-        include: {
-          prospect: {
-            select: {
-              id: true,
-              url: true,
-              companyName: true,
-              contactName: true,
-              status: true,
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-      });
+      const { data, pagination } = paginatedResponse(audits, limit);
 
       return NextResponse.json({
-        data: audits.map((audit) => ({
-          id: audit.id,
-          status: audit.status,
-          siteType: audit.siteType,
-          overallScore: audit.overallScore,
-          emailSubject: audit.emailSubject,
-          emailBody: audit.emailBody,
-          emailPs: audit.emailPs,
-          createdAt: audit.createdAt,
-          prospect: audit.prospect,
-          screenshotUrl: audit.screenshotUrl,
-          annotatedUrl: audit.annotatedUrl,
-        })),
-        pagination: {
-          limit,
-          count: audits.length,
-        },
+        data: data.map(mapAudit),
+        pagination,
       });
     }
+
+    // Offset-based pagination (backward compat)
+    const audits = await prisma.audit.findMany({
+      where,
+      include: baseInclude,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+
+    return NextResponse.json({
+      data: audits.map(mapAudit),
+      pagination: {
+        limit,
+        count: audits.length,
+      },
+    });
   } catch (error) {
     console.error('[API v1/audits] GET error:', error);
     return NextResponse.json(
@@ -409,6 +401,7 @@ export async function POST(request: NextRequest) {
           url,
           companyName,
           contactName,
+          correlationId: getCorrelationId(),
         },
         {
           jobId: `audit-${audit.id}`,

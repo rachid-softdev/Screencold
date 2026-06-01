@@ -7,6 +7,11 @@ import { debitCredits, checkCredits } from '@/lib/credits';
 import { apiMiddleware, getRateLimitHeaders } from '@/middleware';
 import { getPlan, getCSVLimit } from '@/lib/plans';
 import { checkIpRateLimit } from '@/lib/rate-limit';
+import {
+  parsePaginationParams,
+  paginatedResponse,
+} from '@/lib/pagination';
+import { getCorrelationId } from '@/lib/correlation-id';
 
 // ============================================
 // Validation Schema
@@ -251,6 +256,7 @@ export async function POST(request: NextRequest) {
           url,
           companyName,
           contactName,
+          correlationId: getCorrelationId(),
         },
         {
           jobId: `audit-${audit.id}`,
@@ -316,14 +322,11 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    // Support both old pagination (page/limit) and new cursor-based
-    const cursor = searchParams.get('cursor'); // cursor = audit ID
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
+    const { cursor, limit } = parsePaginationParams(searchParams);
     const campaignId = searchParams.get('campaignId');
     const status = searchParams.get('status') as 'PROCESSING' | 'READY' | 'FAILED' | null;
 
-    // Build query
+    // Build query filters
     const where: Record<string, unknown> = { userId };
     if (campaignId) {
       where.prospect = { campaignId };
@@ -332,124 +335,105 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    // Determine if using cursor-based pagination
-    const useCursor = !!cursor;
+    const baseInclude = {
+      prospect: {
+        select: {
+          id: true,
+          url: true,
+          companyName: true,
+          contactName: true,
+          status: true,
+          campaignId: true,
+        },
+      },
+    };
 
-    let audits;
-    let total;
+    const mapAudit = (audit: {
+      id: string;
+      status: string;
+      siteType: string | null;
+      overallScore: number | null;
+      emailSubject: string | null;
+      createdAt: Date;
+      processingTime: number | null;
+      screenshotUrl: string | null;
+      annotatedUrl: string | null;
+      prospect: {
+        id: string;
+        url: string;
+        companyName: string | null;
+        contactName: string | null;
+        status: string;
+        campaignId: string;
+      };
+    }) => ({
+      id: audit.id,
+      status: audit.status,
+      siteType: audit.siteType,
+      overallScore: audit.overallScore,
+      emailSubject: audit.emailSubject,
+      createdAt: audit.createdAt,
+      processingTime: audit.processingTime,
+      prospect: {
+        id: audit.prospect.id,
+        url: audit.prospect.url,
+        companyName: audit.prospect.companyName,
+        contactName: audit.prospect.contactName,
+        status: audit.prospect.status,
+        campaignId: audit.prospect.campaignId,
+      },
+      screenshotUrl: audit.screenshotUrl,
+      annotatedUrl: audit.annotatedUrl,
+    });
 
-    if (useCursor) {
-      // Cursor-based pagination (more efficient for large datasets)
-      where.id = { lt: cursor }; // Assuming id is lexicographically sortable
-
-      audits = await prisma.audit.findMany({
+    // Determine pagination mode
+    if (cursor) {
+      // Cursor-based pagination
+      const audits = await prisma.audit.findMany({
         where,
-        include: {
-          prospect: {
-            select: {
-              id: true,
-              url: true,
-              companyName: true,
-              contactName: true,
-              status: true,
-              campaignId: true,
-            },
-          },
-        },
+        include: baseInclude,
         orderBy: { createdAt: 'desc' },
-        take: limit + 1, // Take one extra to check if there's more
+        take: limit + 1,
+        cursor: { id: cursor },
+        skip: 1,
       });
 
-      total = await prisma.audit.count({ where: { userId } }); // Approximate for cursor
-
-      const hasMore = audits.length > limit;
-      const items = hasMore ? audits.slice(0, -1) : audits;
-      const nextCursor = hasMore ? items[items.length - 1].id : null;
+      const { data, pagination } = paginatedResponse(audits, limit);
 
       return NextResponse.json({
-        audits: items.map((audit) => ({
-          id: audit.id,
-          status: audit.status,
-          siteType: audit.siteType,
-          overallScore: audit.overallScore,
-          emailSubject: audit.emailSubject,
-          createdAt: audit.createdAt,
-          processingTime: audit.processingTime,
-          prospect: {
-            id: audit.prospect.id,
-            url: audit.prospect.url,
-            companyName: audit.prospect.companyName,
-            contactName: audit.prospect.contactName,
-            status: audit.prospect.status,
-            campaignId: audit.prospect.campaignId,
-          },
-          screenshotUrl: audit.screenshotUrl,
-          annotatedUrl: audit.annotatedUrl,
-        })),
-        pagination: {
-          cursor: nextCursor,
-          hasMore,
-          limit,
-          total,
-        },
-      });
-    } else {
-      // Legacy offset-based pagination (for backward compatibility)
-      [audits, total] = await Promise.all([
-        prisma.audit.findMany({
-          where,
-          include: {
-            prospect: {
-              select: {
-                id: true,
-                url: true,
-                companyName: true,
-                contactName: true,
-                status: true,
-                campaignId: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-          skip: (page - 1) * limit,
-          take: limit,
-        }),
-        prisma.audit.count({ where }),
-      ]);
-
-      return NextResponse.json({
-        audits: audits.map((audit) => ({
-          id: audit.id,
-          status: audit.status,
-          siteType: audit.siteType,
-          overallScore: audit.overallScore,
-          emailSubject: audit.emailSubject,
-          createdAt: audit.createdAt,
-          processingTime: audit.processingTime,
-          prospect: {
-            id: audit.prospect.id,
-            url: audit.prospect.url,
-            companyName: audit.prospect.companyName,
-            contactName: audit.prospect.contactName,
-            status: audit.prospect.status,
-            campaignId: audit.prospect.campaignId,
-          },
-          screenshotUrl: audit.screenshotUrl,
-          annotatedUrl: audit.annotatedUrl,
-        })),
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
+        audits: data.map(mapAudit),
+        pagination,
       });
     }
+
+    // Legacy offset-based pagination (backward compatibility)
+    const page = parseInt(searchParams.get('page') || '1', 10);
+
+    const [audits, total] = await Promise.all([
+      prisma.audit.findMany({
+        where,
+        include: baseInclude,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.audit.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      audits: audits.map(mapAudit),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error('[Audits] GET error:', error);
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Une erreur est survenue' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

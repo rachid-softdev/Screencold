@@ -5,6 +5,12 @@
 
 import { logger } from "../lib/logger";
 import { analyzeScreenshot, AnalyzeResult, UXIssue } from "../lib/anthropic";
+import {
+  markJobStarted,
+  markJobCompleted,
+  markJobFailed,
+  isJobAlreadyProcessed,
+} from "../lib/job-tracker";
 
 /**
  * Analysis result with parsed data
@@ -53,14 +59,33 @@ function validateIssues(issues: UXIssue[]): UXIssue[] {
 /**
  * Analyzes a screenshot using Claude Vision
  * @param screenshotBuffer - The desktop screenshot buffer
+ * @param jobId - BullMQ job ID for idempotency tracking
+ * @param auditId - Audit record ID for idempotency tracking
  * @param companyName - Optional company name for context
  * @returns AnalysisResult with parsed UX issues
  */
 export async function analyzeSite(
   screenshotBuffer: Buffer,
-  companyName?: string
+  jobId?: string,
+  auditId?: string,
+  companyName?: string,
 ): Promise<AnalysisResult> {
   const startTime = Date.now();
+
+  // Idempotency check
+  if (jobId && auditId) {
+    await markJobStarted(jobId, auditId, "analyze");
+
+    if (await isJobAlreadyProcessed(jobId, auditId, "analyze")) {
+      logger.info({ jobId, auditId }, "Analysis already processed, skipping");
+      return {
+        siteType: "Unknown",
+        overallScore: 0,
+        issues: [],
+        duration: 0,
+      };
+    }
+  }
 
   try {
     logger.info(
@@ -86,15 +111,32 @@ export async function analyzeSite(
       "Analysis completed"
     );
 
-    return {
+    const analysisResult: AnalysisResult = {
       ...result,
       issues: validatedIssues,
       duration,
     };
+
+    // Mark job as completed
+    if (jobId && auditId) {
+      await markJobCompleted(jobId, auditId, "analyze", {
+        siteType: result.siteType,
+        overallScore: result.overallScore,
+        issuesCount: validatedIssues.length,
+        duration,
+      });
+    }
+
+    return analysisResult;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown analysis error";
 
     logger.error({ error: errorMessage }, "Claude Vision analysis failed");
+
+    // Mark job as failed
+    if (jobId && auditId) {
+      await markJobFailed(jobId, auditId, "analyze", errorMessage);
+    }
 
     throw new Error(`Failed to analyze screenshot: ${errorMessage}`);
   }

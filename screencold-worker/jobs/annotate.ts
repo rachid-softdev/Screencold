@@ -8,6 +8,12 @@ import Jimp from "jimp";
 import sharp from "sharp";
 import { logger } from "../lib/logger";
 import { UXIssue } from "../lib/anthropic";
+import {
+  markJobStarted,
+  markJobCompleted,
+  markJobFailed,
+  isJobAlreadyProcessed,
+} from "../lib/job-tracker";
 
 /**
  * Annotation color definitions by severity
@@ -319,14 +325,28 @@ async function drawWatermark(
  * @param screenshotBuffer - The original screenshot buffer
  * @param issues - Array of UX issues to highlight
  * @param overallScore - Overall conversion score
+ * @param jobId - BullMQ job ID for idempotency tracking
+ * @param auditId - Audit record ID for idempotency tracking
  * @returns Annotated image buffer
  */
 export async function annotateScreenshot(
   screenshotBuffer: Buffer,
   issues: UXIssue[],
-  overallScore: number
+  overallScore: number,
+  jobId?: string,
+  auditId?: string,
 ): Promise<AnnotationResult> {
   const startTime = Date.now();
+
+  // Idempotency check
+  if (jobId && auditId) {
+    await markJobStarted(jobId, auditId, "annotate");
+
+    if (await isJobAlreadyProcessed(jobId, auditId, "annotate")) {
+      logger.info({ jobId, auditId }, "Annotation already processed, skipping");
+      return { annotatedBuffer: screenshotBuffer };
+    }
+  }
 
   try {
     logger.info(
@@ -394,13 +414,27 @@ export async function annotateScreenshot(
 
     logger.info({ duration }, "Image annotation completed");
 
-    return {
+    const result: AnnotationResult = {
       annotatedBuffer: finalBuffer,
     };
+
+    // Mark job as completed
+    if (jobId && auditId) {
+      await markJobCompleted(jobId, auditId, "annotate", {
+        duration,
+      });
+    }
+
+    return result;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown annotation error";
 
     logger.error({ error: errorMessage }, "Image annotation failed");
+
+    // Mark job as failed
+    if (jobId && auditId) {
+      await markJobFailed(jobId, auditId, "annotate", errorMessage);
+    }
 
     throw new Error(`Failed to annotate screenshot: ${errorMessage}`);
   }

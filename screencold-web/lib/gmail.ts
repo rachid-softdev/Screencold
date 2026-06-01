@@ -1,9 +1,10 @@
-/**
+﻿/**
  * Gmail API Integration Service
  * Handles OAuth2 flow and sending emails via Gmail API
  */
 
 import { prisma } from './prisma';
+import { decryptJson, encryptJson } from './encryption';
 
 // ============================================
 // Types
@@ -133,7 +134,7 @@ async function getValidAccessToken(userId: string): Promise<string | null> {
     return null;
   }
 
-  const tokens = integration.tokens as unknown as GmailTokens;
+  const tokens = decryptJson<GmailTokens>(integration.tokens);
 
   // Check if token is expired
   if (tokens.expiresAt < Date.now()) {
@@ -151,7 +152,7 @@ async function getValidAccessToken(userId: string): Promise<string | null> {
     // Update stored tokens
     await prisma.userIntegration.update({
       where: { id: integration.id },
-      data: { tokens: newTokens as never },
+      data: { tokens: encryptJson(newTokens) as never },
     });
 
     return newTokens.accessToken;
@@ -295,7 +296,7 @@ export async function isGmailConnected(userId: string): Promise<boolean> {
     return false;
   }
 
-  const tokens = integration.tokens as unknown as GmailTokens;
+  const tokens = decryptJson<GmailTokens>(integration.tokens);
 
   // Check if token is expired and try to refresh
   if (tokens.expiresAt < Date.now()) {
@@ -308,9 +309,10 @@ export async function isGmailConnected(userId: string): Promise<boolean> {
 
     await prisma.userIntegration.update({
       where: { id: integration.id },
-      data: { tokens: newTokens as never },
+      data: { tokens: encryptJson(newTokens) as never },
     });
   }
 
   return true;
 }
+
