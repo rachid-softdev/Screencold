@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     include: ['**/*.test.ts', '**/*.test.tsx'],
-    exclude: ['node_modules', 'dist', '.next'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.opencode/**', '**/.claude/**'],
   },
   resolve: {
     alias: {
@@ -31,6 +31,8 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/.next/**',
+      '**/.opencode/**',
+      '**/.claude/**',
     ],
   },
 });

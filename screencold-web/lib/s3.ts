@@ -19,8 +19,16 @@ const s3Config = {
   forcePathStyle: Boolean(process.env.AWS_S3_ENDPOINT), // For S3-compatible services
 };
 
-// Create S3 client
-const s3Client = new S3Client(s3Config);
+// Create S3 client with 30-second timeout on all operations.
+// The requestHandler config object matches NodeHttpHandlerOptions
+// and is accepted by the S3Client constructor via the HttpHandlerUserInput union type.
+const s3Client = new S3Client({
+  ...s3Config,
+  requestHandler: {
+    requestTimeout: 30_000,
+    connectionTimeout: 5_000,
+  },
+});
 
 // Bucket name
 const BUCKET_NAME = process.env.AWS_S3_BUCKET ?? "screencold-screenshots";

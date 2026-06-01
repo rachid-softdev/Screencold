@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 import { getFeatureGateService, ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 import { prisma } from '@/lib/prisma';
 
 // ============================================
 // GET /api/debug/entitlements?orgId=X&feature=Y
 // Debug endpoint to trace feature resolution
+// Requires admin role (session-based auth).
 // ============================================
 
 export async function GET(request: NextRequest) {
@@ -23,13 +25,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check admin (simplified - in production use proper auth)
-    const adminKey = request.headers.get('x-admin-key');
-    if (adminKey !== process.env.ADMIN_SECRET_KEY) {
-      // Allow in development
-      if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    // Authenticate via JWT session token — check for admin role
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify admin role
+    const userRecord = await prisma.user.findUnique({
+      where: { id: token.id as string },
+    });
+
+    if (!userRecord || userRecord.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Forbidden: admin access required' },
+        { status: 403 }
+      );
     }
 
     const service = getFeatureGateService();

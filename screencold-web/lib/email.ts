@@ -9,6 +9,30 @@ interface SendEmailOptions {
   text?: string;
 }
 
+// ============================================
+// HTML Entity Encoding
+// ============================================
+
+/**
+ * Escape user-controlled strings for safe HTML interpolation.
+ * Prevents HTML injection / XSS attacks when embedding user
+ * input into email HTML templates.
+ *
+ * Encodes: & < > " '
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// ============================================
+// Email Sending
+// ============================================
+
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
   try {
     const result = await resend.emails.send({
@@ -32,6 +56,13 @@ export async function sendContactEmail(
   subject: string,
   message: string
 ) {
+  // ?? SECURITY: All user-controlled values MUST be escaped before
+  // interpolating into HTML templates to prevent HTML injection/XSS.
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message);
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -43,14 +74,14 @@ export async function sendContactEmail(
       <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h2 style="margin-top: 0; color: #2563eb;">Nouveau message de contact</h2>
         
-        <p><strong>Nom:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Sujet:</strong> ${subject}</p>
+        <p><strong>Nom:</strong> ${safeName}</p>
+        <p><strong>Email:</strong> ${safeEmail}</p>
+        <p><strong>Sujet:</strong> ${safeSubject}</p>
         
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         
         <h3 style="margin-top: 0;">Message:</h3>
-        <p style="white-space: pre-wrap;">${message}</p>
+        <p style="white-space: pre-wrap;">${safeMessage}</p>
       </div>
     </body>
     </html>
@@ -58,7 +89,7 @@ export async function sendContactEmail(
 
   return sendEmail({
     to: process.env.CONTACT_EMAIL || 'support@screencold.com',
-    subject: `[Contact] ${subject} - de ${email}`,
+    subject: `[Contact] ${safeSubject} - de ${safeEmail}`,
     html,
   });
 }

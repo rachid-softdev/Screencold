@@ -29,7 +29,7 @@ export interface IEntitlementRepository {
 
   // Subscription operations
   getSubscription(orgId: string): Promise<SubscriptionInfo | null>;
-  getSubscriptionByStripeId(stripeSubId: string): Promise<SubscriptionInfo | null>;
+  getSubscriptionByStripeId(stripeSubId: string): Promise<(SubscriptionInfo & { orgId: string }) | null>;
   updateSubscription(subscription: Partial<SubscriptionInfo> & { orgId: string }): Promise<void>;
   createSubscription(orgId: string, planKey: string, stripeSubId?: string): Promise<void>;
 
@@ -219,7 +219,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
     };
   }
 
-  async getSubscriptionByStripeId(stripeSubId: string): Promise<SubscriptionInfo | null> {
+  async getSubscriptionByStripeId(stripeSubId: string): Promise<(SubscriptionInfo & { orgId: string }) | null> {
     const sub = await this.prisma.subscription.findUnique({
       where: { stripeSubId },
     });
@@ -231,6 +231,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
       status: sub.status as SubscriptionInfo['status'],
       currentPeriodEnd: sub.currentPeriodEnd,
       cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
+      orgId: sub.orgId,
     };
   }
 

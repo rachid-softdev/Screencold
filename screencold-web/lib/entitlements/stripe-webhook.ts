@@ -146,7 +146,7 @@ export class StripeWebhookHandler {
     const periodEnd = new Date(subscription.current_period_end * 1000);
 
     await this.repo.updateSubscription({
-      orgId: existingSub.planKey, // We need orgId but we have planKey - need to fix
+      orgId: existingSub.orgId,
       planKey,
       status: subscription.status === 'active' ? 'active' : subscription.status === 'trialing' ? 'trialing' : 'past_due',
       currentPeriodStart: periodStart,

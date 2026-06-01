@@ -1,3 +1,51 @@
+// ============================================
+// Startup Security Validation
+// ============================================
+
+/**
+ * Validate that the NEXTAUTH_SECRET is not the default dev secret in production.
+ * This prevents accidental deployment of a weak secret.
+ */
+function validateSecret(): void {
+  const secret = process.env.NEXTAUTH_SECRET;
+  const nodeEnv = process.env.NODE_ENV;
+
+  // Known dev-only / placeholder secrets that must never reach production
+  const DEV_SECRETS = [
+    'dev-nextauth-secret-change-me',
+    'dev-secret-change-in-production',
+    'dev-secret-CHANGEME-do-not-use-in-prod',
+    'change-me-with-openssl-rand-base64-32',
+    'your-nextauth-secret-generate-with-openssl-rand-base64-32',
+  ];
+
+  if (nodeEnv === 'production' && secret && DEV_SECRETS.includes(secret)) {
+    console.error(
+      '==============================================================\n' +
+      '  SECURITY ERROR: NEXTAUTH_SECRET is a dev-only placeholder!\n' +
+      '  This secret must NOT be used in production.\n' +
+      '  Generate a strong secret with: openssl rand -base64 32\n' +
+      '  Set it via environment variables or your deployment platform.\n' +
+      '=============================================================='
+    );
+    throw new Error(
+      'NEXTAUTH_SECRET is a known dev-only placeholder. ' +
+      'Generate a strong secret for production with: openssl rand -base64 32'
+    );
+  }
+
+  // Warn if secret is too short (less than 32 chars base64 ˜ 24 bytes entropy)
+  if (secret && secret.length < 32) {
+    console.warn(
+      '[Auth] WARNING: NEXTAUTH_SECRET is too short (' + secret.length + ' chars). ' +
+      'Use at least 32 characters. Generate with: openssl rand -base64 32'
+    );
+  }
+}
+
+// Run validation at module load time
+validateSecret();
+
 import NextAuth, { type NextAuthConfig, type Session, type User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -22,6 +70,7 @@ type ExtendedSession = Session & {
     plan: string;
     credits: number;
     role: string;
+    roles: string[];
   };
 };
 
@@ -31,6 +80,7 @@ type ExtendedUser = User & {
   plan: string;
   role: string;
   credits: number;
+  roles?: string[];
 };
 
 // Authentication configuration
@@ -122,6 +172,19 @@ const authConfig: NextAuthConfig = {
         token.plan = extUser.plan;
         token.credits = extUser.credits;
         token.role = extUser.role;
+        token.roles = [extUser.role as string];
+      }
+
+      // Fetch roles from DB on token refresh
+      if (!user && token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          include: { userRoles: true },
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.roles = dbUser.userRoles.map((ur) => ur.role);
+        }
       }
 
       // Handle session update (e.g., after credits are used)
@@ -143,6 +206,7 @@ const authConfig: NextAuthConfig = {
           plan: token.plan as string,
           credits: token.credits as number,
           role: token.role as string,
+          roles: token.roles as string[],
         },
       } as ExtendedSession;
     },

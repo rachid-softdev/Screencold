@@ -38,17 +38,30 @@ export class DowngradeService {
 
       // Get target plan access (simulate)
       const targetPlanFeatures = await this.repo.getPlanFeatures(targetPlanKey);
-      const featureConfig = targetPlanFeatures.find((pf) => {
+      const targetFeatureConfig = targetPlanFeatures.find((pf) => {
         // Need to map by feature ID
         const feat = service.getFeatures().find((f) => f.key === feature.key);
         return feat && pf.featureId === feat.id;
       });
 
-      const targetEnabled = featureConfig?.enabled ?? false;
-      const targetLimit = featureConfig?.limitValue ?? (feature.type === 'LIMIT' ? 0 : null);
+      const targetEnabled = targetFeatureConfig?.enabled ?? false;
+      const targetLimit = targetFeatureConfig?.limitValue ?? (feature.type === 'LIMIT' ? 0 : null);
 
-      // Determine strategy
-      const strategy = featureConfig?.downgradeStrategy ?? 'GRACEFUL';
+      // Determine strategy: use target plan's strategy if available, otherwise
+      // fall back to current plan's strategy (for features being removed)
+      let strategy: string;
+      if (targetFeatureConfig?.downgradeStrategy) {
+        strategy = targetFeatureConfig.downgradeStrategy;
+      } else {
+        // Feature is not in target plan or has no explicit strategy;
+        // look up the current plan's feature config for its strategy
+        const currentPlanFeatures = await this.repo.getPlanFeatures(currentPlan);
+        const currentFeatureConfig = currentPlanFeatures.find((pf) => {
+          const feat = service.getFeatures().find((f) => f.key === feature.key);
+          return feat && pf.featureId === feat.id;
+        });
+        strategy = currentFeatureConfig?.downgradeStrategy ?? 'GRACEFUL';
+      }
 
       // Calculate post-downgrade access based on strategy
       let postDowngradeAccess: boolean | number | null;

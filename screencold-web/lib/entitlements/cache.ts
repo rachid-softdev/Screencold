@@ -14,7 +14,7 @@ interface CacheEntry<T> {
   expiresAt: number;
 }
 
-class MemoryCache {
+export class MemoryCache {
   private cache = new Map<string, CacheEntry<unknown>>();
   private maxSize = 100; // Max entries
   private defaultTTL = 30000; // 30 seconds
@@ -261,3 +261,10 @@ export function getCacheService(): EntitlementsCacheService {
 }
 
 export { CACHE_CONFIG };
+
+/**
+ * Clear the global memory cache (used in tests to prevent stale state)
+ */
+export function clearMemoryCache(): void {
+  memoryCache.clear();
+}

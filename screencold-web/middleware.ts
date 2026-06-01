@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import crypto from 'crypto';
 import prisma from '@/lib/prisma';
+import {
+  getRateLimitHeaders as getRedisRateLimitHeaders,
+  checkRateLimit as checkRedisRateLimit,
+} from '@/lib/redis-rate-limit';
 
 // ============================================
 // Security Headers
@@ -55,32 +59,41 @@ export function addSecurityHeaders(response: NextResponse, request: NextRequest)
 }
 
 /**
- * Verify CSRF token for state-changing operations
+ * Verify CSRF token for state-changing operations.
+ *
+ * Uses origin / referer header validation:
+ * - Same-origin requests (Origin or Referer matching APP_URL) are trusted.
+ * - For API routes without Origin, the Referer header is checked.
+ * - NextAuth.js provides SameSite cookies for additional CSRF protection.
  */
 export async function verifyCsrfToken(request: NextRequest): Promise<boolean> {
   // Only check for mutation methods
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
     return true;
   }
-  
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  
+
   // Allow same-origin requests
-  if (origin === appUrl || (referer && referer.startsWith(appUrl))) {
+  if (origin === appUrl) {
     return true;
   }
-  
-  // For API routes, also check the Origin header
+
+  if (referer && referer.startsWith(appUrl)) {
+    return true;
+  }
+
+  // For API routes, check Origin header
   if (request.nextUrl.pathname.startsWith('/api/')) {
     if (!origin) {
-      // Without Origin header, check referer
       return referer ? referer.startsWith(appUrl) : false;
     }
   }
-  
-  return true;
+
+  return false;
 }
 
 export interface MiddlewareOptions {
@@ -222,54 +235,21 @@ export async function apiMiddleware(
 }
 
 // ============================================
-// Rate Limiting (in-memory, per-instance)
-// For distributed rate limiting, use Redis via ioredis in the API routes
-// that need it (e.g., /api/audits, /api/auth/register)
+// Rate Limiting (Redis-backed, distributed)
 // ============================================
 
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-export function getRateLimitHeaders(request: NextRequest): Record<string, string> {
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  const key = `rate-limit-${ip}`;
-  const now = Date.now();
-
-  const current = rateLimitStore.get(key);
-
-  if (!current || now > current.resetTime) {
-    rateLimitStore.set(key, { count: 1, resetTime: now + 60000 }); // 1 minute window
-    return {
-      'X-RateLimit-Limit': '60',
-      'X-RateLimit-Remaining': '59',
-      'X-RateLimit-Reset': String(now + 60000),
-    };
-  }
-
-  const remaining = Math.max(0, 60 - current.count);
-  current.count++;
-
-  return {
-    'X-RateLimit-Limit': '60',
-    'X-RateLimit-Remaining': String(remaining),
-    'X-RateLimit-Reset': String(current.resetTime),
-  };
+/**
+ * Get rate limit headers using Redis-backed distributed rate limiter.
+ * Falls back to fail-open if Redis is unavailable.
+ */
+export async function getRateLimitHeaders(request: NextRequest): Promise<Record<string, string>> {
+  return getRedisRateLimitHeaders(request);
 }
 
-export function checkRateLimit(request: NextRequest): boolean {
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
-  const key = `rate-limit-${ip}`;
-  const now = Date.now();
-
-  const current = rateLimitStore.get(key);
-
-  if (!current || now > current.resetTime) {
-    return true;
-  }
-
-  if (current.count >= 60) {
-    return false;
-  }
-
-  current.count++;
-  return true;
+/**
+ * Check if request is within rate limits using Redis.
+ * Supports per-IP for public endpoints, per-user for authenticated ones.
+ */
+export async function checkRateLimit(request: NextRequest): Promise<boolean> {
+  return checkRedisRateLimit(request);
 }
