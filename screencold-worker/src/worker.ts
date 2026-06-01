@@ -1,6 +1,6 @@
 import { Queue, Worker, Job } from "bullmq";
 import Redis from "ioredis";
-import { createLogger } from "./utils/logger";
+import { createLogger, createChildLogger } from "./utils/logger";
 import { prisma } from "./db";
 import { s3Client, uploadScreenshots } from "./services/s3";
 import { captureWebsite } from "./services/playwright";
@@ -79,8 +79,12 @@ const logger = createLogger();
 
 // Job processors
 async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
-  const { auditId, prospectId, userId, url, captureOnly } = job.data;
-  const jobLogger = createChildLogger(logger, { auditId, jobId: job.id });
+  const { auditId, prospectId, userId, url, captureOnly, correlationId } = job.data;
+  const jobLogger = createChildLogger(logger, {
+    auditId,
+    jobId: job.id,
+    ...(correlationId ? { correlationId } : {}),
+  });
 
   jobLogger.info("Processing audit job", { url, captureOnly });
 
@@ -218,9 +222,13 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
 }
 
 async function processEmailJob(job: Job<EmailJobData>): Promise<void> {
-  const { auditId, prospectId, userId, contactName, contactEmail, customMessage } =
+  const { auditId, prospectId, userId, contactName, contactEmail, customMessage, correlationId } =
     job.data;
-  const jobLogger = createChildLogger(logger, { auditId, jobId: job.id });
+  const jobLogger = createChildLogger(logger, {
+    auditId,
+    jobId: job.id,
+    ...(correlationId ? { correlationId } : {}),
+  });
 
   jobLogger.info("Processing email job", { contactEmail });
 
@@ -288,9 +296,13 @@ if (!emailResult.success) {
 }
 
 async function processCampaignJob(job: Job<ProspectJobData>): Promise<void> {
-  const { campaignId, prospectId, userId, url, companyName, contactName, contactEmail, notes } =
+  const { campaignId, prospectId, userId, url, companyName, contactName, contactEmail, notes, correlationId } =
     job.data;
-  const jobLogger = createChildLogger(logger, { campaignId, jobId: job.id });
+  const jobLogger = createChildLogger(logger, {
+    campaignId,
+    jobId: job.id,
+    ...(correlationId ? { correlationId } : {}),
+  });
 
   jobLogger.info("Processing campaign prospect", { url });
 

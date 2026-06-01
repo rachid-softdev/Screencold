@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // Startup Security Validation
 // ============================================
 
@@ -34,7 +34,7 @@ function validateSecret(): void {
     );
   }
 
-  // Warn if secret is too short (less than 32 chars base64 � 24 bytes entropy)
+  // Warn if secret is too short (less than 32 chars base64 ˜ 24 bytes entropy)
   if (secret && secret.length < 32) {
     console.warn(
       '[Auth] WARNING: NEXTAUTH_SECRET is too short (' + secret.length + ' chars). ' +
@@ -45,6 +45,24 @@ function validateSecret(): void {
 
 // Run validation at module load time
 validateSecret();
+
+// ============================================
+// OAuth Token Security
+// ============================================
+// OAuth tokens (access_token, refresh_token) stored in the Account model
+// are transparently encrypted at rest using AES-256-GCM.
+//
+// Encryption/decryption is handled automatically by the Prisma client
+// extension defined in lib/prisma.ts via $extends().
+//
+// The TOKEN_ENCRYPTION_KEY environment variable must be set to a 32-byte
+// hex-encoded key. If missing, a warning is logged and tokens remain
+// in plaintext (graceful degradation for development).
+//
+// Existing plaintext tokens in the database are lazily migrated:
+// they are encrypted on the next write and decrypted on read.
+// ============================================
+
 
 import NextAuth, { type NextAuthConfig, type Session, type User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -57,7 +75,7 @@ import prisma from "./prisma";
 // Validation schema for credentials
 const credentialsSchema = z.object({
   email: z.string().email("Email invalide"),
-  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractÃ¨res"),
 });
 
 // Extended session type
@@ -132,7 +150,7 @@ const authConfig: NextAuthConfig = {
         });
 
         if (!user) {
-          throw new Error("Aucun compte trouvé avec cet email");
+          throw new Error("Aucun compte trouvÃ© avec cet email");
         }
 
         // Check if user has password (Google users may not have password)
@@ -385,3 +403,5 @@ export async function createCreditTransaction(
     },
   });
 }
+
+

@@ -650,3 +650,121 @@ describe('Job Retry & Error Handling', () => {
     await expect(captureWebsite('https://example.com')).rejects.toThrow();
   });
 });
+
+// ============================================
+// Job Idempotency Tests
+// ============================================
+
+describe('Job Idempotency', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('should process a new job and mark it completed', async () => {
+    const { tryAcquireJob, markJobCompleted, getJobStatus, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    const jobId = 'job-001';
+    const acquired = await tryAcquireJob(jobId);
+    expect(acquired).toBe(true);
+
+    await markJobCompleted(jobId);
+
+    const status = getJobStatus(jobId);
+    expect(status).toBeDefined();
+    expect(status!.status).toBe('completed');
+    expect(status!.completedAt).toBeDefined();
+  });
+
+  it('should skip a job that was already completed', async () => {
+    const { tryAcquireJob, markJobCompleted, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    const jobId = 'job-002';
+
+    // First attempt: process and complete
+    const first = await tryAcquireJob(jobId);
+    expect(first).toBe(true);
+    await markJobCompleted(jobId);
+
+    // Second attempt: should be skipped
+    const second = await tryAcquireJob(jobId);
+    expect(second).toBe(false);
+  });
+
+  it('should skip a job that already failed', async () => {
+    const { tryAcquireJob, markJobFailed, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    const jobId = 'job-003';
+
+    const first = await tryAcquireJob(jobId);
+    expect(first).toBe(true);
+    await markJobFailed(jobId, 'Something went wrong');
+
+    const second = await tryAcquireJob(jobId);
+    expect(second).toBe(false);
+  });
+
+  it('should skip a job that is currently being processed', async () => {
+    const { tryAcquireJob, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    const jobId = 'job-004';
+
+    const first = await tryAcquireJob(jobId);
+    expect(first).toBe(true);
+
+    // Simulate a concurrent attempt
+    const second = await tryAcquireJob(jobId);
+    expect(second).toBe(false);
+  });
+
+  it('should not mark failed jobs as completed', async () => {
+    const { tryAcquireJob, markJobFailed, getJobStatus, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    const jobId = 'job-005';
+
+    await tryAcquireJob(jobId);
+    await markJobFailed(jobId, 'Error occurred');
+
+    const status = getJobStatus(jobId);
+    expect(status!.status).toBe('failed');
+    expect(status!.error).toBe('Error occurred');
+    expect(status!.completedAt).toBeUndefined();
+  });
+
+  it('should throw when completing a non-existent job', async () => {
+    const { markJobCompleted, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    await expect(markJobCompleted('non-existent')).rejects.toThrow('Job not found');
+  });
+
+  it('should throw when failing a non-existent job', async () => {
+    const { markJobFailed, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    await expect(markJobFailed('non-existent', 'err')).rejects.toThrow('Job not found');
+  });
+
+  it('should mark job as pending before processing', async () => {
+    const { markJobPending, tryAcquireJob, getJobStatus, resetStore } = await import('../lib/job-tracker-inmemory');
+    resetStore();
+
+    const jobId = 'job-006';
+    await markJobPending(jobId);
+
+    const pendingStatus = getJobStatus(jobId);
+    expect(pendingStatus).toBeDefined();
+    expect(pendingStatus!.status).toBe('pending');
+
+    // Transition from pending → processing
+    const acquired = await tryAcquireJob(jobId);
+    expect(acquired).toBe(true);
+
+    const processingStatus = getJobStatus(jobId);
+    expect(processingStatus!.status).toBe('processing');
+  });
+});

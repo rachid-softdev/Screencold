@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * Gmail OAuth Callback
  * Handles the return from Gmail OAuth flow.
  * Validates the state parameter against a stored cookie
@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import { getToken } from 'next-auth/jwt';
 import { prisma } from '@/lib/prisma';
 import { exchangeCodeForTokens } from '@/lib/gmail';
+import { encryptJson } from '@/lib/encryption';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
     const storedUserId = request.cookies.get('gmail_oauth_userId')?.value;
 
     if (!storedState || !storedUserId) {
-      console.error('[Gmail Callback] Missing state cookie — possible CSRF attempt');
+      console.error('[Gmail Callback] Missing state cookie â€” possible CSRF attempt');
       return NextResponse.redirect(
         new URL('/settings/integrations?error=invalid_state', request.url)
       );
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     // Constant-time comparison to prevent timing attacks
     if (state.length !== storedState.length ||
         !crypto.timingSafeEqual(Buffer.from(state), Buffer.from(storedState))) {
-      console.error('[Gmail Callback] State mismatch — possible CSRF attempt');
+      console.error('[Gmail Callback] State mismatch â€” possible CSRF attempt');
       return NextResponse.redirect(
         new URL('/settings/integrations?error=invalid_state', request.url)
       );
@@ -98,12 +99,12 @@ export async function GET(request: NextRequest) {
         userId: user.id,
         type: 'GMAIL',
         status: 'ACTIVE',
-        tokens: tokens as never,
+        tokens: encryptJson(tokens) as never,
         expiresAt: new Date(tokens.expiresAt),
       },
       update: {
         status: 'ACTIVE',
-        tokens: tokens as never,
+        tokens: encryptJson(tokens) as never,
         expiresAt: new Date(tokens.expiresAt),
         updatedAt: new Date(),
       },
@@ -124,4 +125,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
 

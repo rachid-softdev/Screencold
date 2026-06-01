@@ -111,6 +111,7 @@ export interface AuditJobData {
   userId: string;
   url: string;
   captureOnly?: boolean;
+  correlationId?: string;
 }
 
 export interface ProspectJobData {
@@ -122,6 +123,7 @@ export interface ProspectJobData {
   contactName?: string;
   contactEmail?: string;
   notes?: string;
+  correlationId?: string;
 }
 
 export interface EmailJobData {
@@ -131,6 +133,7 @@ export interface EmailJobData {
   contactName?: string;
   contactEmail: string;
   customMessage?: string;
+  correlationId?: string;
 }
 
 export interface EmailRegenJobData {
@@ -144,6 +147,7 @@ export interface EmailRegenJobData {
   siteType?: string;
   overallScore?: number;
   issues: UXIssue[];
+  correlationId?: string;
 }
 
 // Job result types

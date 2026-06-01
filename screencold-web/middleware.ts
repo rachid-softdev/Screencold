@@ -6,6 +6,10 @@ import {
   getRateLimitHeaders as getRedisRateLimitHeaders,
   checkRateLimit as checkRedisRateLimit,
 } from '@/lib/redis-rate-limit';
+import {
+  getCorrelationId,
+  runWithCorrelationId,
+} from '@/lib/correlation-id';
 
 // ============================================
 // Security Headers
@@ -113,6 +117,7 @@ export interface MiddlewareResult {
     credits: number;
   };
   isApiKey?: boolean;
+  correlationId?: string;
   errorResponse?: NextResponse;
 }
 
@@ -158,80 +163,92 @@ export async function apiMiddleware(
   request: NextRequest,
   options: MiddlewareOptions = {}
 ): Promise<MiddlewareResult> {
-  const { requireAuth = false, requireCredits = false, requireApiKey = false } = options;
+  // Generate correlation ID for this request
+  const correlationId =
+    request.headers.get('x-correlation-id') || crypto.randomUUID();
+  request.headers.set('x-correlation-id', correlationId);
 
-  // First, try API key authentication if header is present
-  const authHeader = request.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer sk_')) {
-    const apiKeyValidation = await validateApiKey(request);
-    
-    if (apiKeyValidation.valid && apiKeyValidation.userId) {
-      const user = await prisma.user.findUnique({
-        where: { id: apiKeyValidation.userId },
-        select: { id: true, email: true, name: true, plan: true, credits: true },
-      });
+  // Execute in async context so downstream code can retrieve the ID
+  return runWithCorrelationId(correlationId, async () => {
+    const { requireAuth = false, requireCredits = false, requireApiKey = false } = options;
 
-      if (user) {
-        return {
-          authorized: true,
-          userId: user.id,
-          isApiKey: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            credits: user.credits,
-          },
-        };
+    // First, try API key authentication if header is present
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer sk_')) {
+      const apiKeyValidation = await validateApiKey(request);
+      
+      if (apiKeyValidation.valid && apiKeyValidation.userId) {
+        const user = await prisma.user.findUnique({
+          where: { id: apiKeyValidation.userId },
+          select: { id: true, email: true, name: true, plan: true, credits: true },
+        });
+
+        if (user) {
+          return {
+            authorized: true,
+            userId: user.id,
+            isApiKey: true,
+            correlationId,
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              plan: user.plan,
+              credits: user.credits,
+            },
+          };
+        }
       }
     }
-  }
 
-  // Otherwise, try JWT/session authentication
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
+    // Otherwise, try JWT/session authentication
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    // Check if auth is required
+    if (requireAuth && !token) {
+      return {
+        authorized: false,
+        correlationId,
+        errorResponse: NextResponse.json(
+          { error: 'UNAUTHORIZED', message: 'Authentication required' },
+          { status: 401 }
+        ),
+      };
+    }
+
+    // If no auth required and no token, return early
+    if (!token) {
+      return { authorized: true, correlationId };
+    }
+
+    // Check credits if required
+    if (requireCredits && token.credits && (token.credits as number) <= 0) {
+      return {
+        authorized: false,
+        correlationId,
+        errorResponse: NextResponse.json(
+          { error: 'NO_CREDITS', message: 'Insufficient credits' },
+          { status: 402 }
+        ),
+      };
+    }
+
+    return {
+      authorized: true,
+      correlationId,
+      userId: token.id as string,
+      user: {
+        id: token.id as string,
+        email: token.email as string,
+        name: token.name,
+        plan: token.plan as string,
+        credits: token.credits as number,
+      },
+    };
   });
-
-  // Check if auth is required
-  if (requireAuth && !token) {
-    return {
-      authorized: false,
-      errorResponse: NextResponse.json(
-        { error: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 }
-      ),
-    };
-  }
-
-  // If no auth required and no token, return early
-  if (!token) {
-    return { authorized: true };
-  }
-
-  // Check credits if required
-  if (requireCredits && token.credits && (token.credits as number) <= 0) {
-    return {
-      authorized: false,
-      errorResponse: NextResponse.json(
-        { error: 'NO_CREDITS', message: 'Insufficient credits' },
-        { status: 402 }
-      ),
-    };
-  }
-
-  return {
-    authorized: true,
-    userId: token.id as string,
-    user: {
-      id: token.id as string,
-      email: token.email as string,
-      name: token.name,
-      plan: token.plan as string,
-      credits: token.credits as number,
-    },
-  };
 }
 
 // ============================================
@@ -252,4 +269,13 @@ export async function getRateLimitHeaders(request: NextRequest): Promise<Record<
  */
 export async function checkRateLimit(request: NextRequest): Promise<boolean> {
   return checkRedisRateLimit(request);
+}
+
+/**
+ * Returns headers that should be included in every API response.
+ * Currently includes the correlation ID so clients can trace requests.
+ */
+export function getResponseHeaders(): Record<string, string> {
+  const correlationId = getCorrelationId();
+  return correlationId ? { 'x-correlation-id': correlationId } : {};
 }
