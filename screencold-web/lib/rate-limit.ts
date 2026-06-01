@@ -12,13 +12,34 @@ export interface RateLimitResult {
 }
 
 /**
+ * Configuration for rate limit fail behavior.
+ *
+ * RATE_LIMIT_FAIL_OPEN env var:
+ * - "true"  (default): Fail open — allow requests when Redis is down.
+ * - "false":           Fail closed — deny requests when Redis is down.
+ *
+ * Auth endpoints always fail-closed regardless of this setting
+ * to prevent brute-force attacks during Redis outages.
+ */
+function shouldFailOpen(isAuthEndpoint: boolean = false): boolean {
+  // Auth endpoints always fail closed (security-critical)
+  if (isAuthEndpoint) {
+    return false;
+  }
+
+  // For other endpoints, respect the env var (default: fail open)
+  return process.env.RATE_LIMIT_FAIL_OPEN !== 'false';
+}
+
+/**
  * Rate limiter using Redis for distributed rate limiting
  * Uses sliding window algorithm
  */
 export async function checkRateLimit(
   key: string,
   limit: number,
-  windowSeconds: number = 60
+  windowSeconds: number = 60,
+  isAuthEndpoint: boolean = false
 ): Promise<RateLimitResult> {
   const now = Date.now();
   const windowStart = now - windowSeconds * 1000;
@@ -66,7 +87,18 @@ export async function checkRateLimit(
     };
   } catch (error) {
     console.error('[RateLimit] Error:', error);
-    // Fail open - allow request if Redis is down
+    
+    // Respect fail-open/fail-closed configuration
+    if (!shouldFailOpen(isAuthEndpoint)) {
+      // Fail closed — deny request when Redis is down
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: Math.ceil(now / 1000) + windowSeconds,
+      };
+    }
+
+    // Fail open — allow request if Redis is down (for non-auth endpoints)
     return {
       allowed: true,
       remaining: limit,

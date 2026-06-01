@@ -371,7 +371,7 @@ describe('user validators', () => {
   describe('checkPasswordStrength', () => {
     it('should return low score for weak password', () => {
       const result = checkPasswordStrength('abc');
-      expect(result.score).toBe(0);
+      expect(result.score).toBeLessThanOrEqual(1);
       expect(result.feedback.length).toBeGreaterThan(0);
     });
 

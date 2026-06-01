@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
   apiVersion: "2024-04-10",
   typescript: true,
   maxNetworkRetries: 3,
-  timeout: 10000,
+  timeout: 30000,
 });
 
 export default stripe;

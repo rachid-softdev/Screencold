@@ -4,9 +4,10 @@ import type { AnalyzeResult, UXIssue, IssueSeverity, IssueCategory } from "@scre
 
 const logger = createLogger();
 
-// Initialize Anthropic client
+// Initialize Anthropic client with 60-second timeout for API calls
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY ?? "",
+  timeout: 60_000,
 });
 
 // System prompt for UX analysis

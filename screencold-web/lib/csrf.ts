@@ -36,8 +36,12 @@ export function verifyCsrfToken(token: string, secret: string, signature: string
  * Generate CSRF token pair (token + signature for form)
  */
 export function createCsrfTokenPair(): { token: string; signature: string } {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    throw new Error('NEXTAUTH_SECRET environment variable is required');
+  }
   const token = generateCsrfToken();
-  const signature = signCsrfToken(token, process.env.NEXTAUTH_SECRET || 'default-secret');
+  const signature = signCsrfToken(token, secret);
   return { token, signature };
 }
 

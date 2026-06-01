@@ -9,15 +9,41 @@ interface SendEmailOptions {
   text?: string;
 }
 
+/**
+ * Execute an async operation with a timeout using AbortController.
+ */
+async function withTimeout<T>(
+  operation: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number
+): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await operation(controller.signal);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`Operation timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
   try {
-    const result = await resend.emails.send({
-      from: process.env.FROM_EMAIL || 'ScreenCold <noreply@screencold.com>',
-      to,
-      subject,
-      html,
-      text: text || html.replace(/<[^>]*>/g, ''),
-    });
+    const result = await withTimeout(
+      (signal) =>
+        resend.emails.send({
+          from: process.env.FROM_EMAIL || 'ScreenCold <noreply@screencold.com>',
+          to,
+          subject,
+          html,
+          text: text || html.replace(/<[^>]*>/g, ''),
+        }),
+      30_000
+    );
 
     return { success: true, data: result };
   } catch (error) {

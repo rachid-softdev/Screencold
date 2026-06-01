@@ -1,9 +1,14 @@
 /**
  * Gmail OAuth Callback
- * Handles the return from Gmail OAuth flow
+ * Handles the return from Gmail OAuth flow.
+ * Validates the state parameter against a stored cookie
+ * to prevent CSRF and account hijacking attacks.
+ * The authenticated user is identified via JWT session, not the URL.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { getToken } from 'next-auth/jwt';
 import { prisma } from '@/lib/prisma';
 import { exchangeCodeForTokens } from '@/lib/gmail';
 
@@ -27,15 +32,41 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify state contains user ID
-    const [userId, expectedState] = state.split(':');
-    if (!userId || !expectedState) {
+    // --- CSRF / State Validation ---
+    // The state token is a random value we stored in a cookie during /authorize
+    // We compare the returned state against the cookie to prevent CSRF attacks.
+    const storedState = request.cookies.get('gmail_oauth_state')?.value;
+    const storedUserId = request.cookies.get('gmail_oauth_userId')?.value;
+
+    if (!storedState || !storedUserId) {
+      console.error('[Gmail Callback] Missing state cookie — possible CSRF attempt');
       return NextResponse.redirect(
         new URL('/settings/integrations?error=invalid_state', request.url)
       );
     }
 
-    // Verify user exists and owns this request
+    // Constant-time comparison to prevent timing attacks
+    if (state.length !== storedState.length ||
+        !crypto.timingSafeEqual(Buffer.from(state), Buffer.from(storedState))) {
+      console.error('[Gmail Callback] State mismatch — possible CSRF attempt');
+      return NextResponse.redirect(
+        new URL('/settings/integrations?error=invalid_state', request.url)
+      );
+    }
+
+    // --- User Authentication ---
+    // Identify the user from their authenticated JWT session, not from the URL.
+    // This prevents an attacker from associating their Gmail with a victim's account.
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    // Fall back to the stored userId cookie if session is not available
+    // (the cookie was set by the /authorize endpoint which already authenticated)
+    const userId = token?.id as string || storedUserId;
+
+    // Verify user exists
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -78,10 +109,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Redirect to integrations page with success
-    return NextResponse.redirect(
+    // Clean up state cookies
+    const response = NextResponse.redirect(
       new URL('/settings/integrations?success=gmail_connected', request.url)
     );
+    response.cookies.delete('gmail_oauth_state');
+    response.cookies.delete('gmail_oauth_userId');
+
+    return response;
   } catch (error) {
     console.error('[Gmail Callback] Error:', error);
     return NextResponse.redirect(
@@ -89,3 +124,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

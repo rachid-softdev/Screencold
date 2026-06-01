@@ -287,7 +287,7 @@ export async function POST(request: NextRequest) {
       {
         status: 201,
         headers: {
-          ...getRateLimitHeaders(request),
+          ...(await getRateLimitHeaders(request)),
         },
       }
     );
