@@ -13,43 +13,43 @@ async function checkDatabase(): Promise<HealthCheck> {
   try {
     await prisma.$queryRaw`SELECT 1`;
     return { status: 'healthy', time: Date.now() - start };
-  } catch (error) {
+  } catch {
     return {
       status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Database error',
+      error: 'Database check failed',
       time: Date.now() - start,
     };
   }
 }
 
+// Singleton Redis connection for health checks — avoids creating a new
+// connection on every request (which caused port exhaustion under load).
+let redisConnection: Redis | null = null;
+
 async function checkRedis(): Promise<HealthCheck> {
   const start = Date.now();
-  let connection: Redis | null = null;
   try {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    connection = new Redis(redisUrl, {
-      lazyConnect: true,
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-      retryStrategy: () => null, // No retries for health check
-    });
-    await connection.connect();
-    await connection.ping();
+    if (!redisConnection) {
+      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      redisConnection = new Redis(redisUrl, {
+        lazyConnect: true,
+        maxRetriesPerRequest: null,
+        enableReadyCheck: false,
+        retryStrategy: () => null,
+      });
+      await redisConnection.connect();
+    }
+
+    await redisConnection.ping();
     return { status: 'healthy', time: Date.now() - start };
-  } catch (error) {
+  } catch {
+    // Connection lost — recreate on next check
+    redisConnection = null;
     return {
       status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Redis error',
+      error: 'Redis check failed',
       time: Date.now() - start,
     };
-  } finally {
-    if (connection) {
-      try {
-        await connection.quit();
-      } catch {
-        // Ignore disconnect errors
-      }
-    }
   }
 }
 
@@ -73,16 +73,16 @@ async function checkWorker(): Promise<HealthCheck> {
 
       return {
         status: 'degraded',
-        error: `Worker responded with status ${response.status}`,
+        error: 'Worker responded with error status',
         time: Date.now() - start,
       };
     } finally {
       clearTimeout(timeout);
     }
-  } catch (error) {
+  } catch {
     return {
       status: 'unreachable',
-      error: error instanceof Error ? error.message : 'Worker unreachable',
+      error: 'Worker metrics unreachable',
       time: Date.now() - start,
     };
   }

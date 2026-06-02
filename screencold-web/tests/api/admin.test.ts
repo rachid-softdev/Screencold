@@ -33,7 +33,7 @@ const mockPrisma = {
     count: vi.fn(),
     findUnique: vi.fn(),
   },
-  planConfigFeature: {
+  planFeature: {
     upsert: vi.fn(),
   },
   entitlementOverride: {
@@ -505,7 +505,7 @@ describe('Admin Entitlements — POST plan-features', () => {
     // Arrange
     mockPrisma.planConfig.findUnique.mockResolvedValue({ id: 'plan-1', key: 'PRO' });
     mockPrisma.feature.findUnique.mockResolvedValue({ id: 'feat-1', key: 'max_audits' });
-    mockPrisma.planConfigFeature.upsert.mockResolvedValue({
+    mockPrisma.planFeature.upsert.mockResolvedValue({
       planId: 'plan-1',
       featureId: 'feat-1',
       enabled: true,
@@ -529,7 +529,7 @@ describe('Admin Entitlements — POST plan-features', () => {
     // Assert
     expect(response.status).toBe(200);
     expect(body).toBeDefined();
-    expect(mockPrisma.planConfigFeature.upsert).toHaveBeenCalled();
+    expect(mockPrisma.planFeature.upsert).toHaveBeenCalled();
   });
 
   it('should return 404 when plan or feature not found', async () => {

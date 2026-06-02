@@ -122,7 +122,7 @@ export async function POST_PLAN_FEATURE(request: NextRequest) {
       return NextResponse.json({ error: 'Plan or feature not found' }, { status: 404 });
     }
 
-    const planFeature = await prisma.planConfigFeature.upsert({
+    const planFeature = await prisma.planFeature.upsert({
       where: {
         planId_featureId: { planId: plan.id, featureId: feature.id },
       },

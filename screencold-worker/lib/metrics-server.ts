@@ -202,9 +202,9 @@ export function startMetricsServer(logger?: {
   const port = METRICS_PORT;
   const server = createMetricsServer();
 
-  server.listen(port, () => {
+  server.listen(port, "127.0.0.1", () => {
     const log = logger ?? { info: () => {} };
-    log.info(`Metrics server listening on port ${port}`);
+    log.info(`Metrics server listening on 127.0.0.1:${port}`);
   });
 
   // Allow the process to exit even if this server is still listening

@@ -148,7 +148,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
 
     if (!plan) return [];
 
-    const planFeatures = await this.prisma.planConfigFeature.findMany({
+    const planFeatures = await this.prisma.planFeature.findMany({
       where: { planId: plan.id },
       include: { feature: true },
     });
@@ -177,7 +177,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
 
     if (!feature) return null;
 
-    const planFeature = await this.prisma.planConfigFeature.findUnique({
+    const planFeature = await this.prisma.planFeature.findUnique({
       where: {
         planId_featureId: { planId: plan.id, featureId: feature.id },
       },

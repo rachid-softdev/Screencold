@@ -225,7 +225,7 @@ async function main() {
     const feature = await prisma.feature.findUnique({ where: { key: pf.featureKey } });
 
     if (plan && feature) {
-      await prisma.planConfigFeature.upsert({
+      await prisma.planFeature.upsert({
         where: {
           planId_featureId: { planId: plan.id, featureId: feature.id },
         },
