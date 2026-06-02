@@ -1,40 +1,41 @@
 /** @type {import('next').NextConfig} */
 const { withSentryConfig } = require("@sentry/nextjs");
 
-// Bundle analyzer configuration
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+// Bundle analyzer (optional) — wrap require so missing dep doesn't crash lint/dev
+let withBundleAnalyzer = (config) => config;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  withBundleAnalyzer = require("@next/bundle-analyzer")({
+    enabled: process.env.ANALYZE === "true",
+  });
+} catch {
+  // @next/bundle-analyzer not installed — skip
+}
 
 const nextConfig = {
-  // Enable compression (enabled by default in production)
   compress: true,
-  
+
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
     ],
-    // Enable modern formats for better performance
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
   },
-  
-  // Optimize chunking
+
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Split chunks for better caching
       config.optimization = {
         ...config.optimization,
         splitChunks: {
-          chunks: 'all',
+          chunks: "all",
           cacheGroups: {
-            // Separate vendor chunks
             vendor: {
               test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
+              name: "vendors",
+              chunks: "all",
             },
           },
         },
@@ -44,8 +45,10 @@ const nextConfig = {
   },
 };
 
-module.exports = withBundleAnalyzer(withSentryConfig(nextConfig, {
-  silent: true,
-  org: process.env.SENTRY_ORG || "screencold",
-  project: process.env.SENTRY_PROJECT || "screencold-web",
-}));
+module.exports = withBundleAnalyzer(
+  withSentryConfig(nextConfig, {
+    silent: true,
+    org: process.env.SENTRY_ORG || "screencold",
+    project: process.env.SENTRY_PROJECT || "screencold-web",
+  })
+);

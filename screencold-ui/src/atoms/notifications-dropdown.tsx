@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Bell, Check } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Button } from "./button";
-import { Badge } from "./badge";
 
 interface Notification {
   id: string;

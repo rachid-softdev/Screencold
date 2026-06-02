@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { clsx } from "clsx";
-import { ChevronDown } from "lucide-react";
 
 interface DropdownItem {
   label: string;
@@ -76,14 +74,14 @@ function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
   );
 
   useEffect(() => {
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKeyDown);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("keydown", handleKeyDown);
-      };
-    }
+    if (!open) return;
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open, handleClickOutside, handleKeyDown]);
 
   if (!mounted) return null;
@@ -147,13 +145,7 @@ function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
 }
 
 // Convenience components for menu structure
-function MenuItem({
-  children,
-  onClick,
-  href,
-  disabled,
-  icon,
-}: {
+function MenuItem(_props: {
   children: React.ReactNode;
   onClick?: () => void;
   href?: string;
@@ -167,7 +159,7 @@ function MenuSeparator() {
   return null; // Used as type marker
 }
 
-function MenuLabel({ children }: { children: React.ReactNode }) {
+function MenuLabel(_props: { children: React.ReactNode }) {
   return null; // Used as type marker
 }
 

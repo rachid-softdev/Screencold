@@ -1,6 +1,7 @@
 import { createWorker } from "./worker";
 import { createLogger } from "./utils/logger";
 import { checkHealth, isAlive, isReady } from "./health";
+import { startMetricsServer } from "../lib/metrics-server";
 import * as Sentry from "@sentry/node";
 
 // ============================================
@@ -141,6 +142,13 @@ async function main() {
       logger.info(`Health check server running on port ${healthPort}`);
     });
 
+    // Start metrics HTTP server for Prometheus scraping
+    const metricsPort = parseInt(process.env.WORKER_METRICS_PORT || '9091', 10);
+    const metricsServer = startMetricsServer({
+      info: (msg: string) => logger.info(msg),
+    });
+    logger.info(`Metrics server configured for port ${metricsPort}`);
+
     // Create and start the worker
     const worker = await createWorker();
 
@@ -159,6 +167,11 @@ async function main() {
         // Close health server
         await new Promise((resolve) => {
           healthServer.close(resolve);
+        });
+
+        // Close metrics server
+        await new Promise((resolve) => {
+          metricsServer.close(resolve);
         });
         
         // Close worker connections

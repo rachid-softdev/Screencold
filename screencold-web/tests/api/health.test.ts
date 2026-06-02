@@ -25,9 +25,16 @@ vi.mock('@/lib/prisma', () => ({
   default: mockPrisma,
 }));
 
-// For the net module used in checkRedis, mock dynamically
-vi.mock('net', () => ({
-  createConnection: vi.fn(),
+// Mock ioredis for checkRedis — singleton connection
+const mockRedisInstance = {
+  connect: vi.fn().mockResolvedValue(undefined),
+  ping: vi.fn().mockResolvedValue('PONG'),
+  disconnect: vi.fn(),
+  quit: vi.fn().mockResolvedValue('OK'),
+};
+
+vi.mock('ioredis', () => ({
+  Redis: vi.fn().mockImplementation(() => mockRedisInstance),
 }));
 
 // ============================================
@@ -41,6 +48,10 @@ describe('Health Check API', () => {
     vi.stubEnv('NODE_ENV', 'test');
     // Mock process.uptime
     vi.spyOn(process, 'uptime').mockReturnValue(12345.67);
+    // Mock global.fetch for worker check
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response('ok', { status: 200 }),
+    );
   });
 
   afterEach(() => {
@@ -48,25 +59,16 @@ describe('Health Check API', () => {
   });
 
   describe('GET /api/health', () => {
+    beforeEach(() => {
+      // Reset mock state between tests
+      vi.clearAllMocks();
+      mockRedisInstance.ping.mockResolvedValue('PONG');
+      mockRedisInstance.connect.mockResolvedValue(undefined);
+    });
+
     it('should return 200 with healthy status when all services are up', async () => {
       // Arrange
       mockPrisma.$queryRaw.mockResolvedValue([{ '1': 1 }]);
-      mockPrisma.audit.count.mockResolvedValue(0);
-
-      // Mock net.createConnection for Redis check
-      const net = await import('net');
-      const mockSocket = {
-        on: vi.fn((event: string, handler: () => void) => {
-          if (event === 'connect') {
-            // Call connect handler asynchronously
-            setTimeout(handler, 0);
-          }
-          return mockSocket;
-        }),
-        destroy: vi.fn(),
-        setTimeout: vi.fn(),
-      };
-      vi.mocked(net.createConnection).mockReturnValue(mockSocket as never);
 
       // Import the route handler dynamically
       const { GET } = await import('@/app/api/health/route');
@@ -86,26 +88,13 @@ describe('Health Check API', () => {
       expect(body.checks.database).toBeDefined();
       expect(body.checks.database.status).toBe('healthy');
       expect(body.checks.redis).toBeDefined();
+      expect(body.checks.redis.status).toBe('healthy');
       expect(body.responseTime).toBeGreaterThanOrEqual(0);
     });
 
     it('should return 503 when database is down', async () => {
       // Arrange
       mockPrisma.$queryRaw.mockRejectedValue(new Error('Connection refused'));
-      mockPrisma.audit.count.mockResolvedValue(0);
-
-      const net = await import('net');
-      const mockSocket = {
-        on: vi.fn((event: string, handler: () => void) => {
-          if (event === 'connect') {
-            setTimeout(handler, 0);
-          }
-          return mockSocket;
-        }),
-        destroy: vi.fn(),
-        setTimeout: vi.fn(),
-      };
-      vi.mocked(net.createConnection).mockReturnValue(mockSocket as never);
 
       const { GET } = await import('@/app/api/health/route');
       const request = { url: 'http://localhost:3000/api/health' } as Request;
@@ -120,52 +109,9 @@ describe('Health Check API', () => {
       expect(body.checks.database.status).toBe('unhealthy');
     });
 
-    it('should return degraded status when queue has too many pending items', async () => {
-      // Arrange
-      mockPrisma.$queryRaw.mockResolvedValue([{ '1': 1 }]);
-      mockPrisma.audit.count.mockResolvedValue(150); // > 100 = degraded
-
-      const net = await import('net');
-      const mockSocket = {
-        on: vi.fn((event: string, handler: () => void) => {
-          if (event === 'connect') {
-            setTimeout(handler, 0);
-          }
-          return mockSocket;
-        }),
-        destroy: vi.fn(),
-        setTimeout: vi.fn(),
-      };
-      vi.mocked(net.createConnection).mockReturnValue(mockSocket as never);
-
-      const { GET } = await import('@/app/api/health/route');
-      const request = { url: 'http://localhost:3000/api/health' } as Request;
-
-      // Act
-      const response = await GET(request as never);
-      const body = await response.json();
-
-      // Assert
-      expect(body.checks.queue.status).toBe('degraded');
-    });
-
     it('should include proper response shape with all required fields', async () => {
       // Arrange
       mockPrisma.$queryRaw.mockResolvedValue([{ '1': 1 }]);
-      mockPrisma.audit.count.mockResolvedValue(5);
-
-      const net = await import('net');
-      const mockSocket = {
-        on: vi.fn((event: string, handler: () => void) => {
-          if (event === 'connect') {
-            setTimeout(handler, 0);
-          }
-          return mockSocket;
-        }),
-        destroy: vi.fn(),
-        setTimeout: vi.fn(),
-      };
-      vi.mocked(net.createConnection).mockReturnValue(mockSocket as never);
 
       const { GET } = await import('@/app/api/health/route');
 
@@ -181,32 +127,21 @@ describe('Health Check API', () => {
       expect(body).toHaveProperty('checks');
       expect(body.checks).toHaveProperty('database');
       expect(body.checks).toHaveProperty('redis');
-      expect(body.checks).toHaveProperty('queue');
+      expect(body.checks).toHaveProperty('worker');
     });
 
     it('should handle Redis check failure gracefully', async () => {
       // Arrange
       mockPrisma.$queryRaw.mockResolvedValue([{ '1': 1 }]);
-      mockPrisma.audit.count.mockResolvedValue(0);
-
-      // Mock Redis (net) to fail
-      const net = await import('net');
-      const mockSocket: Record<string, unknown> = {
-        on: vi.fn((event: string, handler: (err?: Error) => void) => {
-          if (event === 'error') {
-            setTimeout(() => handler(new Error('ECONNREFUSED')), 0);
-          }
-          return mockSocket;
-        }),
-        destroy: vi.fn(),
-        setTimeout: vi.fn().mockReturnThis(),
-      };
-      vi.mocked(net.createConnection).mockReturnValue(mockSocket as never);
+      mockRedisInstance.ping.mockRejectedValue(new Error('ECONNREFUSED'));
 
       const { GET } = await import('@/app/api/health/route');
 
+      // Re-import to reset singleton for this test (first import creates the connection)
+      const { GET: GET2 } = await import('@/app/api/health/route');
+
       // Act
-      const response = await GET({ url: 'http://localhost:3000/api/health' } as Request);
+      const response = await GET2({ url: 'http://localhost:3000/api/health' } as Request);
       const body = await response.json();
 
       // Assert

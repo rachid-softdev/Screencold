@@ -30,7 +30,7 @@ export async function GET_PLANS(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const plans = await prisma.plan.findMany({
+    const plans = await prisma.planConfig.findMany({
       ...getPagination(page, limit),
       orderBy: { sortOrder: 'asc' },
       include: {
@@ -40,7 +40,7 @@ export async function GET_PLANS(request: NextRequest) {
       },
     });
 
-    const total = await prisma.plan.count();
+    const total = await prisma.planConfig.count();
 
     return NextResponse.json({
       data: plans,
@@ -115,7 +115,7 @@ export async function POST_PLAN_FEATURE(request: NextRequest) {
 
     const body = planFeatureSchema.parse(await request.json());
 
-    const plan = await prisma.plan.findUnique({ where: { key: body.planKey } });
+    const plan = await prisma.planConfig.findUnique({ where: { key: body.planKey } });
     const feature = await prisma.feature.findUnique({ where: { key: body.featureKey } });
 
     if (!plan || !feature) {

@@ -21,7 +21,7 @@ function FormGroup({ className, label, error, helperText, children, id, ...props
           {label}
         </label>
       )}
-      {React.isValidElement(children) && React.cloneElement(children as React.ReactElement<{ id?: string }>, { id: inputId, error: !!error })}
+      {React.isValidElement(children) && React.cloneElement(children as React.ReactElement<{ id?: string; error?: boolean }>, { id: inputId, error: !!error })}
       {error && (
         <p id={`${inputId}-error`} className="mt-1.5 text-sm text-red-600">
           {error}
