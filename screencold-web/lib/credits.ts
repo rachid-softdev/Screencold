@@ -283,40 +283,67 @@ export async function batchRefundCredits(
 // ============================================
 
 /**
- * Reset credits for users with monthly plans
- * Should be called by a cron job or Stripe webhook
+ * Plan credit limits (monthly reset amounts)
+ */
+const PLAN_CREDITS: Record<string, number> = {
+  FREE: 5,
+  STARTER: 50,
+  PRO: 200,
+  AGENCY: 1000,
+};
+
+/**
+ * Result of a monthly credit reset operation.
+ */
+export interface ResetCreditsResult {
+  reset: number;
+  skipped: number;
+}
+
+/**
+ * Reset credits for users whose monthly period has lapsed.
+ * Handles all plans: FREE=5, STARTER=50, PRO=200, AGENCY=1000.
+ * Sets next creditsResetsAt to the 1st of the following month.
+ * Should be called by a cron job or Stripe webhook.
  */
 export async function resetMonthlyCredits(): Promise<number> {
+  const result = await resetCreditsForAllPlans();
+  return result.reset;
+}
+
+/**
+ * Full credit reset for all eligible users.
+ * Finds users where creditsResetsAt <= now OR creditsResetsAt IS NULL,
+ * resets their credits based on plan, and updates creditsResetsAt.
+ */
+export async function resetCreditsForAllPlans(): Promise<ResetCreditsResult> {
   const now = new Date();
 
-  // Find users whose credits should be reset
+  // Find all users whose credits are due for reset (past OR never set)
   const usersToReset = await prisma.user.findMany({
     where: {
-      plan: { in: ['STARTER', 'PRO', 'AGENCY'] },
-      creditsResetsAt: {
-        lte: now,
-      },
+      OR: [
+        { creditsResetsAt: { lte: now } },
+        { creditsResetsAt: null },
+      ],
     },
     select: {
       id: true,
       plan: true,
-      creditsResetsAt: true,
     },
   });
 
-  // Calculate credits based on plan
-  const planCredits: Record<string, number> = {
-    STARTER: 50,
-    PRO: 500,
-    AGENCY: -1, // Unlimited
-  };
-
-  let resetCount = 0;
+  let reset = 0;
+  let skipped = 0;
 
   await Promise.all(
     usersToReset.map(async (user) => {
-      const credits = planCredits[user.plan];
-      if (credits === -1) return; // No reset for unlimited
+      const credits = PLAN_CREDITS[user.plan];
+
+      if (credits === undefined) {
+        skipped++;
+        return;
+      }
 
       await prisma.$transaction(async (tx) => {
         await tx.user.update({
@@ -335,13 +362,13 @@ export async function resetMonthlyCredits(): Promise<number> {
           },
         });
 
-        resetCount++;
+        reset++;
       });
     })
   );
 
-  console.log(`[Credits] Monthly reset completed: ${resetCount} users`);
-  return resetCount;
+  console.log(`[Credits] Monthly reset completed: ${reset} users reset, ${skipped} skipped`);
+  return { reset, skipped };
 }
 
 // ============================================
