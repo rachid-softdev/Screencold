@@ -67,7 +67,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
   // ============================================
 
   async getAllPlans(): Promise<PlanDefinition[]> {
-    const plans = await this.prisma.plan.findMany({
+    const plans = await this.prisma.planConfig.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
     });
@@ -84,7 +84,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
   }
 
   async getPlanByKey(key: string): Promise<PlanDefinition | null> {
-    const plan = await this.prisma.plan.findUnique({
+    const plan = await this.prisma.planConfig.findUnique({
       where: { key },
     });
 
@@ -142,13 +142,13 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
   // ============================================
 
   async getPlanFeatures(planKey: string): Promise<PlanFeatureConfig[]> {
-    const plan = await this.prisma.plan.findUnique({
+    const plan = await this.prisma.planConfig.findUnique({
       where: { key: planKey },
     });
 
     if (!plan) return [];
 
-    const planFeatures = await this.prisma.planFeature.findMany({
+    const planFeatures = await this.prisma.planConfigFeature.findMany({
       where: { planId: plan.id },
       include: { feature: true },
     });
@@ -165,7 +165,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
   }
 
   async getFeatureConfig(planKey: string, featureKey: string): Promise<PlanFeatureConfig | null> {
-    const plan = await this.prisma.plan.findUnique({
+    const plan = await this.prisma.planConfig.findUnique({
       where: { key: planKey },
     });
 
@@ -177,7 +177,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
 
     if (!feature) return null;
 
-    const planFeature = await this.prisma.planFeature.findUnique({
+    const planFeature = await this.prisma.planConfigFeature.findUnique({
       where: {
         planId_featureId: { planId: plan.id, featureId: feature.id },
       },

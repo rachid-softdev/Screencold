@@ -1,4 +1,8 @@
-import type { Plan } from "@prisma/client";
+import { Plan } from "@prisma/client";
+
+function env(key: string): string | null {
+  return (process.env as Record<string, string | undefined>)[key] ?? null;
+}
 
 // User with computed statistics
 export interface UserWithStats {
@@ -128,7 +132,7 @@ export const DEFAULT_PLANS: Record<Plan, PlanInfo> = {
       "Support email",
     ],
     price: 29,
-    stripePriceId: process.env.STRIPE_PRICE_ID_STARTER ?? null,
+    stripePriceId: env("STRIPE_PRICE_ID_STARTER"),
   },
   PRO: {
     name: Plan.PRO,
@@ -145,7 +149,7 @@ export const DEFAULT_PLANS: Record<Plan, PlanInfo> = {
       "Support prioritaire",
     ],
     price: 99,
-    stripePriceId: process.env.STRIPE_PRICE_ID_PRO ?? null,
+    stripePriceId: env("STRIPE_PRICE_ID_PRO"),
   },
   AGENCY: {
     name: Plan.AGENCY,
@@ -163,7 +167,7 @@ export const DEFAULT_PLANS: Record<Plan, PlanInfo> = {
       "SLA 99.9%",
     ],
     price: 299,
-    stripePriceId: process.env.STRIPE_PRICE_ID_AGENCY ?? null,
+    stripePriceId: env("STRIPE_PRICE_ID_AGENCY"),
   },
 };
 
@@ -174,8 +178,6 @@ export function canUserPerformAction(
   action: "audit" | "campaign" | "batch"
 ): boolean {
   if (credits <= 0) return false;
-
-  const planInfo = DEFAULT_PLANS[plan];
 
   switch (action) {
     case "audit":

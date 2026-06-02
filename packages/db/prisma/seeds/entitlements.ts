@@ -45,7 +45,7 @@ async function main() {
   ];
 
   for (const plan of plans) {
-    await prisma.plan.upsert({
+    await prisma.planConfig.upsert({
       where: { key: plan.key },
       create: plan,
       update: plan,
@@ -221,11 +221,11 @@ async function main() {
   ];
 
   for (const pf of planFeatures) {
-    const plan = await prisma.plan.findUnique({ where: { key: pf.planKey } });
+    const plan = await prisma.planConfig.findUnique({ where: { key: pf.planKey } });
     const feature = await prisma.feature.findUnique({ where: { key: pf.featureKey } });
 
     if (plan && feature) {
-      await prisma.planFeature.upsert({
+      await prisma.planConfigFeature.upsert({
         where: {
           planId_featureId: { planId: plan.id, featureId: feature.id },
         },

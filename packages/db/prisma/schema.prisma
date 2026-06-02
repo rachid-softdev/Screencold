@@ -50,6 +50,14 @@ model User {
   audits               Audit[]
   creditTransactions   CreditTransaction[]
   userRoles            UserRole[]
+  notifications        Notification[]
+  auditEvents          AuditEvent[]
+  apiKeys              ApiKey[]
+  teams                Team[]          // as owner
+  teamMemberships      TeamMember[]
+  emailTemplates       EmailTemplate[]
+  sentEmails           SentEmail[]
+  userIntegrations     UserIntegration[]
 
   @@index([email])
   @@index([stripeCustomerId])
@@ -139,14 +147,13 @@ model Prospect {
   contactEmail String?
   notes        String?
   campaignId   String
-  auditId      String?        @unique
   status       ProspectStatus @default(PENDING)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
   // Relations
   campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  audit    Audit?   @relation(fields: [auditId], references: [id], onDelete: SetNull)
+  audit    Audit?
 
   @@unique([campaignId, url])
   @@index([campaignId])
@@ -183,9 +190,10 @@ model Audit {
   updatedAt      DateTime    @updatedAt
 
   // Relations
-  prospect          Prospect           @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospect          Prospect           @relation(fields: [prospectId], references: [id])
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   creditTransaction CreditTransaction?
+  sentEmails        SentEmail[]
 
   @@index([userId])
   @@index([status])
@@ -466,8 +474,8 @@ enum DowngradeStrategy {
   FREEZE    // Block new actions, keep existing data
 }
 
-// Plan definition
-model Plan {
+// Plan configuration
+model PlanConfig {
   id            String   @id @default(cuid())
   key           String   @unique // FREE, STARTER, PRO, AGENCY
   name          String
@@ -517,7 +525,7 @@ model PlanFeature {
   updatedAt       DateTime         @updatedAt
 
   // Relations
-  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  plan    PlanConfig @relation(fields: [planId], references: [id], onDelete: Cascade)
   feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
 
   @@unique([planId, featureId])
@@ -572,17 +580,19 @@ enum OverrideScope {
 }
 
 model EntitlementOverride {
-  id          String         @id @default(cuid())
-  scope       OverrideScope // user or org
-  scopeId     String         // userId or orgId
-  featureKey  String
-  enabled     Boolean        @default(false)
-  limitValue  Int?
-  expiresAt   DateTime?
-  reason      String?        // Required for audit
-  createdBy   String?        // admin user id
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id             String         @id @default(cuid())
+  scope          OverrideScope // user or org
+  scopeId        String         // userId or orgId
+  featureKey     String
+  enabled        Boolean        @default(false)
+  limitValue     Int?
+  expiresAt      DateTime?
+  reason         String?        // Required for audit
+  createdBy      String?        // admin user id
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  Organization   Organization?  @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   @@unique([scope, scopeId, featureKey])
   @@index([scope, scopeId])
