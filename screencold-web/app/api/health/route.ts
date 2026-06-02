@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Redis } from 'ioredis';
 
 interface HealthCheck {
   status: string;
@@ -23,60 +24,65 @@ async function checkDatabase(): Promise<HealthCheck> {
 
 async function checkRedis(): Promise<HealthCheck> {
   const start = Date.now();
+  let connection: Redis | null = null;
   try {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    // Simple TCP check - try to connect
-    const { createConnection } = await import('net');
-    const url = new URL(redisUrl);
-    return new Promise((resolve) => {
-      const socket = createConnection({
-        host: url.hostname,
-        port: parseInt(url.port || '6379', 10),
-        timeout: 3000,
-      });
-      socket.on('connect', () => {
-        socket.destroy();
-        resolve({ status: 'healthy', time: Date.now() - start });
-      });
-      socket.on('error', (err) => {
-        socket.destroy();
-        resolve({
-          status: 'unhealthy',
-          error: err.message,
-          time: Date.now() - start,
-        });
-      });
-      socket.on('timeout', () => {
-        socket.destroy();
-        resolve({
-          status: 'unhealthy',
-          error: 'Connection timeout',
-          time: Date.now() - start,
-        });
-      });
+    connection = new Redis(redisUrl, {
+      lazyConnect: true,
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      retryStrategy: () => null, // No retries for health check
     });
+    await connection.connect();
+    await connection.ping();
+    return { status: 'healthy', time: Date.now() - start };
   } catch (error) {
     return {
       status: 'unhealthy',
       error: error instanceof Error ? error.message : 'Redis error',
       time: Date.now() - start,
     };
+  } finally {
+    if (connection) {
+      try {
+        await connection.quit();
+      } catch {
+        // Ignore disconnect errors
+      }
+    }
   }
 }
 
-async function checkQueueDepth(): Promise<HealthCheck> {
+async function checkWorker(): Promise<HealthCheck> {
   const start = Date.now();
   try {
-    // Check if we can reach the queue by checking pending audits
-    const pendingCount = await prisma.audit.count({
-      where: { status: 'PROCESSING' },
-    });
-    const status = pendingCount > 100 ? 'degraded' : 'healthy';
-    return { status, time: Date.now() - start };
+    const workerMetricsUrl =
+      process.env.WORKER_METRICS_URL ?? 'http://localhost:9091/metrics';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+
+    try {
+      const response = await fetch(workerMetricsUrl, {
+        signal: controller.signal,
+        headers: { Accept: 'text/plain' },
+      });
+
+      if (response.ok) {
+        return { status: 'healthy', time: Date.now() - start };
+      }
+
+      return {
+        status: 'degraded',
+        error: `Worker responded with status ${response.status}`,
+        time: Date.now() - start,
+      };
+    } finally {
+      clearTimeout(timeout);
+    }
   } catch (error) {
     return {
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Queue check error',
+      status: 'unreachable',
+      error: error instanceof Error ? error.message : 'Worker unreachable',
       time: Date.now() - start,
     };
   }
@@ -88,15 +94,15 @@ export async function GET(request: NextRequest) {
 
   try {
     // Run all checks in parallel
-    const [dbResult, redisResult, queueResult] = await Promise.all([
+    const [dbResult, redisResult, workerResult] = await Promise.all([
       checkDatabase(),
       checkRedis(),
-      checkQueueDepth(),
+      checkWorker(),
     ]);
 
     checks.database = dbResult;
     checks.redis = redisResult;
-    checks.queue = queueResult;
+    checks.worker = workerResult;
 
     const totalTime = Date.now() - start;
     const allHealthy = Object.values(checks).every(
