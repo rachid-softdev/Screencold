@@ -22,7 +22,7 @@ function getPagination(page = 1, limit = 20) {
 // GET /api/admin/entitlements/plans
 // ============================================
 
-export async function GET_PLANS(request: NextRequest) {
+async function handleGetPlans(request: NextRequest) {
   try {
     await ensureEntitlementsInitialized();
 
@@ -61,7 +61,7 @@ export async function GET_PLANS(request: NextRequest) {
 // GET /api/admin/entitlements/features
 // ============================================
 
-export async function GET_FEATURES(request: NextRequest) {
+async function handleGetFeatures(request: NextRequest) {
   try {
     await ensureEntitlementsInitialized();
 
@@ -109,7 +109,7 @@ const planFeatureSchema = z.object({
   downgradeStrategy: z.enum(['GRACEFUL', 'IMMEDIATE', 'FREEZE']).optional(),
 });
 
-export async function POST_PLAN_FEATURE(request: NextRequest) {
+async function handlePostPlanFeature(request: NextRequest) {
   try {
     await ensureEntitlementsInitialized();
 
@@ -168,7 +168,7 @@ const overrideSchema = z.object({
   reason: z.string().min(1),
 });
 
-export async function POST_OVERRIDE(request: NextRequest) {
+async function handlePostOverride(request: NextRequest) {
   try {
     await ensureEntitlementsInitialized();
 
@@ -233,7 +233,7 @@ export async function POST_OVERRIDE(request: NextRequest) {
 // Delete entitlement override
 // ============================================
 
-export async function DELETE_OVERRIDE(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleDeleteOverride(request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const id = params.path[params.path.length - 1];
 
@@ -262,7 +262,7 @@ export async function DELETE_OVERRIDE(request: NextRequest, { params }: { params
 // Get org entitlements
 // ============================================
 
-export async function GET_ORG_ENTITLEMENTS(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleGetOrgEntitlements(request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const orgId = params.path[1]; // path is like ["orgs", "orgId"]
 
@@ -291,7 +291,7 @@ export async function GET_ORG_ENTITLEMENTS(request: NextRequest, { params }: { p
 // Preview what happens if org downgrades
 // ============================================
 
-export async function GET_DOWNGRADE_PREVIEW(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleGetDowngradePreview(request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const parts = params.path;
     const orgId = parts[1];
@@ -316,7 +316,7 @@ export async function GET_DOWNGRADE_PREVIEW(request: NextRequest, { params }: { 
 // Manually invalidate cache
 // ============================================
 
-export async function POST_CACHE_INVALIDATE(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handlePostCacheInvalidate(request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const orgId = params.path[params.path.length - 1];
 
@@ -346,16 +346,16 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
   const pathParts = params.path;
 
   if (pathParts[0] === 'plans') {
-    return GET_PLANS(request);
+    return handleGetPlans(request);
   }
   if (pathParts[0] === 'features') {
-    return GET_FEATURES(request);
+    return handleGetFeatures(request);
   }
   if (pathParts[0] === 'orgs' && pathParts[2] === 'downgrade-preview') {
-    return GET_DOWNGRADE_PREVIEW(request, { params });
+    return handleGetDowngradePreview(request, { params });
   }
   if (pathParts[0] === 'orgs') {
-    return GET_ORG_ENTITLEMENTS(request, { params });
+    return handleGetOrgEntitlements(request, { params });
   }
 
   return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -374,13 +374,13 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
   const pathParts = params.path;
 
   if (pathParts[0] === 'plan-features') {
-    return POST_PLAN_FEATURE(request);
+    return handlePostPlanFeature(request);
   }
   if (pathParts[0] === 'overrides') {
-    return POST_OVERRIDE(request);
+    return handlePostOverride(request);
   }
   if (pathParts[0] === 'cache' && pathParts[2] === 'invalidate') {
-    return POST_CACHE_INVALIDATE(request, { params });
+    return handlePostCacheInvalidate(request, { params });
   }
 
   return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -399,7 +399,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { path:
   const pathParts = params.path;
 
   if (pathParts[0] === 'overrides') {
-    return DELETE_OVERRIDE(request, { params });
+    return handleDeleteOverride(request, { params });
   }
 
   return NextResponse.json({ error: 'Not found' }, { status: 404 });
