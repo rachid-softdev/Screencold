@@ -74,7 +74,8 @@ export async function getSignedS3Url(
     Key: key,
   });
 
-  const presigner = await import("@aws/s3-request-presigner");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const presigner = require("@aws/s3-request-presigner");
   const signedUrl = await presigner.getSignedUrl(s3Client, command, {
     expiresIn,
   });

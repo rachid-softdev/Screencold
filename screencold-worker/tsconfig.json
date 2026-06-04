@@ -8,6 +8,7 @@
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
     "noImplicitAny": false,
+    "useUnknownInCatchVariables": false,
     "outDir": "./dist",
     "rootDir": ".",
     "paths": {
