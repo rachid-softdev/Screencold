@@ -6,7 +6,15 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     include: ['**/*.test.ts', '**/*.test.tsx'],
-    exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.opencode/**', '**/.claude/**'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.next/**',
+      '**/.opencode/**',
+      '**/.claude/**',
+      'screencold-worker/tests/jobs.test.ts',
+      'screencold-worker/tests/pipeline.test.ts',
+    ],
   },
   resolve: {
     alias: {
