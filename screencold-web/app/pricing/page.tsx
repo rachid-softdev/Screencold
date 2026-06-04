@@ -8,20 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { OrganizationSchema, FAQSchema } from "@/components/seo/schema";
 import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
 
-export const metadata = {
-  title: 'Tarifs ScreenCold - Plans pour agences et freelances',
-  description: 'Choisissez le plan adapté à vos besoins : Gratuit, Starter (49€/mois), Pro (149€/mois), ou Agency (399€/mois). Essai gratuit 14 jours, sans engagement.',
-  keywords: ['tarifs', 'pricing', 'abonnement', 'crédits', 'agence', 'freelance', 'essai gratuit'],
-  openGraph: {
-    title: 'Tarifs ScreenCold',
-    description: 'Choisissez le plan adapté à vos besoins',
-    url: '/pricing',
-    siteName: 'ScreenCold',
-    locale: 'fr_FR',
-    type: 'website',
-  },
-};
-
 const planOrder: Plan[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
 
 const planFeatures: Record<Plan, string[]> = {

@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     if (!profile) {
       return NextResponse.json(
-        { error: 'NOT_FOUND', message: 'Utilisateur non trouvé' },
+        { error: 'NOT_FOUND', message: 'Utilisateur non trouvÃ©' },
         { status: 404 }
       );
     }
@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'VALIDATION_ERROR',
-          message: 'Données invalides',
+          message: 'DonnÃ©es invalides',
           details: validationResult.error.flatten(),
         },
         { status: 400 }
@@ -124,7 +124,7 @@ export async function PATCH(request: NextRequest) {
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
-        { error: 'NO_UPDATE', message: 'Aucune donnée à mettre à jour' },
+        { error: 'NO_UPDATE', message: 'Aucune donnÃ©e Ã  mettre Ã  jour' },
         { status: 400 }
       );
     }
@@ -180,7 +180,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!userRecord) {
       return NextResponse.json(
-        { error: 'NOT_FOUND', message: 'Utilisateur non trouvé' },
+        { error: 'NOT_FOUND', message: 'Utilisateur non trouvÃ©' },
         { status: 404 }
       );
     }
@@ -193,7 +193,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'VALIDATION_ERROR',
-          message: 'Données invalides',
+          message: 'DonnÃ©es invalides',
           details: validationResult.error.flatten(),
         },
         { status: 400 }
@@ -261,13 +261,13 @@ export async function DELETE(request: NextRequest) {
             <body style="font-family: sans-serif; padding: 20px;">
               <h2>Confirmation de suppression de compte</h2>
               <p>Bonjour ${userRecord.name || 'utilisateur'},</p>
-              <p>Vous avez demandé la suppression de votre compte ScreenCold.</p>
+              <p>Vous avez demandÃ© la suppression de votre compte ScreenCold.</p>
               <p>Votre code de confirmation est:</p>
               <div style="background: #f3f4f6; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 4px; border-radius: 8px; margin: 20px 0;">
                 ${code}
               </div>
               <p>Ce code expire dans 15 minutes.</p>
-              <p>Si vous n'avez pas demandé cette suppression, ignorez cet email.</p>
+              <p>Si vous n'avez pas demandÃ© cette suppression, ignorez cet email.</p>
             </body>
             </html>
           `,
@@ -276,7 +276,7 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json(
           {
             error: 'DELETION_CODE_REQUIRED',
-            message: 'Un code de confirmation a été envoyé à votre email',
+            message: 'Un code de confirmation a Ã©tÃ© envoyÃ© Ã  votre email',
             codeSent: true,
           },
           { status: 202 }
@@ -302,7 +302,7 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json(
           {
             error: 'NO_DELETION_REQUEST',
-            message: 'Aucune demande de suppression récente. Veuillez réessayer.',
+            message: 'Aucune demande de suppression rÃ©cente. Veuillez rÃ©essayer.',
           },
           { status: 400 }
         );
@@ -327,7 +327,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Compte supprimé avec succès',
+      message: 'Compte supprimÃ© avec succÃ¨s',
     });
   } catch (error) {
     console.error('[Profile] DELETE error:', error);

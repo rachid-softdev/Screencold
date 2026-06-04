@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Authenticate via JWT session token — check for admin role
+    // Authenticate via JWT session token Â— check for admin role
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,

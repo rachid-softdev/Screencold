@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (existingEvent) {
       if (existingEvent.processed) {
-        // Already processed — return 200 as Stripe expects a success response
+        // Already processed Â— return 200 as Stripe expects a success response
         // for duplicate events (it's just confirming delivery).
         console.log(
           `[StripeWebhook] Event ${event.id} (${event.type}) already processed, skipping`
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
 
       if (!result.success) {
         console.error(`[StripeWebhook] Entitlements handler failed for ${event.id}: ${result.error}`);
-        // Don't throw — the event record was already created; if processing failed,
+        // Don't throw Â— the event record was already created; if processing failed,
         // the event will remain unprocessed and can be retried manually.
       }
     }

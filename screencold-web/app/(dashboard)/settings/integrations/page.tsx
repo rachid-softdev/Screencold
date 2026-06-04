@@ -30,14 +30,14 @@ function IntegrationsPage() {
 
   React.useEffect(() => {
     if (success === "gmail_connected") {
-      addToast("Compte Gmail connecté avec succès", "success");
+      addToast("Compte Gmail connectÃ© avec succÃ¨s", "success");
     } else if (error) {
       const errorMessages: Record<string, string> = {
-        gmail_auth_failed: "Échec de l'authentification Gmail",
-        invalid_params: "Paramètres invalides",
-        invalid_state: "État de session invalide",
-        user_not_found: "Utilisateur non trouvé",
-        token_exchange_failed: "Échec de l'échange de token",
+        gmail_auth_failed: "Ã‰chec de l'authentification Gmail",
+        invalid_params: "ParamÃ¨tres invalides",
+        invalid_state: "Ã‰tat de session invalide",
+        user_not_found: "Utilisateur non trouvÃ©",
+        token_exchange_failed: "Ã‰chec de l'Ã©change de token",
         unknown: "Une erreur est survenue",
       };
       addToast(errorMessages[error] || "Erreur de connexion", "error");
@@ -94,16 +94,16 @@ function IntegrationsPage() {
         method: "DELETE",
       });
       if (response.ok) {
-        addToast("Compte Gmail déconnecté", "success");
+        addToast("Compte Gmail dÃ©connectÃ©", "success");
         setGmailConnected(false);
       }
     } catch (err) {
-      addToast("Erreur lors de la déconnexion", "error");
+      addToast("Erreur lors de la dÃ©connexion", "error");
     }
   };
 
   const handleDeleteApiKey = async (keyId: string) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer cette clé API ?")) {
+    if (!confirm("ÃŠtes-vous sÃ»r de vouloir supprimer cette clÃ© API ?")) {
       return;
     }
 
@@ -112,7 +112,7 @@ function IntegrationsPage() {
         method: "DELETE",
       });
       if (response.ok) {
-        addToast("Clé API supprimée", "success");
+        addToast("ClÃ© API supprimÃ©e", "success");
         setApiKeys((prev) => prev.filter((k) => k.id !== keyId));
       }
     } catch (err) {
@@ -132,9 +132,9 @@ function IntegrationsPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Intégrations</h1>
+        <h1 className="text-2xl font-bold text-gray-900">IntÃ©grations</h1>
         <p className="text-sm text-gray-500">
-          Connectez vos comptes et gérez vos clés API
+          Connectez vos comptes et gÃ©rez vos clÃ©s API
         </p>
       </div>
 
@@ -151,11 +151,11 @@ function IntegrationsPage() {
             <div>
               <p className="text-sm text-gray-600">
                 Connectez votre compte Gmail pour envoyer des emails de prospection
-                directement depuis votre boîte mail.
+                directement depuis votre boÃ®te mail.
               </p>
               <div className="mt-2 flex items-center gap-2">
                 <Badge variant={gmailConnected ? "success" : "secondary"}>
-                  {gmailConnected ? "Connecté" : "Non connecté"}
+                  {gmailConnected ? "ConnectÃ©" : "Non connectÃ©"}
                 </Badge>
               </div>
             </div>
@@ -167,7 +167,7 @@ function IntegrationsPage() {
                   className="text-red-600"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Déconnecter
+                  DÃ©connecter
                 </Button>
               ) : (
                 <Button onClick={handleGmailConnect}>
@@ -181,9 +181,9 @@ function IntegrationsPage() {
           <div className="mt-4 rounded-lg bg-blue-50 p-4">
             <h4 className="font-medium text-blue-900">Pourquoi utiliser Gmail ?</h4>
             <ul className="mt-2 list-disc pl-4 text-sm text-blue-800">
-              <li>Emails délivrables directement dans la boîte de réception</li>
+              <li>Emails dÃ©livrables directement dans la boÃ®te de rÃ©ception</li>
               <li>Conservation du historique dans votre compte Gmail</li>
-              <li>Possibilité de répondre directement depuis Gmail</li>
+              <li>PossibilitÃ© de rÃ©pondre directement depuis Gmail</li>
             </ul>
           </div>
         </CardContent>
@@ -194,11 +194,11 @@ function IntegrationsPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
-            Clés API
+            ClÃ©s API
           </CardTitle>
           <Link href="/settings/api-keys">
             <Button variant="secondary" size="sm">
-              Gérer les clés
+              GÃ©rer les clÃ©s
             </Button>
           </Link>
         </CardHeader>
@@ -207,11 +207,11 @@ function IntegrationsPage() {
             <div className="text-center py-6">
               <Key className="mx-auto h-8 w-8 text-gray-400" />
               <p className="mt-2 text-sm text-gray-500">
-                Aucune clé API générée
+                Aucune clÃ© API gÃ©nÃ©rÃ©e
               </p>
               <Link href="/settings/api-keys" className="mt-2 inline-block">
                 <Button variant="secondary" size="sm">
-                  Créer une clé API
+                  CrÃ©er une clÃ© API
                 </Button>
               </Link>
             </div>
@@ -225,13 +225,13 @@ function IntegrationsPage() {
                   <div>
                     <p className="font-medium text-gray-900">{key.name}</p>
                     <p className="text-sm text-gray-500">
-                      {key.keyPrefix}... • {key.rateLimit} req/min
+                      {key.keyPrefix}... Â• {key.rateLimit} req/min
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     {key.lastUsedAt && (
                       <span className="text-xs text-gray-400">
-                        Dernière utilisation:{" "}
+                        DerniÃ¨re utilisation:{" "}
                         {new Date(key.lastUsedAt).toLocaleDateString("fr-FR")}
                       </span>
                     )}
@@ -258,7 +258,7 @@ function IntegrationsPage() {
             <div>
               <h3 className="font-medium text-gray-900">Documentation API</h3>
               <p className="text-sm text-gray-500">
-                Apprenez à utiliser l&apos;API ScreenCold dans vos applications
+                Apprenez Ã  utiliser l&apos;API ScreenCold dans vos applications
               </p>
             </div>
             <Button variant="secondary">
