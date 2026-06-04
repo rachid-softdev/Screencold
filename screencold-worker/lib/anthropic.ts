@@ -4,7 +4,6 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { JSDOM } from "jsdom";
 
 // Initialize the client
 const anthropic = new Anthropic({

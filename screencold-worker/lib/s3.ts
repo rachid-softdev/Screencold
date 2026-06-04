@@ -9,8 +9,6 @@ import {
   GetObjectCommand,
   PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws/s3-request-presigner";
-
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || "eu-west-3",
   credentials: {
@@ -67,7 +65,7 @@ export async function uploadScreenshot(
  * @param expiresIn - Number of seconds until the URL expires (default 3600 = 1 hour)
  * @returns The signed URL
  */
-export async function getSignedUrl(
+export async function getSignedS3Url(
   key: string,
   expiresIn: number = 3600
 ): Promise<string> {
@@ -76,7 +74,8 @@ export async function getSignedUrl(
     Key: key,
   });
 
-  const signedUrl = await getSignedUrl(s3Client, command, {
+  const presigner = await import("@aws/s3-request-presigner");
+  const signedUrl = await presigner.getSignedUrl(s3Client, command, {
     expiresIn,
   });
 

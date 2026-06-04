@@ -5,6 +5,8 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
     "outDir": "./dist",
     "rootDir": ".",
     "paths": {

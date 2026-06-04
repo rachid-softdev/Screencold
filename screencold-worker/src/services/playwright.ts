@@ -218,9 +218,8 @@ export async function captureWithAnnotations(url: string): Promise<string> {
 
     // Add visual markers for issues
     await page.evaluate(() => {
-      // This would be enhanced with actual issue coordinates from AI analysis
-      // For now, just add a simple overlay
-      const overlay = document.createElement("div");
+      const doc = window.document;
+      const overlay = doc.createElement("div");
       overlay.style.cssText = `
         position: fixed;
         top: 0;
@@ -231,7 +230,7 @@ export async function captureWithAnnotations(url: string): Promise<string> {
         z-index: 99999;
         background: rgba(59, 130, 246, 0.1);
       `;
-      document.body.appendChild(overlay);
+      doc.body.appendChild(overlay);
     });
 
     // Capture screenshot with annotations
