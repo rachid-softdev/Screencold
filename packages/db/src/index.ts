@@ -8,12 +8,12 @@ declare global {
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log:
-      process.env.NODE_ENV === "development"
+      process.env["NODE_ENV"] === "development"
         ? ["query", "error", "warn"]
         : ["error"],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: process.env["DATABASE_URL"],
       },
     },
   });
@@ -21,7 +21,7 @@ const prismaClientSingleton = () => {
 
 export const prisma = globalThis.prisma ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env["NODE_ENV"] !== "production") {
   globalThis.prisma = prisma;
 }
 
