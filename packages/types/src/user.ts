@@ -1,4 +1,9 @@
-import { Plan } from "@prisma/client";
+export enum Plan {
+  FREE = "FREE",
+  STARTER = "STARTER",
+  PRO = "PRO",
+  AGENCY = "AGENCY",
+}
 
 function env(key: string): string | null {
   return (process.env as Record<string, string | undefined>)[key] ?? null;

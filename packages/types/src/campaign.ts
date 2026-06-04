@@ -1,4 +1,15 @@
-import type { ProspectStatus, AuditStatus } from "@prisma/client";
+export enum ProspectStatus {
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  DONE = "DONE",
+  FAILED = "FAILED",
+}
+
+export enum AuditStatus {
+  PROCESSING = "PROCESSING",
+  READY = "READY",
+  FAILED = "FAILED",
+}
 
 // Campaign with computed statistics
 export interface CampaignWithStats {
