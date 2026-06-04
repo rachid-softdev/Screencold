@@ -2,8 +2,11 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "skipLibCheck": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@screencold/db": ["../../packages/db/src"],
@@ -11,6 +14,6 @@
     },
     "baseUrl": "."
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "lib/**/*"],
   "exclude": ["node_modules", "dist"]
 }

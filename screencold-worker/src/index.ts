@@ -2,44 +2,43 @@ import { createWorker } from "./worker";
 import { createLogger } from "./utils/logger";
 import { checkHealth, isAlive, isReady } from "./health";
 import { startMetricsServer } from "../lib/metrics-server";
-import * as Sentry from "@sentry/node";
 
 // ============================================
 // Sentry Configuration
 // ============================================
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN_WORKER,
-  environment: process.env.NODE_ENV || "development",
-  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-  release: `worker@${process.env.WORKER_VERSION || "1.0.0"}`,
-  // Performance monitoring
-  integrations: [
-    // Add monitoring for unhandled rejections
-    Sentry.onFinishScope(() => {}),
-  ],
-  beforeSend(event, hint) {
-    // Filter out noisy errors in development
-    if (process.env.NODE_ENV === "development") {
-      return null;
-    }
-    
-    // Filter specific noisy errors
-    const error = hint.originalException;
-    if (error instanceof Error) {
-      // Ignore DNS resolution errors that are common
-      if (error.message?.includes("ENOTFOUND") || error.message?.includes("DNS")) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let Sentry: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  Sentry = require("@sentry/node");
+} catch {
+  Sentry = null;
+}
+
+if (Sentry?.init) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN_WORKER,
+    environment: process.env.NODE_ENV || "development",
+    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+    release: `worker@${process.env.WORKER_VERSION || "1.0.0"}`,
+    integrations: [
+      Sentry?.onFinishScope?.(() => {}) ?? (() => {}),
+    ].filter(Boolean),
+    beforeSend(event, hint) {
+      if (process.env.NODE_ENV === "development") {
         return null;
       }
-      // Ignore connection reset errors
-      if (error.message?.includes("ECONNRESET")) {
-        return null;
+      const error = hint.originalException;
+      if (error instanceof Error) {
+        if (error.message.includes("getaddrinfo") || error.message.includes("ENOTFOUND")) {
+          return null;
+        }
       }
-    }
-    
-    return event;
-  },
-});
+      return event;
+    },
+  });
+}
 
 // ============================================
 // Health Check HTTP Server
@@ -195,14 +194,14 @@ async function main() {
     // Handle uncaught exceptions
     process.on("uncaughtException", (error) => {
       logger.error("Uncaught exception", { error: error.message, stack: error.stack });
-      Sentry.captureException(error);
+      Sentry?.captureException?.(error);
       process.exit(1);
     });
 
     // Handle unhandled rejections
     process.on("unhandledRejection", (reason, promise) => {
       logger.error("Unhandled rejection", { reason, promise });
-      Sentry.captureEvent({
+      Sentry?.captureEvent?.({
         level: 'error',
         message: 'Unhandled rejection',
         extra: { reason: String(reason) },
@@ -214,7 +213,7 @@ async function main() {
       error: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
     });
-    Sentry.captureException(error);
+    Sentry?.captureException?.(error);
     process.exit(1);
   }
 }
