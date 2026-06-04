@@ -217,9 +217,9 @@ export async function captureWithAnnotations(url: string): Promise<string> {
     });
 
     // Add visual markers for issues
+    // @ts-expect-error - page.evaluate runs in browser context where document exists
     await page.evaluate(() => {
-      const doc = window.document;
-      const overlay = doc.createElement("div");
+      const overlay = document.createElement("div");
       overlay.style.cssText = `
         position: fixed;
         top: 0;

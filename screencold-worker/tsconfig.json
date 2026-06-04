@@ -1,14 +1,8 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "strict": false,
     "skipLibCheck": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "strictNullChecks": false,
-    "strictPropertyInitialization": false,
-    "noImplicitAny": false,
-    "useUnknownInCatchVariables": false,
     "outDir": "./dist",
     "rootDir": ".",
     "paths": {
