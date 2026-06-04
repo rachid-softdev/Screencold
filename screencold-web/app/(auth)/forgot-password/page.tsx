@@ -2,14 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 
 function ForgotPasswordPage() {
-  const router = useRouter();
   const { addToast } = useToast();
   const [email, setEmail] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
