@@ -15,8 +15,8 @@ export interface RateLimitResult {
  * Configuration for rate limit fail behavior.
  *
  * RATE_LIMIT_FAIL_OPEN env var:
- * - "true"  (default): Fail open — allow requests when Redis is down.
- * - "false":           Fail closed — deny requests when Redis is down.
+ * - "true"  (default): Fail open Â— allow requests when Redis is down.
+ * - "false":           Fail closed Â— deny requests when Redis is down.
  *
  * Auth endpoints always fail-closed regardless of this setting
  * to prevent brute-force attacks during Redis outages.
@@ -90,7 +90,7 @@ export async function checkRateLimit(
     
     // Respect fail-open/fail-closed configuration
     if (!shouldFailOpen(isAuthEndpoint)) {
-      // Fail closed — deny request when Redis is down
+      // Fail closed Â— deny request when Redis is down
       return {
         allowed: false,
         remaining: 0,
@@ -98,7 +98,7 @@ export async function checkRateLimit(
       };
     }
 
-    // Fail open — allow request if Redis is down (for non-auth endpoints)
+    // Fail open Â— allow request if Redis is down (for non-auth endpoints)
     return {
       allowed: true,
       remaining: limit,

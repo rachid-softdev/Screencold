@@ -1,3 +1,5 @@
+"use client";
+
 // Re-export from @screencold/ui
 export {
   Card,

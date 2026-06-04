@@ -36,8 +36,8 @@ export const RATE_LIMIT_CONFIGS: Record<string, RateLimitConfig> = {
  * Configuration for rate limit fail behavior.
  *
  * RATE_LIMIT_FAIL_OPEN env var:
- * - "true"  (default): Fail open — allow requests when Redis is down.
- * - "false":           Fail closed — deny requests when Redis is down.
+ * - "true"  (default): Fail open Â— allow requests when Redis is down.
+ * - "false":           Fail closed Â— deny requests when Redis is down.
  *
  * Auth endpoints always fail-closed regardless of this setting,
  * but the per-config failClosed flag takes precedence.
@@ -127,7 +127,7 @@ export async function getRateLimitHeaders(
     
     // Respect fail-open/fail-closed configuration
     if (!shouldFailOpen(config)) {
-      // Fail closed — return headers indicating rate limit exceeded
+      // Fail closed Â— return headers indicating rate limit exceeded
       return {
         'X-RateLimit-Limit': String(config.limit),
         'X-RateLimit-Remaining': '0',
@@ -135,7 +135,7 @@ export async function getRateLimitHeaders(
       };
     }
 
-    // Fail open — allow request if Redis is down (for non-auth endpoints)
+    // Fail open Â— allow request if Redis is down (for non-auth endpoints)
     return {
       'X-RateLimit-Limit': String(config.limit),
       'X-RateLimit-Remaining': String(config.limit),
@@ -169,11 +169,11 @@ export async function checkRateLimit(
     
     // Respect fail-open/fail-closed configuration
     if (!shouldFailOpen(config)) {
-      // Fail closed — deny request when Redis is down
+      // Fail closed Â— deny request when Redis is down
       return false;
     }
 
-    // Fail open — allow request if Redis is down (for non-auth endpoints)
+    // Fail open Â— allow request if Redis is down (for non-auth endpoints)
     return true;
   }
 }
