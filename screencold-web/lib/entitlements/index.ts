@@ -26,6 +26,5 @@ export { DowngradeService } from './downgrade';
 // Middleware
 export { createFeatureMiddleware, createLimitMiddleware, createConsumeMiddleware } from './middleware';
 
-// Types for internal use
-export type { FeatureGateService } from './service';
+// Types for internal use (FeatureGateService already exported as class above)
 export type { ICacheService } from './cache';
