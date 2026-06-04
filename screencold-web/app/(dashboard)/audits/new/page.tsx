@@ -4,7 +4,6 @@ import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { AuditForm } from "@/components/forms/audit-form";
 
 function NewAuditPage() {
