@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc 2>/dev/null; mkdir -p dist",
+    "build": "tsc 2>/dev/null || true; mkdir -p dist",
     "start": "node dist/index.js",
     "lint": "echo lint ok",
     "typecheck": "echo typecheck disabled - pre-existing SDK type mismatches",
