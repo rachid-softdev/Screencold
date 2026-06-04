@@ -90,6 +90,9 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+        env:
+          DATABASE_URL: postgresql://screencold:screencold_dev_password@localhost:5432/screencold
+          REDIS_URL: redis://localhost:6379
 
   build:
     name: Build

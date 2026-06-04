@@ -5,8 +5,8 @@ const urlSchema = z.string().url("URL invalide").or(
   z.string().min(1).refine(
     (val) => {
       try {
-        new URL(`https://${val}`);
-        return true;
+        const url = new URL(`https://${val}`);
+        return url.hostname.includes(".");
       } catch {
         return false;
       }
