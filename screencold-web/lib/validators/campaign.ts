@@ -5,8 +5,8 @@ const urlSchema = z.string().url("URL invalide").or(
   z.string().min(1).refine(
     (val) => {
       try {
-        new URL(`https://${val}`);
-        return true;
+        const url = new URL(`https://${val}`);
+        return url.hostname.includes(".");
       } catch {
         return false;
       }
@@ -65,7 +65,7 @@ export const importProspectsSchema = z.object({
 
 // CSV row parsing schema
 export const csvRowSchema = z.object({
-  url: z.string(),
+  url: urlSchema,
   companyName: z.string().optional(),
   contactName: z.string().optional(),
   contactEmail: z.string().optional(),

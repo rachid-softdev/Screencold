@@ -436,7 +436,7 @@ describe('GET /api/v1/audits', () => {
     expect(response.status).toBe(200);
     // Since we requested limit=10 but got 2 items, hasMore = false (2 <= 10)
     expect(body.pagination.hasMore).toBe(false);
-    expect(body.pagination.cursor).toBeNull();
+    expect(body.pagination.nextCursor).toBeNull();
   });
 
   it('should filter by status when provided', async () => {

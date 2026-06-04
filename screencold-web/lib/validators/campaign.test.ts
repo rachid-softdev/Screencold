@@ -223,7 +223,7 @@ describe('campaign validators', () => {
 
     it('should accept removeProspectIds', () => {
       const validData = {
-        removeProspectIds: ['abc123', 'def456'],
+        removeProspectIds: ['ckopqwo3u0000jv3hg7r1z3xh', 'ckopqwwo30000jv3hg7r1z3xi'],
       };
 
       const result = updateCampaignSchema.safeParse(validData);
@@ -243,7 +243,7 @@ describe('campaign validators', () => {
   describe('importProspectsSchema', () => {
     it('should validate valid import', () => {
       const validData = {
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         prospects: [{ url: 'https://example.com' }],
       };
 
@@ -263,7 +263,7 @@ describe('campaign validators', () => {
 
     it('should accept mode option', () => {
       const validData = {
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         prospects: [{ url: 'https://example.com' }],
         mode: 'replace',
       };
@@ -274,7 +274,7 @@ describe('campaign validators', () => {
 
     it('should default mode to add', () => {
       const validData = {
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         prospects: [{ url: 'https://example.com' }],
       };
 
@@ -287,7 +287,7 @@ describe('campaign validators', () => {
 
     it('should reject too many prospects (>1000)', () => {
       const invalidData = {
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         prospects: Array(1001).fill({ url: 'https://example.com' }),
       };
 
@@ -417,7 +417,7 @@ https://test.com
   describe('launchCampaignSchema', () => {
     it('should validate valid launch', () => {
       const validData = {
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
       };
 
       const result = launchCampaignSchema.safeParse(validData);
@@ -425,7 +425,7 @@ https://test.com
     });
 
     it('should use default values', () => {
-      const result = launchCampaignSchema.parse({ campaignId: 'abc123def456' });
+      const result = launchCampaignSchema.parse({ campaignId: 'ckopqwo3u0000jv3hg7r1z3xh' });
       expect(result.startFrom).toBe(0);
       expect(result.parallelJobs).toBe(3);
     });
@@ -441,7 +441,7 @@ https://test.com
 
     it('should accept custom startFrom', () => {
       const result = launchCampaignSchema.parse({
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         startFrom: '5',
       });
 
@@ -450,7 +450,7 @@ https://test.com
 
     it('should accept custom parallelJobs', () => {
       const result = launchCampaignSchema.parse({
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         parallelJobs: '5',
       });
 
@@ -459,7 +459,7 @@ https://test.com
 
     it('should reject parallelJobs > 10', () => {
       const result = launchCampaignSchema.safeParse({
-        campaignId: 'abc123def456',
+        campaignId: 'ckopqwo3u0000jv3hg7r1z3xh',
         parallelJobs: '11',
       });
 
