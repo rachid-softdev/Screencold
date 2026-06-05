@@ -2,8 +2,9 @@ import IORedis from 'ioredis';
 import { NextRequest } from 'next/server';
 
 // Use the same Redis connection as rate-limit.ts
-function getRedis(): IORedis {
-  return new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+let redis: IORedis | null = null;
+try {
+  redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
     retryStrategy: (times: number) => {
@@ -11,6 +12,12 @@ function getRedis(): IORedis {
     },
     lazyConnect: true,
   });
+} catch {
+  // Redis unavailable - will use fail-open behavior
+}
+
+function getRedis(): IORedis | null {
+  return redis;
 }
 
 export interface RateLimitConfig {
@@ -110,7 +117,11 @@ export async function getRateLimitHeaders(
   const windowKey = `${key}:${Math.floor(now / config.windowSeconds)}`;
 
   try {
-    const multi = getRedis().multi();
+    const r = getRedis();
+    if (!r) {
+      throw new Error('Redis not available');
+    }
+    const multi = r.multi();
     multi.incr(windowKey);
     multi.expire(windowKey, config.windowSeconds);
     const results = await multi.exec();
@@ -159,7 +170,11 @@ export async function checkRateLimit(
   const windowKey = `${key}:${Math.floor(now / config.windowSeconds)}`;
 
   try {
-    const multi = getRedis().multi();
+    const r = getRedis();
+    if (!r) {
+      throw new Error('Redis not available');
+    }
+    const multi = r.multi();
     multi.incr(windowKey);
     multi.expire(windowKey, config.windowSeconds);
     const results = await multi.exec();
