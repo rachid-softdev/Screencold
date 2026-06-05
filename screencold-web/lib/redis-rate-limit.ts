@@ -2,14 +2,20 @@ import IORedis from 'ioredis';
 import { NextRequest } from 'next/server';
 
 // Use the same Redis connection as rate-limit.ts
-const redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-  retryStrategy: (times: number) => {
-    // Exponential backoff, max 30s between retries
-    return Math.min(times * 50, 30000);
-  },
-});
+let redis: IORedis | null = null;
+
+function getRedis(): IORedis {
+  if (!redis) {
+    redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      retryStrategy: (times: number) => {
+        return Math.min(times * 50, 30000);
+      },
+    });
+  }
+  return redis;
+}
 
 export interface RateLimitConfig {
   /** Max requests allowed in the window */
@@ -108,7 +114,7 @@ export async function getRateLimitHeaders(
   const windowKey = `${key}:${Math.floor(now / config.windowSeconds)}`;
 
   try {
-    const multi = redis.multi();
+    const multi = getRedis().multi();
     multi.incr(windowKey);
     multi.expire(windowKey, config.windowSeconds);
     const results = await multi.exec();
@@ -157,7 +163,7 @@ export async function checkRateLimit(
   const windowKey = `${key}:${Math.floor(now / config.windowSeconds)}`;
 
   try {
-    const multi = redis.multi();
+    const multi = getRedis().multi();
     multi.incr(windowKey);
     multi.expire(windowKey, config.windowSeconds);
     const results = await multi.exec();
@@ -178,4 +184,4 @@ export async function checkRateLimit(
   }
 }
 
-export default redis;
+

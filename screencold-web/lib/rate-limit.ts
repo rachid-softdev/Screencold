@@ -1,9 +1,16 @@
 import IORedis from 'ioredis';
 
-const redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-});
+let redis: IORedis | null = null;
+
+function getRedis(): IORedis {
+  if (!redis) {
+    redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+    });
+  }
+  return redis;
+}
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -47,7 +54,7 @@ export async function checkRateLimit(
 
   try {
     // Use Redis transaction for atomic operations
-    const pipeline = redis.pipeline();
+    const pipeline = getRedis().pipeline();
     
     // Remove old entries outside the window
     pipeline.zremrangebyscore(redisKey, 0, windowStart);
@@ -77,8 +84,8 @@ export async function checkRateLimit(
 
     // Add new request to the window
     const requestId = `${now}-${Math.random().toString(36).substr(2, 9)}`;
-    await redis.zadd(redisKey, now, requestId);
-    await redis.expire(redisKey, windowSeconds);
+    await getRedis().zadd(redisKey, now, requestId);
+    await getRedis().expire(redisKey, windowSeconds);
 
     return {
       allowed: true,
