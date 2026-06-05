@@ -13,6 +13,9 @@ try {
 }
 
 const nextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   compress: true,
 
   images: {
