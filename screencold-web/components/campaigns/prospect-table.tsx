@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { clsx } from "clsx";
 import { Eye, RotateCcw, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

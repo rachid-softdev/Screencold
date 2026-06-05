@@ -4,7 +4,6 @@ import * as React from "react";
 import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { clsx } from "clsx";
 import { Calendar, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 

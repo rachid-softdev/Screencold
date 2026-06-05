@@ -10,7 +10,7 @@
  * These are public routes — no auth middleware to mock.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ============================================
 // Mocks

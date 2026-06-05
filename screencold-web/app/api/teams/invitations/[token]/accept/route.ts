@@ -8,7 +8,7 @@ import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
   try {

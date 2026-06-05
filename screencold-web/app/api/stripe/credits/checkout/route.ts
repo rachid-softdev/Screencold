@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       return errorResponse!;
     }
 
-    const { credits, price } = await request.json();
+    const { credits } = await request.json();
 
     // Validate inputs
     if (!credits || !CREDIT_PRICES[credits]) {

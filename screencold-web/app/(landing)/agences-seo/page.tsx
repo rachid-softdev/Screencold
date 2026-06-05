@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search, BarChart3, Mail, CheckCircle } from "lucide-react";
+import { ArrowRight, Search, BarChart3, Mail } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "ScreenCold pour les agences SEO — Audits automatisés et prospection",

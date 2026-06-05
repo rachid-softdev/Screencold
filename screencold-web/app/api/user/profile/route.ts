@@ -26,7 +26,7 @@ const deleteAccountSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const { authorized, userId, user, errorResponse } = await apiMiddleware(request, {
+    const { authorized, userId, errorResponse } = await apiMiddleware(request, {
       requireAuth: true,
       requireCredits: false,
     });

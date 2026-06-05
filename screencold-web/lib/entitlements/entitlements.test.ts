@@ -45,7 +45,7 @@ vi.mock('./cache', async (importOriginal) => {
 });
 import { FeatureGateService, initializeFeatureGateService, getFeatureGateService } from './service';
 import { DowngradeService } from './downgrade';
-import { MemoryCache, EntitlementsCacheService, getCacheService, CACHE_CONFIG, clearMemoryCache } from './cache';
+import { MemoryCache, EntitlementsCacheService, clearMemoryCache } from './cache';
 import type {
   IEntitlementRepository,
   FeatureDefinition,

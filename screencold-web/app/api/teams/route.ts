@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { apiMiddleware } from '@/middleware';
 
 // Validation schemas
 const createTeamSchema = z.object({
   name: z.string().min(1).max(100),
-});
-
-const inviteSchema = z.object({
-  email: z.string().email(),
-  role: z.enum(['ADMIN', 'MEMBER', 'VIEWER']).optional(),
 });
 
 // GET /api/teams - List user's teams

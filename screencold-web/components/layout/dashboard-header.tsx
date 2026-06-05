@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Menu, Bell, User } from "lucide-react";
 import { Dropdown } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
 interface Breadcrumb {
   label: string;

@@ -11,7 +11,7 @@
  * - POST /api/v1/campaigns with invalid API key
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ============================================
 // Mocks

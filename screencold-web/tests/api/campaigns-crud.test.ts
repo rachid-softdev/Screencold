@@ -13,7 +13,7 @@
  * Pattern: mock @/middleware (apiMiddleware), @/lib/prisma, and other deps.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ============================================
 // Mocks
@@ -93,7 +93,7 @@ vi.mock('ioredis', () => ({
 import { apiMiddleware } from '@/middleware';
 import { parsePaginationParams, paginatedResponse } from '@/lib/pagination';
 import { getCSVLimit } from '@/lib/plans';
-import { checkCredits, batchDebitCredits, batchRefundCredits } from '@/lib/credits';
+import { checkCredits, batchDebitCredits } from '@/lib/credits';
 import Papa from 'papaparse';
 
 // ============================================

@@ -5,10 +5,9 @@ import IORedis from 'ioredis';
 import prisma from '@/lib/prisma';
 import { debitCredits, checkCredits } from '@/lib/credits';
 import { apiMiddleware, getRateLimitHeaders } from '@/middleware';
-import { getPlan, getCSVLimit } from '@/lib/plans';
+import { getCSVLimit } from '@/lib/plans';
 import { checkIpRateLimit } from '@/lib/rate-limit';
 import {
-  parsePaginationParams,
   paginatedResponse,
 } from '@/lib/pagination';
 import { getCorrelationId } from '@/lib/correlation-id';
@@ -322,7 +321,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursor = searchParams.get('cursor');
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
     const campaignId = searchParams.get('campaignId');
     const status = searchParams.get('status') as 'PROCESSING' | 'READY' | 'FAILED' | null;
 

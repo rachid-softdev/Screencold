@@ -12,7 +12,6 @@ import {
   Megaphone,
   Settings,
   ChevronLeft,
-  LogOut,
   User,
   CreditCard,
   Key,

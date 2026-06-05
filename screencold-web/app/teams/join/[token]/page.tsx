@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ interface InvitationData {
 
 function TeamJoinPage() {
   const params = useParams();
-  const router = useRouter();
   const token = params.token as string;
 
   const [status, setStatus] = React.useState<InvitationStatus>("loading");

@@ -88,7 +88,7 @@ async function checkWorker(): Promise<HealthCheck> {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const start = Date.now();
   const checks: Record<string, HealthCheck> = {};
 

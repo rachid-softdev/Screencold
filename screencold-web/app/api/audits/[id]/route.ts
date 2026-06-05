@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { apiMiddleware, getRateLimitHeaders } from '@/middleware';
+import { apiMiddleware } from '@/middleware';
 
 // ============================================
 // GET /api/audits/[id] - Get audit details

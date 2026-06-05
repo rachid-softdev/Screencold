@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,6 @@ interface Prospect {
 
 function CampaignDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const { addToast } = useToast();
   const [showImportModal, setShowImportModal] = React.useState(false);
   const [isLaunching, setIsLaunching] = React.useState(false);
@@ -53,16 +52,16 @@ function CampaignDetailPage() {
     pending: prospects.filter((p) => p.status === "PENDING").length,
   };
 
-  const handleViewAudit = (prospect: Prospect) => {
+  const handleViewAudit = (_prospect: Prospect) => {
     // Navigate to audit result if available
     addToast("Redirection vers l'audit...", "info");
   };
 
-  const handleRetry = async (prospect: Prospect) => {
+  const handleRetry = async (_prospect: Prospect) => {
     addToast("Relance de l'audit...", "info");
   };
 
-  const handleDelete = (prospect: Prospect) => {
+  const handleDelete = (_prospect: Prospect) => {
     addToast("Prospect supprimé", "success");
   };
 
@@ -79,7 +78,7 @@ function CampaignDetailPage() {
     }
   };
 
-  const handleImportSubmit = async (campaignName: string, file: File) => {
+  const handleImportSubmit = async (_campaignName: string, _file: File) => {
     // Handle CSV import
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setShowImportModal(false);

@@ -91,7 +91,7 @@ function createCreditService() {
      */
     deduct: async (userId: string, auditId: string): Promise<{ success: boolean; remainingCredits: number }> => {
       try {
-        const result = await mockPrisma.$transaction(async (tx: unknown) => {
+        const result = await mockPrisma.$transaction(async () => {
           // Lock and check credits
           const user = await mockPrisma.user.findUnique({
             where: { id: userId },
@@ -131,7 +131,7 @@ function createCreditService() {
     /**
      * Refund a single credit to user
      */
-    refund: async (userId: string, auditId: string, reason: string): Promise<void> => {
+    refund: async (userId: string, auditId: string, _reason: string): Promise<void> => {
       await mockPrisma.$transaction(async () => {
         await mockPrisma.user.update({
           where: { id: userId },

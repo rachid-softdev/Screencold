@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Search, TrendingUp, Zap, ArrowRight, BarChart3, Mail } from 'lucide-react';
-import { getDashboardData, DashboardData } from '@/lib/dashboard';
+import { getDashboardData } from '@/lib/dashboard';
 import { CreditCounter } from '@/components/dashboard/credit-counter';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { QuickAuditForm } from '@/components/dashboard/quick-audit-form';

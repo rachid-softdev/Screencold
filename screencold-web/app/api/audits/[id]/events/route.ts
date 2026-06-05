@@ -28,7 +28,7 @@ export async function GET(
   const encoder = new TextEncoder();
 
   // Verify authentication first
-  const { authorized, userId, errorResponse } = await apiMiddleware(request, {
+  const { authorized, userId } = await apiMiddleware(request, {
     requireAuth: true,
     requireCredits: false,
   });

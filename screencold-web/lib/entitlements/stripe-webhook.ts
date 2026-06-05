@@ -1,7 +1,6 @@
 import Stripe from 'stripe';
 import { IEntitlementRepository } from './repository';
 import { getFeatureGateService } from './service';
-import { getCacheService } from './cache';
 import { addMonths, startOfDay } from 'date-fns';
 
 // ============================================
@@ -11,8 +10,6 @@ import { addMonths, startOfDay } from 'date-fns';
 export class StripeWebhookHandler {
   private stripe: Stripe;
   private repo: IEntitlementRepository;
-  private cache = getCacheService();
-
   constructor(repo: IEntitlementRepository) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: '2025-04-30.basil',
@@ -119,9 +116,6 @@ export class StripeWebhookHandler {
       console.error('[StripeWebhook] Unknown price ID:', subscription.items.data[0]?.price.id);
       return;
     }
-
-    const periodStart = new Date(subscription.current_period_start * 1000);
-    const periodEnd = new Date(subscription.current_period_end * 1000);
 
     await this.repo.createSubscription(orgId, planKey, subscription.id);
     console.log(`[StripeWebhook] Created subscription for org ${orgId}: ${planKey}`);

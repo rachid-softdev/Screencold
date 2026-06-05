@@ -28,9 +28,6 @@ export async function GET(request: NextRequest) {
     // Generate a cryptographically random state value
     const stateToken = crypto.randomBytes(32).toString('hex');
 
-    // Build the redirect URL (same origin)
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-
     // Store the state token in a signed, HTTP-only cookie
     // This prevents CSRF attacks on the OAuth callback
     const response = NextResponse.json({

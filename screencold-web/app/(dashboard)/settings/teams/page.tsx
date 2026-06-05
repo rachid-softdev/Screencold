@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { Users, Plus, Mail, Trash2, Crown } from "lucide-react";
+import { Users, Plus, Mail, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -62,11 +61,7 @@ export default function TeamsPage() {
     }
   };
 
-  const copyInviteLink = (teamId: string, token: string) => {
-    const link = `${window.location.origin}/teams/join?token=${token}`;
-    navigator.clipboard.writeText(link);
-    alert("Lien d'invitation copié!");
-  };
+
 
   if (loading) {
     return (

@@ -3,8 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Plus, Users, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Users, ArrowRight } from "lucide-react";
 
 interface Campaign {
   id: string;

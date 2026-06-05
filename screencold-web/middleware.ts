@@ -19,8 +19,7 @@ import {
  * Add security headers to response
  * Includes CSP, X-Frame-Options, X-Content-Type-Options, etc.
  */
-export function addSecurityHeaders(response: NextResponse, request: NextRequest): void {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+export function addSecurityHeaders(response: NextResponse, _request: NextRequest): void {
   
   // Content-Security-Policy
   const csp = [
@@ -170,7 +169,7 @@ export async function apiMiddleware(
 
   // Execute in async context so downstream code can retrieve the ID
   return runWithCorrelationId(correlationId, async () => {
-    const { requireAuth = false, requireCredits = false, requireApiKey = false } = options;
+    const { requireAuth = false, requireCredits = false } = options;
 
     // First, try API key authentication if header is present
     const authHeader = request.headers.get('authorization');

@@ -230,7 +230,7 @@ const authConfig: NextAuthConfig = {
     },
 
     // Sign in callback - allow only verified users
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // Always allow OAuth (Google) sign in
       if (account?.type === "oauth") {
         return true;

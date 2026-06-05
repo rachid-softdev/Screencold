@@ -164,7 +164,6 @@ export function FAQSchema({ faqs }: FAQSchemaProps) {
  */
 export function BreadcrumbSchema({
   items,
-  url,
 }: {
   items: Array<{ name: string; url: string }>;
   url: string;

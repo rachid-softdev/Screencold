@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { clsx } from "clsx";
-import { ChevronDown, ChevronUp, AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { ChevronDown, AlertTriangle, AlertCircle, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type Severity = "HIGH" | "MEDIUM" | "LOW";

@@ -75,15 +75,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create verification token
-    const verificationToken = await prisma.verificationToken.create({
-      data: {
-        identifier: email.toLowerCase(),
-        token: crypto.randomUUID(),
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-      },
-    });
-
     // TODO: Send verification email
     // For now, just return success
 

@@ -233,7 +233,7 @@ async function handlePostOverride(request: NextRequest) {
 // Delete entitlement override
 // ============================================
 
-async function handleDeleteOverride(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleDeleteOverride(_request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const id = params.path[params.path.length - 1];
 
@@ -262,7 +262,7 @@ async function handleDeleteOverride(request: NextRequest, { params }: { params: 
 // Get org entitlements
 // ============================================
 
-async function handleGetOrgEntitlements(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleGetOrgEntitlements(_request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const orgId = params.path[1]; // path is like ["orgs", "orgId"]
 
@@ -291,7 +291,7 @@ async function handleGetOrgEntitlements(request: NextRequest, { params }: { para
 // Preview what happens if org downgrades
 // ============================================
 
-async function handleGetDowngradePreview(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleGetDowngradePreview(_request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const parts = params.path;
     const orgId = parts[1];
@@ -316,7 +316,7 @@ async function handleGetDowngradePreview(request: NextRequest, { params }: { par
 // Manually invalidate cache
 // ============================================
 
-async function handlePostCacheInvalidate(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handlePostCacheInvalidate(_request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     const orgId = params.path[params.path.length - 1];
 

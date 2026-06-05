@@ -12,7 +12,7 @@
  * Pattern: mock @/lib/auth/require-admin, @/lib/prisma, @/lib/entitlements/*.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ============================================
 // Mocks
@@ -198,7 +198,6 @@ describe('GET /api/admin/users', () => {
 
     // Act
     const response = await GET();
-    const body = await response.json();
 
     // Assert
     expect(response.status).toBe(403);

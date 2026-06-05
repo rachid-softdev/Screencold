@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 type EventName =
   | "sign_up"
   | "first_audit"

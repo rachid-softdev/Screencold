@@ -105,7 +105,7 @@ vi.mock('@/lib/audit-log', () => ({
 // Imports
 // ============================================
 
-import { checkCredits, debitCredits, refundCredits } from '@/lib/credits';
+import { checkCredits, debitCredits } from '@/lib/credits';
 import { validateUrl } from '@/lib/ssrf';
 
 // ============================================

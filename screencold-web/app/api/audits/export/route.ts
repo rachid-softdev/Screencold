@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { apiMiddleware } from '@/middleware';
-import { getPlan, canUseAPI } from '@/lib/plans';
+import { canUseAPI } from '@/lib/plans';
 
 // ============================================
 // GET /api/audits/export - Export audits as CSV

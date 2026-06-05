@@ -135,8 +135,6 @@ describe('Health Check API', () => {
       mockPrisma.$queryRaw.mockResolvedValue([{ '1': 1 }]);
       mockRedisInstance.ping.mockRejectedValue(new Error('ECONNREFUSED'));
 
-      const { GET } = await import('@/app/api/health/route');
-
       // Re-import to reset singleton for this test (first import creates the connection)
       const { GET: GET2 } = await import('@/app/api/health/route');
 

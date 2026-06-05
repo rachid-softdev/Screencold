@@ -9,7 +9,7 @@ Sentry.init({
     Sentry.httpIntegration(),
   ],
   // Filter out certain errors in development
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     if (process.env.NODE_ENV === "development") {
       return null; // Don't send errors in dev
     }

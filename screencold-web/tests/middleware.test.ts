@@ -40,7 +40,6 @@ vi.mock('@/lib/redis-rate-limit', () => ({
   checkRateLimit: vi.fn(),
 }));
 
-import { getToken } from 'next-auth/jwt';
 import {
   addSecurityHeaders,
   verifyCsrfToken,
@@ -48,7 +47,6 @@ import {
   checkRateLimit,
   getRateLimitHeaders,
 } from '@/middleware';
-import { NextResponse } from 'next/server';
 
 // ============================================
 // Helpers

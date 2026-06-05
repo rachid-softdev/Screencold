@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFeatureGateService } from './service';
 import { getCacheService } from './cache';
-import type { ConsumeResult } from '@screencold/types';
 
 // ============================================
 // Middleware Factory Functions

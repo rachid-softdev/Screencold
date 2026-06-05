@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Mail, Key, ExternalLink, Check, X, RefreshCw, Trash2 } from "lucide-react";
+import { Mail, Key, ExternalLink, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";

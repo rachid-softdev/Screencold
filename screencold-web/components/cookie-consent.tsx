@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Settings, Check } from "lucide-react";
+import { Settings, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CookiePreferences {

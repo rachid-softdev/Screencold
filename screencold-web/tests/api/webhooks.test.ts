@@ -12,7 +12,7 @@
  * Pattern: mock stripe, @/lib/prisma, @/lib/entitlements at module level.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ============================================
 // Mocks

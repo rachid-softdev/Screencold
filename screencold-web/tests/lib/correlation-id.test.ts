@@ -10,7 +10,7 @@
  * Run:  npx vitest run screencold-web/tests/lib/correlation-id.test.ts
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   generateCorrelationId,
   getCorrelationId,

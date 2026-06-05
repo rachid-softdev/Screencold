@@ -11,7 +11,6 @@ import type {
   FeatureConfig,
   ExperimentAssignment,
 } from '@screencold/types';
-import { createHash } from 'crypto';
 import { IEntitlementRepository } from './repository';
 import { getCacheService } from './cache';
 
@@ -411,7 +410,7 @@ export class FeatureGateService {
   /**
    * Check if user is in experiment (stable hash)
    */
-  isInExperiment(userId: string, experimentKey: string, percentage: number, seed: string): boolean {
+  isInExperiment(userId: string, _experimentKey: string, percentage: number, seed: string): boolean {
     const hashInput = `${seed}:${userId}`;
     const bucket = murmurhash(hashInput) % 100;
     return bucket < percentage;

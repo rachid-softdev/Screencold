@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Key, Plus, Trash2, Copy, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ApiKey {
   id: string;

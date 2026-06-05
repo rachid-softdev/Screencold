@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Clock, Calendar, User } from "lucide-react";
+import { Clock, Calendar } from "lucide-react";
 import { ShareButtons } from "./share-buttons";
 
 interface ArticleHeroProps {
