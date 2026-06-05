@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getFeatureGateService, ensureEntitlementsInitialized } from '@/lib/entitlements/init';
+import { getFeatureGateService } from '@/lib/entitlements';
+import { ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 import { DowngradeService } from '@/lib/entitlements';
 import { PrismaEntitlementRepository } from '@/lib/entitlements/repository';
 import { z } from 'zod';
