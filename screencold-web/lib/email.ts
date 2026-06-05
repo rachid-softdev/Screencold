@@ -1,6 +1,12 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+  return new Resend(apiKey);
+}
 
 interface SendEmailOptions {
   to: string;
@@ -34,6 +40,11 @@ function escapeHtml(str: string): string {
 // ============================================
 
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
+  const resend = getResend();
+  if (!resend) {
+    console.warn('[Email] RESEND_API_KEY not configured, email not sent');
+    return { success: false, error: 'Email service not configured' };
+  }
   try {
     const result = await resend.emails.send({
       from: process.env.FROM_EMAIL || 'ScreenCold <noreply@screencold.com>',
