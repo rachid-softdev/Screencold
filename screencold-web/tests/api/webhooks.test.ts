@@ -47,10 +47,13 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/lib/entitlements', () => ({
   handleStripeWebhook: vi.fn(),
-  ensureEntitlementsInitialized: vi.fn(),
   getFeatureGateService: vi.fn(),
   initializeFeatureGateService: vi.fn(),
   PrismaEntitlementRepository: vi.fn(),
+}));
+
+vi.mock('@/lib/entitlements/init', () => ({
+  ensureEntitlementsInitialized: vi.fn(),
 }));
 
 vi.mock('@/lib/entitlements/repository', () => ({
@@ -72,7 +75,8 @@ vi.mock('stripe', () => ({
   })),
 }));
 
-import { handleStripeWebhook, ensureEntitlementsInitialized } from '@/lib/entitlements';
+import { handleStripeWebhook } from '@/lib/entitlements';
+import { ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 
 // ============================================
 // Helpers

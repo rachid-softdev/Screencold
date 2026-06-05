@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
-import { handleStripeWebhook, ensureEntitlementsInitialized } from '@/lib/entitlements';
+import { handleStripeWebhook } from '@/lib/entitlements';
+import { ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 import { PrismaEntitlementRepository } from '@/lib/entitlements/repository';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {

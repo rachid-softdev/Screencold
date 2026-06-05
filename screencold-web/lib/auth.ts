@@ -293,6 +293,9 @@ const authConfig: NextAuthConfig = {
   trustHost: true,
 };
 
+// Export the auth config for use with getServerSession, etc.
+export const authOptions = authConfig;
+
 // Create NextAuth instance
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
 

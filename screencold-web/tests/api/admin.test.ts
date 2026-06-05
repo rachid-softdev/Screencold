@@ -82,7 +82,6 @@ vi.mock('@/lib/entitlements/init', () => ({
 
 vi.mock('@/lib/entitlements', () => ({
   handleStripeWebhook: vi.fn(),
-  ensureEntitlementsInitialized: mockEnsureEntitlementsInitialized,
   getFeatureGateService: mockGetFeatureGateService,
   initializeFeatureGateService: vi.fn(),
   DowngradeService: vi.fn(() => ({

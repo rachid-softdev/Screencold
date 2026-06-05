@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { getFeatureGateService, ensureEntitlementsInitialized } from '@/lib/entitlements/init';
+import { getFeatureGateService } from '@/lib/entitlements';
+import { ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 import { prisma } from '@/lib/prisma';
 
 // ============================================

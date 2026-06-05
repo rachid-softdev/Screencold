@@ -1,4 +1,4 @@
-﻿import { PrismaClient } from "@screencold/db";
+﻿import { PrismaClient } from "@prisma/client";
 import { encrypt, decrypt, isEncrypted } from "./encryption";
 
 declare global {
