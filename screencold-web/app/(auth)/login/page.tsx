@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 
-function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -165,4 +165,10 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8">Chargement...</div>}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}

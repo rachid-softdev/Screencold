@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 
-function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -172,4 +173,10 @@ function ResetPasswordPage() {
   );
 }
 
-export default ResetPasswordPage;
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8">Chargement...</div>}>
+      <ResetPasswordPageContent />
+    </Suspense>
+  );
+}

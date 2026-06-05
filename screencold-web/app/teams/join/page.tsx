@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
-export default function TeamJoinPage() {
+function TeamJoinPageContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   
@@ -99,5 +99,20 @@ export default function TeamJoinPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function TeamJoinPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    }>
+      <TeamJoinPageContent />
+    </Suspense>
   );
 }
