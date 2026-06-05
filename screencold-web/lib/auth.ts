@@ -297,7 +297,22 @@ const authConfig: NextAuthConfig = {
 export const authOptions = authConfig;
 
 // Create NextAuth instance
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
+let handlers: ReturnType<typeof NextAuth>["handlers"] | undefined;
+let auth: ReturnType<typeof NextAuth>["auth"] | undefined;
+let signIn: ReturnType<typeof NextAuth>["signIn"] | undefined;
+let signOut: ReturnType<typeof NextAuth>["signOut"] | undefined;
+
+try {
+  const nextAuth = NextAuth(authConfig);
+  handlers = nextAuth.handlers;
+  auth = nextAuth.auth;
+  signIn = nextAuth.signIn;
+  signOut = nextAuth.signOut;
+} catch (e) {
+  console.error('[Auth] Failed to initialize NextAuth:', e);
+}
+
+export { handlers, auth, signIn, signOut };
 
 // Helper to get current session (server-side)
 export async function getSession() {
