@@ -2,19 +2,15 @@ import IORedis from 'ioredis';
 import { NextRequest } from 'next/server';
 
 // Use the same Redis connection as rate-limit.ts
-let redis: IORedis | null = null;
-
 function getRedis(): IORedis {
-  if (!redis) {
-    redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-      retryStrategy: (times: number) => {
-        return Math.min(times * 50, 30000);
-      },
-    });
-  }
-  return redis;
+  return new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    retryStrategy: (times: number) => {
+      return Math.min(times * 50, 30000);
+    },
+    lazyConnect: true,
+  });
 }
 
 export interface RateLimitConfig {

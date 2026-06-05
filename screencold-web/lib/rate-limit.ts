@@ -1,15 +1,11 @@
 import IORedis from 'ioredis';
 
-let redis: IORedis | null = null;
-
 function getRedis(): IORedis {
-  if (!redis) {
-    redis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-    });
-  }
-  return redis;
+  return new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    lazyConnect: true,
+  });
 }
 
 export interface RateLimitResult {
@@ -149,4 +145,4 @@ export async function checkApiKeyRateLimit(
   return checkRateLimit(`apikey:${keyId}`, limit, windowSeconds);
 }
 
-export default redis;
+
