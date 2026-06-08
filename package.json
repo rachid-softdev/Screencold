@@ -47,7 +47,11 @@
     "extension:lint": "pnpm --filter @screencold/extension lint",
     "extension:typecheck": "pnpm --filter @screencold/extension typecheck",
     "check-env": "pnpm --filter @screencold/web check-env",
-    "push-env": "pnpm --filter @screencold/web push-env"
+    "push-env": "pnpm --filter @screencold/web push-env",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset tag",
+    "ci:release": "pnpm changeset version && pnpm install --no-frozen-lockfile && pnpm build && pnpm changeset tag"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
@@ -61,7 +65,9 @@
     "prettier": "^3.2.5",
     "turbo": "^2.0.0",
     "typescript": "^5.4.0",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "@changesets/cli": "^2.27.0",
+    "@changesets/changelog-github": "^0.5.0"
   },
   "engines": {
     "node": ">=20.0.0",
