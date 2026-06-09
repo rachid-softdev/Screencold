@@ -3,13 +3,13 @@
 import * as React from "react";
 import { Plus, Edit2, Trash2, Copy, Mail, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Modal } from "@/components/ui/modal";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Card, CardContent, CardHeader, CardTitle } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { Textarea } from '@screencold/ui';
+import { Badge } from '@screencold/ui';
+import { Modal } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 interface EmailTemplate {
   id: string;
@@ -170,7 +170,7 @@ function EmailTemplatesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
       </div>
     );
   }
@@ -186,10 +186,10 @@ function EmailTemplatesPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-neutral-900">
               Templates d&apos;emails
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-neutral-500">
               Personnalisez vos emails de prospection
             </p>
           </div>
@@ -205,11 +205,11 @@ function EmailTemplatesPage() {
         {templates.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Mail className="h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 font-medium text-gray-900">
+              <Mail className="h-12 w-12 text-neutral-400" />
+              <h3 className="mt-4 font-medium text-neutral-900">
                 Aucun template
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-neutral-500">
                 Créez votre premier template d&apos;email
               </p>
               <Button className="mt-4" onClick={openCreateModal}>
@@ -224,9 +224,9 @@ function EmailTemplatesPage() {
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-gray-900">{template.name}</h3>
+                    <h3 className="font-medium text-neutral-900">{template.name}</h3>
                     {template.isDefault && (
-                      <Badge variant="default" className="bg-blue-100 text-blue-700">
+                      <Badge variant="default" className="bg-info-100 text-info-700">
                         Défaut
                       </Badge>
                     )}
@@ -238,11 +238,11 @@ function EmailTemplatesPage() {
                     )}
                   </div>
                   {template.description && (
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-neutral-500">
                       {template.description}
                     </p>
                   )}
-                  <p className="mt-1 text-sm text-gray-400">
+                  <p className="mt-1 text-sm text-neutral-400">
                     Sujet: {template.subject}
                   </p>
                 </div>
@@ -267,7 +267,7 @@ function EmailTemplatesPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(template)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-error-600 hover:text-error-700"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -290,13 +290,13 @@ function EmailTemplatesPage() {
             {defaultVariables.map((v) => (
               <code
                 key={v.name}
-                className="rounded bg-gray-100 px-2 py-1 text-sm text-gray-700"
+                className="rounded bg-neutral-100 px-2 py-1 text-sm text-neutral-700"
               >
                 {`{{${v.name}}}`}
               </code>
             ))}
           </div>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-neutral-500">
             Utilisez ces variables dans le sujet et le corps de l&apos;email.
             Elles seront remplacées automatiquement lors de la génération.
           </p>
@@ -312,7 +312,7 @@ function EmailTemplatesPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-neutral-700">
               Nom du template
             </label>
             <Input
@@ -327,7 +327,7 @@ function EmailTemplatesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-neutral-700">
               Description
             </label>
             <Input
@@ -341,7 +341,7 @@ function EmailTemplatesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-neutral-700">
               Sujet
             </label>
             <Input
@@ -356,7 +356,7 @@ function EmailTemplatesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-neutral-700">
               Corps de l&apos;email
             </label>
             <div className="mt-1 flex flex-wrap gap-2">
@@ -365,7 +365,7 @@ function EmailTemplatesPage() {
                   key={v.name}
                   type="button"
                   onClick={() => insertVariable(v.name)}
-                  className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-600 hover:bg-blue-100"
+                  className="rounded bg-info-50 px-2 py-1 text-xs text-info-600 hover:bg-info-100"
                 >
                   {`{{${v.name}}}`}
                 </button>
@@ -391,9 +391,9 @@ function EmailTemplatesPage() {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))
               }
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-neutral-300"
             />
-            <label htmlFor="isDefault" className="text-sm text-gray-700">
+            <label htmlFor="isDefault" className="text-sm text-neutral-700">
               Utiliser comme template par défaut
             </label>
           </div>

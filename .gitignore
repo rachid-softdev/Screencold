@@ -66,3 +66,6 @@ playwright/.cache/
 
 # Husky
 .husky/
+
+# Database backups
+backups/

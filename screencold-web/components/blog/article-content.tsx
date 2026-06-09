@@ -17,17 +17,17 @@ interface ArticleContentProps {
 }
 
 const calloutStyles = {
-  info: "border-l-4 border-blue-500 bg-blue-50",
-  tip: "border-l-4 border-green-500 bg-green-50",
+  info: "border-l-4 border-info-500 bg-info-50",
+  tip: "border-l-4 border-success-500 bg-success-50",
   warning: "border-l-4 border-amber-500 bg-amber-50",
-  important: "border-l-4 border-red-500 bg-red-50",
+  important: "border-l-4 border-error-500 bg-error-50",
 };
 
 const calloutTitles = {
-  info: "bg-blue-100 text-blue-800",
-  tip: "bg-green-100 text-green-800",
+  info: "bg-info-100 text-info-800",
+  tip: "bg-success-100 text-success-800",
   warning: "bg-amber-100 text-amber-800",
-  important: "bg-red-100 text-red-800",
+  important: "bg-error-100 text-error-800",
 };
 
 export function ArticleContent({ content }: ArticleContentProps) {
@@ -35,7 +35,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
     switch (block.type) {
       case "paragraph":
         return (
-          <p key={index} className="mb-6 text-gray-700 leading-relaxed text-base md:text-lg">
+          <p key={index} className="mb-6 text-neutral-700 leading-relaxed text-base md:text-lg">
             {block.content}
           </p>
         );
@@ -43,9 +43,9 @@ export function ArticleContent({ content }: ArticleContentProps) {
       case "heading":
         const HeadingTag = `h${block.level}` as keyof JSX.IntrinsicElements;
         const headingClasses = {
-          2: "text-3xl font-bold mt-12 mb-6 text-gray-900",
-          3: "text-2xl font-semibold mt-8 mb-4 text-gray-900",
-          4: "text-xl font-semibold mt-6 mb-3 text-gray-900",
+          2: "text-3xl font-bold mt-12 mb-6 text-neutral-900",
+          3: "text-2xl font-semibold mt-8 mb-4 text-neutral-900",
+          4: "text-xl font-semibold mt-6 mb-3 text-neutral-900",
         };
         return (
           <HeadingTag key={index} className={headingClasses[block.level]}>
@@ -55,7 +55,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
 
       case "list":
         return (
-          <ul key={index} className="mb-6 space-y-2 list-disc list-inside text-gray-700">
+          <ul key={index} className="mb-6 space-y-2 list-disc list-inside text-neutral-700">
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="leading-relaxed">
                 {item}
@@ -68,11 +68,11 @@ export function ArticleContent({ content }: ArticleContentProps) {
         return (
           <blockquote
             key={index}
-            className="mb-6 border-l-4 border-gray-300 pl-6 py-2 italic bg-gray-50 text-gray-700 rounded-r-lg"
+            className="mb-6 border-l-4 border-neutral-300 pl-6 py-2 italic bg-neutral-50 text-neutral-700 rounded-r-lg"
           >
             <p className="text-lg leading-relaxed">&ldquo;{block.content}&rdquo;</p>
             {block.author && (
-              <cite className="block mt-2 text-sm text-gray-500 not-italic">
+              <cite className="block mt-2 text-sm text-neutral-500 not-italic">
                 — {block.author}
               </cite>
             )}
@@ -88,7 +88,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
             <div className={`inline-block px-2 py-1 rounded text-xs font-semibold mb-3 ${calloutTitles[block.variant]}`}>
               {block.title}
             </div>
-            <p className="text-gray-700 leading-relaxed">{block.content}</p>
+            <p className="text-neutral-700 leading-relaxed">{block.content}</p>
           </div>
         );
 
@@ -96,7 +96,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
         return (
           <pre
             key={index}
-            className="mb-6 p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto text-sm font-mono"
+            className="mb-6 p-4 bg-neutral-900 text-neutral-100 rounded-lg overflow-x-auto text-sm font-mono"
           >
             <code>{block.content}</code>
           </pre>
@@ -115,7 +115,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
               />
             </div>
             {block.caption && (
-              <figcaption className="mt-2 text-center text-sm text-gray-500 italic">
+              <figcaption className="mt-2 text-center text-sm text-neutral-500 italic">
                 {block.caption}
               </figcaption>
             )}
@@ -126,13 +126,13 @@ export function ArticleContent({ content }: ArticleContentProps) {
         return (
           <div
             key={index}
-            className="mb-8 p-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl text-center"
+            className="mb-8 p-8 bg-gradient-to-r from-info-600 to-info-700 rounded-2xl text-center"
           >
             <h3 className="text-xl font-bold text-white mb-2">{block.title}</h3>
-            <p className="text-blue-100 mb-4">{block.description}</p>
+            <p className="text-info-100 mb-4">{block.description}</p>
             <Link
               href={block.url}
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-info-700 font-semibold rounded-lg hover:bg-info-50 transition-colors"
             >
               {block.label}
             </Link>
@@ -143,7 +143,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
         return (
           <hr
             key={index}
-            className="my-12 border-t border-gray-200"
+            className="my-12 border-t border-neutral-200"
           />
         );
 

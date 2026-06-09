@@ -9,11 +9,10 @@ import sharp from "sharp";
 import { logger } from "../lib/logger";
 import { UXIssue } from "../lib/anthropic";
 import {
-  markJobStarted,
-  markJobCompleted,
+  checkJobIdempotency,
+  markJobComplete,
   markJobFailed,
-  isJobAlreadyProcessed,
-} from "../lib/job-tracker";
+} from "./index";
 
 /**
  * Annotation color definitions by severity
@@ -340,9 +339,7 @@ export async function annotateScreenshot(
 
   // Idempotency check
   if (jobId && auditId) {
-    await markJobStarted(jobId, auditId, "annotate");
-
-    if (await isJobAlreadyProcessed(jobId, auditId, "annotate")) {
+    if (await checkJobIdempotency(jobId, auditId, "annotate")) {
       logger.info({ jobId, auditId }, "Annotation already processed, skipping");
       return { annotatedBuffer: screenshotBuffer };
     }
@@ -420,7 +417,7 @@ export async function annotateScreenshot(
 
     // Mark job as completed
     if (jobId && auditId) {
-      await markJobCompleted(jobId, auditId, "annotate", {
+      await markJobComplete(jobId, auditId, "annotate", {
         duration,
       });
     }

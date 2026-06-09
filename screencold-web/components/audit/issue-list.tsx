@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { clsx } from "clsx";
 import { ChevronDown, AlertTriangle, AlertCircle, Info } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@screencold/ui';
 
 type Severity = "HIGH" | "MEDIUM" | "LOW";
 type Category =
@@ -32,9 +32,9 @@ interface IssueListProps {
 const severityConfig = {
   HIGH: {
     label: "Critique",
-    color: "text-red-600",
-    bgColor: "bg-red-50",
-    borderColor: "border-red-200",
+    color: "text-error-600",
+    bgColor: "bg-error-50",
+    borderColor: "border-error-200",
     icon: AlertTriangle,
   },
   MEDIUM: {
@@ -46,20 +46,20 @@ const severityConfig = {
   },
   LOW: {
     label: "Mineur",
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
+    color: "text-info-600",
+    bgColor: "bg-info-50",
+    borderColor: "border-info-200",
     icon: Info,
   },
 };
 
 const categoryColors: Record<Category, string> = {
   SEO: "bg-purple-100 text-purple-700",
-  PERFORMANCE: "bg-yellow-100 text-yellow-700",
-  ACCESSIBILITY: "bg-green-100 text-green-700",
+  PERFORMANCE: "bg-warning-100 text-warning-700",
+  ACCESSIBILITY: "bg-success-100 text-success-700",
   UX: "bg-pink-100 text-pink-700",
-  SECURITY: "bg-red-100 text-red-700",
-  CONTENT: "bg-blue-100 text-blue-700",
+  SECURITY: "bg-error-100 text-error-700",
+  CONTENT: "bg-info-100 text-info-700",
 };
 
 function IssueItem({ issue }: { issue: Issue }) {
@@ -92,32 +92,32 @@ function IssueItem({ issue }: { issue: Issue }) {
               {issue.category}
             </Badge>
           </div>
-          <h4 className="mt-2 text-sm font-medium text-gray-900">
+          <h4 className="mt-2 text-sm font-medium text-neutral-900">
             {issue.title}
           </h4>
         </div>
 
-        <div className={clsx("shrink-0 text-gray-400", isExpanded ? "rotate-180" : "")}>
+        <div className={clsx("shrink-0 text-neutral-400", isExpanded ? "rotate-180" : "")}>
           <ChevronDown className="h-5 w-5" />
         </div>
       </button>
 
       {isExpanded && (
-        <div className="border-t border-gray-200/50 px-4 py-4 bg-white">
-          <p className="text-sm text-gray-600">{issue.description}</p>
+        <div className="border-t border-neutral-200/50 px-4 py-4 bg-white">
+          <p className="text-sm text-neutral-600">{issue.description}</p>
 
           {issue.element && (
             <div className="mt-3">
-              <p className="text-xs font-medium text-gray-500 mb-1">Élément concerné</p>
-              <code className="block rounded bg-gray-100 px-3 py-2 text-xs text-gray-700 overflow-x-auto">
+              <p className="text-xs font-medium text-neutral-500 mb-1">Élément concerné</p>
+              <code className="block rounded bg-neutral-100 px-3 py-2 text-xs text-neutral-700 overflow-x-auto">
                 {issue.element}
               </code>
             </div>
           )}
 
-          <div className="mt-4 rounded-lg bg-blue-50 p-3">
-            <p className="text-xs font-medium text-blue-800 mb-1">Recommandation</p>
-            <p className="text-sm text-blue-700">{issue.suggestion}</p>
+          <div className="mt-4 rounded-lg bg-info-50 p-3">
+            <p className="text-xs font-medium text-info-800 mb-1">Recommandation</p>
+            <p className="text-sm text-info-700">{issue.suggestion}</p>
           </div>
         </div>
       )}
@@ -128,11 +128,11 @@ function IssueItem({ issue }: { issue: Issue }) {
 function IssueList({ issues }: IssueListProps) {
   if (issues.length === 0) {
     return (
-      <div className="rounded-xl border border-green-200 bg-green-50 p-8 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+      <div className="rounded-xl border border-success-200 bg-success-50 p-8 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-100">
           <svg
             viewBox="0 0 24 24"
-            className="h-6 w-6 text-green-600"
+            className="h-6 w-6 text-success-600"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -141,10 +141,10 @@ function IssueList({ issues }: IssueListProps) {
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
         </div>
-        <h3 className="mt-4 text-sm font-medium text-green-800">
+        <h3 className="mt-4 text-sm font-medium text-success-800">
           Aucun problème détecté
         </h3>
-        <p className="mt-1 text-sm text-green-600">
+        <p className="mt-1 text-sm text-success-600">
           Ce site semble bien optimisé !
         </p>
       </div>
@@ -166,16 +166,16 @@ function IssueList({ issues }: IssueListProps) {
       {/* Summary */}
       <div className="flex flex-wrap gap-4 text-sm">
         <div className="flex items-center gap-1.5">
-          <AlertTriangle className="h-4 w-4 text-red-500" />
-          <span className="text-gray-600">{highCount} critique{highCount !== 1 ? "s" : ""}</span>
+          <AlertTriangle className="h-4 w-4 text-error-500" />
+          <span className="text-neutral-600">{highCount} critique{highCount !== 1 ? "s" : ""}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <AlertCircle className="h-4 w-4 text-orange-500" />
-          <span className="text-gray-600">{mediumCount} important{mediumCount !== 1 ? "s" : ""}</span>
+          <span className="text-neutral-600">{mediumCount} important{mediumCount !== 1 ? "s" : ""}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Info className="h-4 w-4 text-blue-500" />
-          <span className="text-gray-600">{lowCount} mineur{lowCount !== 1 ? "s" : ""}</span>
+          <Info className="h-4 w-4 text-info-500" />
+          <span className="text-neutral-600">{lowCount} mineur{lowCount !== 1 ? "s" : ""}</span>
         </div>
       </div>
 

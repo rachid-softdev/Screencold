@@ -4,7 +4,7 @@ import { clsx } from "clsx";
 import { Loader2 } from "lucide-react";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "ghost" | "destructive";
+  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   leftIcon?: React.ReactNode;
@@ -33,6 +33,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       default: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
       secondary:
         "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-blue-500",
+      outline:
+        "border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50 focus:ring-blue-500",
       ghost: "bg-transparent hover:bg-gray-100 text-gray-700 focus:ring-gray-500",
       destructive: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
     };

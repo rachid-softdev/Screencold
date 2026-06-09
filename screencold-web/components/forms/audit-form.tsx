@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { Building2, User, Mail, Globe, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 import { AuditProgress } from "@/components/audit/audit-progress";
 import { z } from "zod";
 
@@ -151,7 +151,7 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* URL Field */}
       <div className="relative">
-        <div className="absolute left-3 top-3 text-gray-400">
+        <div className="absolute left-3 top-3 text-neutral-400">
           <Globe className="h-5 w-5" />
         </div>
         <Input
@@ -194,15 +194,15 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
 
       {/* Agency Type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
           Type d&apos;agence
         </label>
         <select
           value={formData.agencyType}
           onChange={handleChange("agencyType")}
           className={clsx(
-            "flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm",
-            "focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            "flex h-10 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm",
+            "focus:outline-none focus:ring-2 focus:ring-info-200 focus:border-info-500"
           )}
         >
           <option value="">Sélectionnez (optionnel)</option>
@@ -225,7 +225,7 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
         Lancer l&apos;audit
       </Button>
 
-      <p className="text-xs text-center text-gray-500">
+      <p className="text-xs text-center text-neutral-500">
         1 crédit sera déduit de votre solde pour cet audit.
       </p>
     </form>

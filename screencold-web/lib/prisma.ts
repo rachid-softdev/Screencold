@@ -51,6 +51,9 @@ const prisma = basePrisma.$extends({
         if (data.refresh_token) {
           data.refresh_token = encryptToken(data.refresh_token as string);
         }
+        if (data.id_token) {
+          data.id_token = encryptToken(data.id_token as string);
+        }
         return query(args);
       },
 
@@ -85,6 +88,20 @@ const prisma = basePrisma.$extends({
             }
           }
         }
+        if (data.id_token !== undefined) {
+          if (typeof data.id_token === "string") {
+            data.id_token = encryptToken(data.id_token);
+          } else if (
+            data.id_token &&
+            typeof data.id_token === "object" &&
+            "set" in (data.id_token as Record<string, unknown>)
+          ) {
+            const ops = data.id_token as Record<string, unknown>;
+            if (typeof ops.set === "string") {
+              ops.set = encryptToken(ops.set);
+            }
+          }
+        }
         return query(args);
       },
 
@@ -96,6 +113,9 @@ const prisma = basePrisma.$extends({
         }
         if (createData.refresh_token) {
           createData.refresh_token = encryptToken(createData.refresh_token as string);
+        }
+        if (createData.id_token) {
+          createData.id_token = encryptToken(createData.id_token as string);
         }
 
         const updateData = args.update as Record<string, unknown>;
@@ -109,6 +129,11 @@ const prisma = basePrisma.$extends({
             updateData.refresh_token = encryptToken(updateData.refresh_token);
           }
         }
+        if (updateData.id_token !== undefined) {
+          if (typeof updateData.id_token === "string") {
+            updateData.id_token = encryptToken(updateData.id_token);
+          }
+        }
 
         return query(args);
       },
@@ -119,6 +144,7 @@ const prisma = basePrisma.$extends({
         if (result) {
           result.access_token = maybeDecryptToken(result.access_token);
           result.refresh_token = maybeDecryptToken(result.refresh_token);
+          result.id_token = maybeDecryptToken(result.id_token);
         }
         return result;
       },
@@ -129,6 +155,7 @@ const prisma = basePrisma.$extends({
         if (result) {
           result.access_token = maybeDecryptToken(result.access_token);
           result.refresh_token = maybeDecryptToken(result.refresh_token);
+          result.id_token = maybeDecryptToken(result.id_token);
         }
         return result;
       },
@@ -139,6 +166,7 @@ const prisma = basePrisma.$extends({
         return results.map((result) => {
           result.access_token = maybeDecryptToken(result.access_token);
           result.refresh_token = maybeDecryptToken(result.refresh_token);
+          result.id_token = maybeDecryptToken(result.id_token);
           return result;
         });
       },

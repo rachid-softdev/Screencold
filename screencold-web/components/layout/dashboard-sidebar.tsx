@@ -17,8 +17,8 @@ import {
   Key,
   Users,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Dropdown } from "@/components/ui/dropdown-menu";
+import { Badge } from '@screencold/ui';
+import { Dropdown } from '@screencold/ui';
 
 interface NavItem {
   href: string;
@@ -75,14 +75,14 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
   return (
     <aside
       className={clsx(
-        "flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300",
+        "flex h-screen flex-col border-r border-neutral-200 bg-white transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
+      <div className="flex h-16 items-center justify-between border-b border-neutral-100 px-4">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
             <svg
               viewBox="0 0 24 24"
               className="h-5 w-5 text-white"
@@ -96,13 +96,13 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
             </svg>
           </div>
           {!collapsed && (
-            <span className="text-lg font-bold text-gray-900">ScreenCold</span>
+            <span className="text-lg font-bold text-neutral-900">ScreenCold</span>
           )}
         </Link>
         {onToggle && (
           <button
             onClick={onToggle}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
             aria-label={collapsed ? "Développer" : "Réduire"}
           >
             <ChevronLeft
@@ -126,8 +126,8 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
               className={clsx(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                  ? "bg-info-50 text-info-700"
+                  : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900",
                 collapsed && "justify-center px-2"
               )}
             >
@@ -139,17 +139,17 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
       </nav>
 
       {/* User */}
-      <div className="border-t border-gray-100 p-3">
+      <div className="border-t border-neutral-100 p-3">
         {user ? (
           <Dropdown
             trigger={
               <div
                 className={clsx(
-                  "flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-50",
+                  "flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-neutral-50",
                   collapsed && "justify-center"
                 )}
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-200 text-neutral-600">
                   {user.image ? (
                     <Image
                       src={user.image}
@@ -166,7 +166,7 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
                 </div>
                 {!collapsed && (
                   <div className="flex-1 overflow-hidden">
-                    <p className="truncate text-sm font-medium text-gray-900">
+                    <p className="truncate text-sm font-medium text-neutral-900">
                       {user.name || "Utilisateur"}
                     </p>
                     <Badge variant="outline" className="text-xs">
@@ -186,11 +186,11 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
               collapsed && "justify-center"
             )}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
-              <User className="h-4 w-4 text-gray-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-200">
+              <User className="h-4 w-4 text-neutral-600" />
             </div>
             {!collapsed && (
-              <span className="text-sm font-medium text-gray-600">
+              <span className="text-sm font-medium text-neutral-600">
                 Chargement...
               </span>
             )}

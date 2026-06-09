@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from '@screencold/ui';
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 function TeamJoinPageContent() {
@@ -49,10 +49,10 @@ function TeamJoinPageContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
-          <p className="mt-4 text-gray-600">Adhésion à l'équipe en cours...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-info-600" />
+          <p className="mt-4 text-neutral-600">Adhésion à l'équipe en cours...</p>
         </div>
       </div>
     );
@@ -60,11 +60,11 @@ function TeamJoinPageContent() {
 
   if (status === 'invalid') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-sm text-center">
-          <XCircle className="h-12 w-12 mx-auto text-red-500" />
-          <h1 className="mt-4 text-xl font-bold text-gray-900">Invitation invalide</h1>
-          <p className="mt-2 text-gray-600">{errorMessage}</p>
+          <XCircle className="h-12 w-12 mx-auto text-error-500" />
+          <h1 className="mt-4 text-xl font-bold text-neutral-900">Invitation invalide</h1>
+          <p className="mt-2 text-neutral-600">{errorMessage}</p>
           <Link href="/dashboard" className="mt-6 inline-block">
             <Button>Retour au tableau de bord</Button>
           </Link>
@@ -75,11 +75,11 @@ function TeamJoinPageContent() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-sm text-center">
-          <XCircle className="h-12 w-12 mx-auto text-red-500" />
-          <h1 className="mt-4 text-xl font-bold text-gray-900">Erreur</h1>
-          <p className="mt-2 text-gray-600">{errorMessage}</p>
+          <XCircle className="h-12 w-12 mx-auto text-error-500" />
+          <h1 className="mt-4 text-xl font-bold text-neutral-900">Erreur</h1>
+          <p className="mt-2 text-neutral-600">{errorMessage}</p>
           <Link href="/dashboard" className="mt-6 inline-block">
             <Button>Retour au tableau de bord</Button>
           </Link>
@@ -89,11 +89,11 @@ function TeamJoinPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-sm text-center">
-        <CheckCircle className="h-12 w-12 mx-auto text-green-500" />
-        <h1 className="mt-4 text-xl font-bold text-gray-900">Bienvenue dans l'équipe!</h1>
-        <p className="mt-2 text-gray-600">Vous avez rejoint l'équipe avec succès.</p>
+        <CheckCircle className="h-12 w-12 mx-auto text-success-500" />
+        <h1 className="mt-4 text-xl font-bold text-neutral-900">Bienvenue dans l'équipe!</h1>
+        <p className="mt-2 text-neutral-600">Vous avez rejoint l'équipe avec succès.</p>
         <Link href="/dashboard" className="mt-6 inline-block">
           <Button>Aller au tableau de bord</Button>
         </Link>
@@ -105,10 +105,10 @@ function TeamJoinPageContent() {
 export default function TeamJoinPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
-          <p className="mt-4 text-gray-600">Chargement...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-info-600" />
+          <p className="mt-4 text-neutral-600">Chargement...</p>
         </div>
       </div>
     }>

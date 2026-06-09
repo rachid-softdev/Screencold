@@ -22,6 +22,8 @@ function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) {
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
+      role="status"
+      aria-live="polite"
     >
       <circle
         className="opacity-25"

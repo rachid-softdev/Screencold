@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
-import { apiMiddleware } from '@/middleware';
+import { apiMiddleware, verifyCsrfToken } from '@/middleware';
 
 // Validation schemas
 const createTeamSchema = z.object({
@@ -78,6 +78,13 @@ export async function POST(request: NextRequest) {
       return errorResponse!;
     }
 
+    if (!await verifyCsrfToken(request)) {
+      return NextResponse.json(
+        { error: 'CSRF_TOKEN_INVALID', message: 'Invalid or missing CSRF token' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const validationResult = createTeamSchema.safeParse(body);
 
@@ -119,7 +126,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// POST /api/teams/join - Join team via invitation token
+// PUT /api/teams/join - Join team via invitation token
 export async function PUT(request: NextRequest) {
   try {
     const { authorized, userId, errorResponse } = await apiMiddleware(request, {
@@ -129,6 +136,13 @@ export async function PUT(request: NextRequest) {
 
     if (!authorized || !userId) {
       return errorResponse!;
+    }
+
+    if (!await verifyCsrfToken(request)) {
+      return NextResponse.json(
+        { error: 'CSRF_TOKEN_INVALID', message: 'Invalid or missing CSRF token' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

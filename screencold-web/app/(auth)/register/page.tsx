@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 function RegisterPage() {
   const router = useRouter();
@@ -92,8 +92,8 @@ function RegisterPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-neutral-900">Créer un compte</h1>
+        <p className="mt-2 text-sm text-neutral-600">
           Rejoignez ScreenCold et commencez à auditer vos prospects
         </p>
       </div>
@@ -101,7 +101,7 @@ function RegisterPage() {
       {/* Register Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <User className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="text"
             value={name}
@@ -113,7 +113,7 @@ function RegisterPage() {
         </div>
 
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="email"
             value={email}
@@ -125,7 +125,7 @@ function RegisterPage() {
         </div>
 
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="password"
             value={password}
@@ -137,13 +137,13 @@ function RegisterPage() {
           />
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-neutral-500">
           En vous inscrivant, vous acceptez nos{" "}
-          <Link href="/terms" className="text-blue-600 hover:underline">
+          <Link href="/terms" className="text-info-600 hover:underline">
             Conditions d&apos;utilisation
           </Link>{" "}
           et notre{" "}
-          <Link href="/privacy" className="text-blue-600 hover:underline">
+          <Link href="/privacy" className="text-info-600 hover:underline">
             Politique de confidentialité
           </Link>
           .
@@ -155,9 +155,9 @@ function RegisterPage() {
       </form>
 
       {/* Login Link */}
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-neutral-600">
         Déjà un compte ?{" "}
-        <Link href="/login" className="font-medium text-blue-600 hover:text-blue-700">
+        <Link href="/login" className="font-medium text-info-600 hover:text-info-700">
           Se connecter
         </Link>
       </p>

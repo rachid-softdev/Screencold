@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { X, ArrowRight, ArrowLeft, Search, BarChart3, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@screencold/ui';
 
 interface Step {
   title: string;
@@ -73,23 +73,23 @@ export function OnboardingTour() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-neutral-500">
             {currentStep + 1} / {steps.length}
           </span>
           <button
             onClick={handleComplete}
-            className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="mt-6 flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-info-100 text-info-600">
             {step.icon}
           </div>
-          <h2 className="mt-4 text-xl font-bold text-gray-900">{step.title}</h2>
-          <p className="mt-2 text-sm text-gray-600">{step.description}</p>
+          <h2 className="mt-4 text-xl font-bold text-neutral-900">{step.title}</h2>
+          <p className="mt-2 text-sm text-neutral-600">{step.description}</p>
         </div>
 
         <div className="mt-8 flex items-center justify-between">

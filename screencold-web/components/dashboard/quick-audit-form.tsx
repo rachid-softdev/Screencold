@@ -5,8 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { Search, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 interface QuickAuditFormProps {
   onSubmit?: (url: string) => Promise<void>;
@@ -67,12 +67,12 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 p-6 sm:p-8">
+    <div className="rounded-xl border border-neutral-200 bg-gradient-to-r from-info-600 to-info-700 p-6 sm:p-8">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-white sm:text-2xl">
           Analysez un site en quelques secondes
         </h2>
-        <p className="mt-2 text-blue-100">
+        <p className="mt-2 text-info-100">
           Entrez l'URL d'un site pour générer un audit complet et un email de
           prospection personnalisé.
         </p>
@@ -82,7 +82,7 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
               <input
                 type="text"
                 value={url}
@@ -94,14 +94,14 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
                 placeholder="www.exemple.com"
                 disabled={loading || disabled}
                 className={clsx(
-                  "h-12 w-full rounded-lg border-0 bg-white pl-10 pr-4 text-gray-900 placeholder:text-gray-400",
+                  "h-12 w-full rounded-lg border-0 bg-white pl-10 pr-4 text-neutral-900 placeholder:text-neutral-400",
                   "focus:outline-none focus:ring-2 focus:ring-white/50",
                   "disabled:cursor-not-allowed disabled:opacity-50"
                 )}
               />
             </div>
             {error && (
-              <p className="mt-1.5 text-sm text-yellow-200">{error}</p>
+              <p className="mt-1.5 text-sm text-warning-200">{error}</p>
             )}
           </div>
 
@@ -110,7 +110,7 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
             size="lg"
             loading={loading}
             disabled={loading || disabled}
-            className="h-12 bg-white text-blue-700 hover:bg-blue-50"
+            className="h-12 bg-white text-info-700 hover:bg-info-50"
             rightIcon={<ArrowRight className="h-4 w-4" />}
           >
             Analyser

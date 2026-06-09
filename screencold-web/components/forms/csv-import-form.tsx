@@ -3,10 +3,10 @@
 import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from '@screencold/ui';
+import { Button } from '@screencold/ui';
 import { CSVUploader } from "@/components/campaigns/csv-uploader";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from '@screencold/ui';
 
 interface CSVImportFormProps {
   onSubmit: (campaignName: string, file: File) => Promise<void>;
@@ -68,24 +68,24 @@ function CSVImportForm({ onSubmit, isLoading = false }: CSVImportFormProps) {
 
       {step === "upload" ? (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
             Import CSV
           </label>
           <CSVUploader onUpload={handleFileUpload} isUploading={isLoading} />
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-            <p className="text-sm text-green-800">
+          <div className="rounded-lg border border-success-200 bg-success-50 p-4">
+            <p className="text-sm text-success-800">
               <strong>Fichier sélectionné:</strong> {file?.name}
             </p>
-            <p className="mt-1 text-sm text-green-700">
+            <p className="mt-1 text-sm text-success-700">
               {preview?.length} prospects trouvés dans le fichier
             </p>
             <button
               type="button"
               onClick={handleBack}
-              className="mt-2 text-sm text-green-600 underline hover:text-green-700"
+              className="mt-2 text-sm text-success-600 underline hover:text-success-700"
             >
               Changer de fichier
             </button>
@@ -93,21 +93,21 @@ function CSVImportForm({ onSubmit, isLoading = false }: CSVImportFormProps) {
 
           {/* Column mapping info */}
           {preview && preview.length > 0 && (
-            <div className="rounded-lg border border-gray-200 p-4">
-              <p className="text-sm font-medium text-gray-700 mb-2">
+            <div className="rounded-lg border border-neutral-200 p-4">
+              <p className="text-sm font-medium text-neutral-700 mb-2">
                 Colonnes détectées:
               </p>
               <div className="flex flex-wrap gap-2">
                 {Object.keys(preview[0]).map((col) => (
                   <span
                     key={col}
-                    className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"
+                    className="inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-700"
                   >
                     {col}
                   </span>
                 ))}
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-3 text-xs text-neutral-500">
                 Assurez-vous que vos colonnes incluent: URL (colonne obligatoire),
                 Nom de l&apos;entreprise, Email (optionnel)
               </p>

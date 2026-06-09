@@ -17,9 +17,9 @@ const sizes = {
 };
 
 function getScoreColor(score: number): string {
-  if (score < 40) return "#ef4444"; // red-500
+  if (score < 40) return "#ef4444"; // error-500
   if (score < 70) return "#f97316"; // orange-500
-  return "#22c55e"; // green-500
+  return "#22c55e"; // success-500
 }
 
 function getScoreLabel(score: number): string {
@@ -101,11 +101,11 @@ function ScoreGauge({ score, size = "md", animated = true }: ScoreGaugeProps) {
 
       {/* Score text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={clsx("font-bold text-gray-900", config.textSize)}>
+        <span className={clsx("font-bold text-neutral-900", config.textSize)}>
           {displayScore}
         </span>
         {size !== "sm" && (
-          <span className={clsx("text-gray-500", config.labelSize)}>
+          <span className={clsx("text-neutral-500", config.labelSize)}>
             {getScoreLabel(displayScore)}
           </span>
         )}

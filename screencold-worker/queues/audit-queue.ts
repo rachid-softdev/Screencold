@@ -1,6 +1,6 @@
 /**
  * BullMQ Queue Configuration
- * Defines the audit processing queue and job types
+ * Defines the audit processing queue, job types, and Dead Letter Queue
  */
 
 import { Queue, QueueOptions } from "bullmq";
@@ -12,9 +12,10 @@ const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379"
 });
 
 /**
- * Queue name constant
+ * Queue name constants
  */
 export const AUDIT_QUEUE_NAME = "audit-processing";
+export const AUDIT_DLQ_NAME = "audit-processing-dlq";
 
 /**
  * Default job options for retry and backoff
@@ -36,6 +37,20 @@ export const defaultJobOptions = {
 };
 
 /**
+ * DLQ job options — keep failed jobs indefinitely for manual inspection
+ */
+export const dlqJobOptions = {
+  removeOnComplete: {
+    count: 1000,
+    age: 30 * 24 * 3600, // 30 days
+  },
+  removeOnFail: {
+    count: 1000,
+    age: 90 * 24 * 3600, // 90 days
+  },
+};
+
+/**
  * Queue options
  */
 const queueOptions: QueueOptions = {
@@ -44,9 +59,45 @@ const queueOptions: QueueOptions = {
 };
 
 /**
+ * Dead Letter Queue options
+ */
+const dlqOptions: QueueOptions = {
+  connection,
+  defaultJobOptions: dlqJobOptions,
+};
+
+/**
  * Creates the audit processing queue
  */
 export const auditQueue = new Queue(AUDIT_QUEUE_NAME, queueOptions);
+
+/**
+ * Creates the Dead Letter Queue for exhausted retries
+ */
+export const auditDlq = new Queue(AUDIT_DLQ_NAME, dlqOptions);
+
+/**
+ * Moves a failed job to the Dead Letter Queue
+ */
+export async function moveToDLQ(
+  jobId: string,
+  data: Record<string, unknown>,
+  reason: string,
+  attemptsMade: number,
+  stacktrace?: string[],
+): Promise<void> {
+  await auditDlq.add("dead-letter", {
+    originalQueue: AUDIT_QUEUE_NAME,
+    originalJobId: jobId,
+    data,
+    reason,
+    failedAt: new Date().toISOString(),
+    attempts: attemptsMade,
+    stacktrace,
+  }, {
+    jobId: `dlq-${jobId}`,
+  });
+}
 
 /**
  * Audit job data structure
@@ -127,6 +178,13 @@ export async function getQueueStats(): Promise<{
  */
 export async function closeAuditQueue(): Promise<void> {
   await auditQueue.close();
+}
+
+/**
+ * Closes the DLQ connection
+ */
+export async function closeAuditDlq(): Promise<void> {
+  await auditDlq.close();
 }
 
 /**

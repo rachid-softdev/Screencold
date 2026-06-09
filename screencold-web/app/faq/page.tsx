@@ -64,23 +64,23 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
               <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="2" y="3" width="20" height="14" rx="2" />
                 <line x1="8" y1="21" x2="16" y2="21" />
                 <line x1="12" y1="17" x2="12" y2="21" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900">ScreenCold</span>
+            <span className="text-xl font-bold text-neutral-900">ScreenCold</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link href="/pricing" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
               Tarifs
             </Link>
-            <Link href="/contact" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link href="/contact" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
               Contact
             </Link>
           </div>
@@ -90,40 +90,40 @@ export default function FAQPage() {
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900">Questions fréquentes</h1>
-          <p className="mt-4 text-lg text-gray-600">
+          <h1 className="text-4xl font-bold text-neutral-900">Questions fréquentes</h1>
+          <p className="mt-4 text-lg text-neutral-600">
             Tout ce que vous devez savoir sur ScreenCold
           </p>
         </div>
 
         <div className="mt-12 space-y-4">
           {faqs.map((faq, index) => (
-            <details key={index} className="group rounded-xl border border-gray-200 bg-white">
-              <summary className="flex cursor-pointer items-center justify-between p-6 font-medium text-gray-900">
+            <details key={index} className="group rounded-xl border border-neutral-200 bg-white">
+              <summary className="flex cursor-pointer items-center justify-between p-6 font-medium text-neutral-900">
                 {faq.question}
-                <ChevronDown className="h-5 w-5 text-gray-500 transition-transform group-open:rotate-180" />
+                <ChevronDown className="h-5 w-5 text-neutral-500 transition-transform group-open:rotate-180" />
               </summary>
-              <div className="px-6 pb-6 text-gray-600">
+              <div className="px-6 pb-6 text-neutral-600">
                 {faq.answer}
               </div>
             </details>
           ))}
         </div>
 
-        <div className="mt-12 rounded-xl bg-blue-50 p-6 text-center">
-          <p className="text-gray-700">
+        <div className="mt-12 rounded-xl bg-info-50 p-6 text-center">
+          <p className="text-neutral-700">
             Vous n'avez pas trouvé la réponse à votre question ?
           </p>
-          <Link href="/contact" className="mt-4 inline-block text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/contact" className="mt-4 inline-block text-info-600 hover:text-info-700 font-medium">
            Contactez-nous →
           </Link>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12">
+      <footer className="border-t border-neutral-200 py-12">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-gray-500">© 2024 ScreenCold. Tous droits réservés.</p>
+          <p className="text-sm text-neutral-500">© 2024 ScreenCold. Tous droits réservés.</p>
         </div>
       </footer>
 

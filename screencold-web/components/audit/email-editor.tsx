@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { Copy, RefreshCw, Check, Download, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 interface EmailEditorProps {
   subject: string;
@@ -74,7 +74,7 @@ function EmailEditor({
     <div className="space-y-4">
       {/* Subject */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
           Objet de l&apos;email
         </label>
         <input
@@ -84,13 +84,13 @@ function EmailEditor({
             setEditedSubject(e.target.value);
             onSubjectChange?.(e.target.value);
           }}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-info-500 focus:outline-none focus:ring-2 focus:ring-info-200"
         />
       </div>
 
       {/* Body */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
           Corps de l&apos;email
         </label>
         <textarea
@@ -100,15 +100,15 @@ function EmailEditor({
             onBodyChange?.(e.target.value);
           }}
           rows={12}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono leading-relaxed focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 resize-y"
+          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm font-mono leading-relaxed focus:border-info-500 focus:outline-none focus:ring-2 focus:ring-info-200 resize-y"
           style={{ whiteSpace: "pre-wrap" }}
         />
       </div>
 
       {/* P.S. */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          P.S. <span className="text-gray-400 font-normal">(optionnel)</span>
+        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+          P.S. <span className="text-neutral-400 font-normal">(optionnel)</span>
         </label>
         <input
           type="text"
@@ -118,7 +118,7 @@ function EmailEditor({
             onPsChange?.(e.target.value);
           }}
           placeholder="Un post-scriptum personnalisé..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-info-500 focus:outline-none focus:ring-2 focus:ring-info-200"
         />
       </div>
 
@@ -138,7 +138,7 @@ function EmailEditor({
           onClick={handleCopy}
           leftIcon={
             copied ? (
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-success-500" />
             ) : (
               <Copy className="h-4 w-4" />
             )

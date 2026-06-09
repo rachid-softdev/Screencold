@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { Users, Plus, Mail, Crown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@screencold/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@screencold/ui';
 
 interface Team {
   id: string;
@@ -66,7 +66,7 @@ export default function TeamsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
       </div>
     );
   }
@@ -75,8 +75,8 @@ export default function TeamsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Équipes</h1>
-          <p className="mt-2 text-gray-600">Gérez vos équipes et invitations</p>
+          <h1 className="text-3xl font-bold text-neutral-900">Équipes</h1>
+          <p className="mt-2 text-neutral-600">Gérez vos équipes et invitations</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -86,9 +86,9 @@ export default function TeamsPage() {
 
       {teams.length === 0 ? (
         <div className="text-center py-12">
-          <Users className="h-12 w-12 mx-auto text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Aucune équipe</h3>
-          <p className="mt-2 text-gray-600">Créez votre première équipe pour collaborate.</p>
+          <Users className="h-12 w-12 mx-auto text-neutral-400" />
+          <h3 className="mt-4 text-lg font-medium text-neutral-900">Aucune équipe</h3>
+          <p className="mt-2 text-neutral-600">Créez votre première équipe pour collaborate.</p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -97,7 +97,7 @@ export default function TeamsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{team.name}</CardTitle>
-                  {team.role === "OWNER" && <Crown className="h-5 w-5 text-yellow-500" />}
+                  {team.role === "OWNER" && <Crown className="h-5 w-5 text-warning-500" />}
                 </div>
                 <CardDescription>
                   {team.members.length} membre{team.members.length !== 1 ? "s" : ""}
@@ -107,17 +107,17 @@ export default function TeamsPage() {
                 <div className="space-y-2">
                   {team.members.slice(0, 3).map((member) => (
                     <div key={member.id} className="flex items-center gap-2 text-sm">
-                      <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium">
+                      <div className="h-8 w-8 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-medium">
                         {member.name?.charAt(0) || member.email.charAt(0)}
                       </div>
                       <span className="truncate">{member.name || member.email}</span>
                       {member.role === "OWNER" && (
-                        <span className="text-xs text-yellow-600">Proprio</span>
+                        <span className="text-xs text-warning-600">Proprio</span>
                       )}
                     </div>
                   ))}
                   {team.members.length > 3 && (
-                    <p className="text-sm text-gray-500">+{team.members.length - 3} autres</p>
+                    <p className="text-sm text-neutral-500">+{team.members.length - 3} autres</p>
                   )}
                 </div>
                 {team.role === "OWNER" && (

@@ -63,8 +63,8 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   }
 
   return (
-    <nav className="sticky top-8 p-5 bg-white rounded-xl border border-gray-200 shadow-sm">
-      <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+    <nav className="sticky top-8 p-5 bg-white rounded-xl border border-neutral-200 shadow-sm">
+      <h4 className="text-sm font-semibold text-neutral-900 mb-4 uppercase tracking-wide">
         Sommaire
       </h4>
       <ul className="space-y-2">
@@ -78,8 +78,8 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                 onClick={() => handleClick(id)}
                 className={`block w-full text-left text-sm py-1.5 px-2 rounded transition-colors ${
                   isActive
-                    ? "text-blue-600 font-medium bg-blue-50"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "text-info-600 font-medium bg-info-50"
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50"
                 }`}
               >
                 {heading.text}

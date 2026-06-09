@@ -11,23 +11,23 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
               <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="2" y="3" width="20" height="14" rx="2" />
                 <line x1="8" y1="21" x2="16" y2="21" />
                 <line x1="12" y1="17" x2="12" y2="21" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900">ScreenCold</span>
+            <span className="text-xl font-bold text-neutral-900">ScreenCold</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link href="/pricing" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
               Tarifs
             </Link>
-            <Link href="/contact" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link href="/contact" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
               Contact
             </Link>
           </div>
@@ -36,10 +36,10 @@ export default function TermsPage() {
 
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900">Conditions générales d'utilisation</h1>
-        <p className="mt-2 text-sm text-gray-500">Dernière mise à jour : Mai 2026</p>
+        <h1 className="text-3xl font-bold text-neutral-900">Conditions générales d'utilisation</h1>
+        <p className="mt-2 text-sm text-neutral-500">Dernière mise à jour : Mai 2026</p>
 
-        <div className="mt-8 space-y-8 text-gray-600">
+        <div className="mt-8 space-y-8 text-neutral-600">
           <p>
             Les présentes conditions générales d'utilisation (« CGU ») constituent un accord
             légal entre vous (« Utilisateur ») et ScreenCold (« nous », « notre »). En utilisant
@@ -47,7 +47,7 @@ export default function TermsPage() {
           </p>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">1. Définitions</h2>
+            <h2 className="text-xl font-bold text-neutral-900">1. Définitions</h2>
             <ul className="mt-3 list-disc pl-6 space-y-2">
               <li><strong>Service</strong> : la plateforme ScreenCold accessible à screencold.com</li>
               <li><strong>Utilisateur</strong> : toute personne physique ou morale qui s'inscrit et utilise le Service</li>
@@ -58,7 +58,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">2. Objet</h2>
+            <h2 className="text-xl font-bold text-neutral-900">2. Objet</h2>
             <p className="mt-3">
               ScreenCold est un service SaaS permettant l'automatisation d'audits de sites web
               et la génération d'emails de prospection personnalisés. Le Service est fourni en
@@ -67,7 +67,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">3. Accès au Service</h2>
+            <h2 className="text-xl font-bold text-neutral-900">3. Accès au Service</h2>
             <p className="mt-3">
               Pour utiliser le Service, vous devez créer un compte avec une adresse email valide.
               Vous êtes responsable de maintenir la confidentialité de vos identifiants. Vous êtes
@@ -80,9 +80,9 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">4. Tarifs et paiement</h2>
+            <h2 className="text-xl font-bold text-neutral-900">4. Tarifs et paiement</h2>
             <p className="mt-3">
-              Les tarifs sont indiqués sur la page <Link href="/pricing" className="text-blue-600 hover:underline">/pricing</Link>.
+              Les tarifs sont indiqués sur la page <Link href="/pricing" className="text-info-600 hover:underline">/pricing</Link>.
               Les paiements sont traités par Stripe. Les abonnements sont facturés mensuellement
               ou annuellement selon l'option choisie.
             </p>
@@ -99,7 +99,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">5. Crédits</h2>
+            <h2 className="text-xl font-bold text-neutral-900">5. Crédits</h2>
             <p className="mt-3">
               Chaque audit consomme 1 crédit. Les crédits sont renouvelés chaque mois à la date
               d'anniversaire de votre abonnement. Les crédits non utilisés ne sont pas reportés
@@ -112,7 +112,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">6. Utilisation acceptable</h2>
+            <h2 className="text-xl font-bold text-neutral-900">6. Utilisation acceptable</h2>
             <p className="mt-3">Vous acceptez de ne pas :</p>
             <ul className="mt-3 list-disc pl-6 space-y-2">
               <li>Utiliser le Service à des fins illégales ou non autorisées</li>
@@ -126,7 +126,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">7. Propriété intellectuelle</h2>
+            <h2 className="text-xl font-bold text-neutral-900">7. Propriété intellectuelle</h2>
             <p className="mt-3">
               Le Service et son contenu (code, design, logo, documentation) sont la propriété
               exclusive de ScreenCold et sont protégés par les lois sur la propriété intellectuelle.
@@ -139,7 +139,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">8. Limitation de responsabilité</h2>
+            <h2 className="text-xl font-bold text-neutral-900">8. Limitation de responsabilité</h2>
             <p className="mt-3">
               Le Service est fourni « en l'état » sans garantie d'aucune sorte. Nous ne garantissons
               pas que le Service sera ininterrompu, sans erreur ou parfaitement sécurisé.
@@ -153,7 +153,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">9. Résiliation</h2>
+            <h2 className="text-xl font-bold text-neutral-900">9. Résiliation</h2>
             <p className="mt-3">
               Vous pouvez supprimer votre compte à tout moment depuis vos paramètres. Nous pouvons
               suspendre ou résilier votre accès si vous violez ces CGU.
@@ -165,7 +165,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">10. Modifications</h2>
+            <h2 className="text-xl font-bold text-neutral-900">10. Modifications</h2>
             <p className="mt-3">
               Nous nous réservons le droit de modifier ces CGU à tout moment. Les modifications
               substantielles vous seront notifiées par email 30 jours avant leur entrée en vigueur.
@@ -174,7 +174,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">11. Droit applicable et juridiction</h2>
+            <h2 className="text-xl font-bold text-neutral-900">11. Droit applicable et juridiction</h2>
             <p className="mt-3">
               Ces CGU sont régies par le droit français. Tout litige sera soumis à la compétence
               exclusive des tribunaux de Paris, sauf disposition légale contraire.
@@ -182,7 +182,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-gray-900">12. Contact</h2>
+            <h2 className="text-xl font-bold text-neutral-900">12. Contact</h2>
             <p className="mt-3">
               Pour toute question concernant ces CGU, contactez-nous à :
               <strong> legal@screencold.com</strong>
@@ -192,9 +192,9 @@ export default function TermsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12">
+      <footer className="border-t border-neutral-200 py-12">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-gray-500">© 2026 ScreenCold. Tous droits réservés.</p>
+          <p className="text-sm text-neutral-500">© 2026 ScreenCold. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

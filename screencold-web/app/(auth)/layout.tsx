@@ -7,11 +7,11 @@ interface AuthLayoutProps {
 
 function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col justify-center bg-neutral-50 py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
             <svg
               viewBox="0 0 24 24"
               className="h-6 w-6 text-white"
@@ -24,18 +24,18 @@ function AuthLayout({ children }: AuthLayoutProps) {
               <line x1="12" y1="17" x2="12" y2="21" />
             </svg>
           </div>
-          <span className="text-2xl font-bold text-gray-900">ScreenCold</span>
+          <span className="text-2xl font-bold text-neutral-900">ScreenCold</span>
         </Link>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-gray-200">
+        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-neutral-200">
           {children}
         </div>
       </div>
 
       {/* Footer */}
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-neutral-500">
         © 2024 ScreenCold. Tous droits réservés.
       </p>
     </div>

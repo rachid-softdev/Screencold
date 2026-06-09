@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
-import { apiMiddleware } from '@/middleware';
+import { apiMiddleware, verifyCsrfToken } from '@/middleware';
 import {
   parsePaginationParams,
   paginatedResponse,
@@ -146,6 +146,13 @@ export async function POST(request: NextRequest) {
 
     if (!authorized || !userId) {
       return errorResponse!;
+    }
+
+    if (!await verifyCsrfToken(request)) {
+      return NextResponse.json(
+        { error: 'CSRF_TOKEN_INVALID', message: 'Invalid or missing CSRF token' },
+        { status: 403 }
+      );
     }
 
     // Parse and validate body

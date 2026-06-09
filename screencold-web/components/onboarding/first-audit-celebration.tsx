@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { PartyPopper, ArrowRight, Copy, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@screencold/ui';
 import Link from "next/link";
 
 interface FirstAuditCelebrationProps {
@@ -47,15 +47,15 @@ export function FirstAuditCelebration({
 
       <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-            <PartyPopper className="h-10 w-10 text-green-600" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-success-100">
+            <PartyPopper className="h-10 w-10 text-success-600" />
           </div>
 
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
+          <h2 className="mt-6 text-2xl font-bold text-neutral-900">
             Bravo ! Votre premier audit est prêt
           </h2>
 
-          <p className="mt-3 text-gray-600">
+          <p className="mt-3 text-neutral-600">
             Vous venez de gagner du temps précieux. Voici quoi faire ensuite :
           </p>
 
@@ -85,7 +85,7 @@ export function FirstAuditCelebration({
 
           <button
             onClick={onClose}
-            className="mt-4 text-sm text-gray-500 hover:text-gray-700"
+            className="mt-4 text-sm text-neutral-500 hover:text-neutral-700"
           >
             Continuer sans voir les résultats
           </button>
