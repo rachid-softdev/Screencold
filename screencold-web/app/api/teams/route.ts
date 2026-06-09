@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { apiMiddleware, verifyCsrfToken } from '@/middleware';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'teams-api' });
 
 // Validation schemas
 const createTeamSchema = z.object({
@@ -58,7 +61,7 @@ export async function GET(request: NextRequest) {
       memberTeams: memberTeams.map((m) => ({ ...m.team, role: m.role })),
     });
   } catch (error) {
-    console.error('[Teams] GET error:', error);
+    logger.error({ error }, 'GET error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'An error occurred' },
       { status: 500 }
@@ -118,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ team }, { status: 201 });
   } catch (error) {
-    console.error('[Teams] POST error:', error);
+    logger.error({ error }, 'POST error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'An error occurred' },
       { status: 500 }
@@ -203,7 +206,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[Teams] PUT (join) error:', error);
+    logger.error({ error }, 'PUT (join) error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'An error occurred' },
       { status: 500 }

@@ -59,6 +59,9 @@ model User {
   @@index([email])
   @@index([stripeCustomerId])
   @@index([googleId])
+
+  // CHECK constraints (applied via raw SQL migration)
+  // credits >= 0 enforced at DB level
 }
 
 model UserRole {

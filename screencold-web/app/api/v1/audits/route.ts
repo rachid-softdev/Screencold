@@ -16,6 +16,9 @@ import {
   paginatedResponse,
 } from '@/lib/pagination';
 import { getCorrelationId } from '@/lib/correlation-id';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'v1-audits-api' });
 
 // ============================================
 // Validation Schemas
@@ -253,7 +256,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[API v1/audits] GET error:', error);
+    logger.error({ error }, 'GET error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'An error occurred' },
       { status: 500 }
@@ -410,7 +413,7 @@ export async function POST(request: NextRequest) {
         }
       );
     } catch (queueError) {
-      console.error('[API v1/audits] Failed to enqueue:', queueError);
+      logger.error({ error: queueError }, 'Failed to enqueue job');
     }
 
     return NextResponse.json(
@@ -426,7 +429,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[API v1/audits] POST error:', error);
+    logger.error({ error }, 'POST error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'An error occurred' },
       { status: 500 }

@@ -1,4 +1,25 @@
 import { Resend } from 'resend';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'email' });
+
+async function withTimeout<T>(
+  operation: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number
+): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await operation(controller.signal);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`Operation timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 async function withTimeout<T>(
   operation: (signal: AbortSignal) => Promise<T>,
@@ -60,7 +81,7 @@ function escapeHtml(str: string): string {
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
   const resend = getResend();
   if (!resend) {
-    console.warn('[Email] RESEND_API_KEY not configured, email not sent');
+    logger.warn('RESEND_API_KEY not configured, email not sent');
     return { success: false, error: 'Email service not configured' };
   }
   try {
@@ -77,7 +98,7 @@ export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
 
     return { success: true, data: result };
   } catch (error) {
-    console.error('[Email] Failed to send email:', error);
+    logger.error({ error }, 'Failed to send email');
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }

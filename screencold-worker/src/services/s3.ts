@@ -1,128 +1,84 @@
-import { S3Client } from "@aws-sdk/client-s3";
-import sharp from "sharp";
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { s3CircuitBreaker } from './circuit-breaker';
+import fs from 'fs/promises';
+import path from 'path';
 
-const s3Config = {
-  region: process.env.AWS_REGION ?? "eu-west-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
-  },
-  endpoint: process.env.AWS_S3_ENDPOINT,
-  forcePathStyle: Boolean(process.env.AWS_S3_ENDPOINT),
-};
+const FALLBACK_DIR = path.join(process.cwd(), '.s3-fallback');
 
-export const s3Client = new S3Client({
-  ...s3Config,
-  requestHandler: {
-    requestTimeout: 30_000,
-    connectionTimeout: 5_000,
-  },
-});
+let s3Client: S3Client | null = null;
 
-const BUCKET_NAME = process.env.AWS_S3_BUCKET ?? "screencold-screenshots";
-
-export function getS3Url(key: string): string {
-  if (process.env.AWS_S3_ENDPOINT) {
-    return `${process.env.AWS_S3_ENDPOINT}/${BUCKET_NAME}/${key}`;
+function getS3Client(): S3Client {
+  if (!s3Client) {
+    s3Client = new S3Client({
+      region: process.env.AWS_REGION || 'us-east-1',
+      requestTimeout: 30000,
+      maxAttempts: 2,
+    });
   }
-  return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+  return s3Client;
 }
 
-export interface ScreenshotUploadData {
-  desktop: Buffer;
-  mobile?: Buffer;
-  annotated?: Buffer;
+async function ensureFallbackDir(): Promise<void> {
+  try {
+    await fs.mkdir(FALLBACK_DIR, { recursive: true });
+  } catch { /* exists */ }
 }
 
-/**
- * Compress and convert image to WebP using Sharp
- */
-async function compressImage(buffer: Buffer, maxWidth: number = 1920): Promise<Buffer> {
-  return await sharp(buffer)
-    .resize(maxWidth, null, {
-      withoutEnlargement: true,
-      fit: 'inside',
-    })
-    .webp({
-      quality: 80,
-      effort: 4, // Balance between size and speed
-    })
-    .toBuffer();
-}
+export async function uploadFile(
+  key: string,
+  body: Buffer,
+  contentType: string
+): Promise<string> {
+  return s3CircuitBreaker.call(
+    async () => {
+      const client = getS3Client();
+      const bucket = process.env.AWS_S3_BUCKET;
+      if (!bucket) throw new Error('AWS_S3_BUCKET not set');
 
-export async function uploadScreenshots(
-  userId: string,
-  screenshots: ScreenshotUploadData
-): Promise<{
-  desktop: { key: string; url: string };
-  mobile?: { key: string; url: string };
-  annotated?: { key: string; url: string };
-}> {
-  const timestamp = Date.now();
-  const basePath = `screenshots/${userId}/${timestamp}`;
+      await client.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      }));
 
-  const result: {
-    desktop: { key: string; url: string };
-    mobile?: { key: string; url: string };
-    annotated?: { key: string; url: string };
-  } = {
-    desktop: {
-      key: `${basePath}/desktop.webp`,
-      url: "",
+      return `https://${bucket}.s3.amazonaws.com/${key}`;
     },
-  };
-
-  const { PutObjectCommand } = await import("@aws-sdk/client-s3");
-
-  // Compress and upload desktop screenshot
-  const compressedDesktop = await compressImage(screenshots.desktop);
-  const desktopCommand = new PutObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: result.desktop.key,
-    Body: compressedDesktop,
-    ContentType: "image/webp",
-    ServerSideEncryption: "AES256",
-  });
-  await s3Client.send(desktopCommand);
-  result.desktop.url = getS3Url(result.desktop.key);
-
-  // Compress and upload mobile screenshot
-  if (screenshots.mobile) {
-    result.mobile = {
-      key: `${basePath}/mobile.webp`,
-      url: "",
-    };
-    const compressedMobile = await compressImage(screenshots.mobile, 480);
-    const mobileCommand = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: result.mobile.key,
-      Body: compressedMobile,
-      ContentType: "image/webp",
-      ServerSideEncryption: "AES256",
-    });
-    await s3Client.send(mobileCommand);
-    result.mobile.url = getS3Url(result.mobile.key);
-  }
-
-  // Compress and upload annotated screenshot
-  if (screenshots.annotated) {
-    result.annotated = {
-      key: `${basePath}/annotated.webp`,
-      url: "",
-    };
-    const compressedAnnotated = await compressImage(screenshots.annotated);
-    const annotatedCommand = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: result.annotated.key,
-      Body: compressedAnnotated,
-      ContentType: "image/webp",
-      ServerSideEncryption: "AES256",
-    });
-    await s3Client.send(annotatedCommand);
-    result.annotated.url = getS3Url(result.annotated.key);
-  }
-
-  return result;
+    async () => {
+      console.warn('[s3] Circuit breaker OPEN, using fallback storage');
+      await ensureFallbackDir();
+      const localPath = path.join(FALLBACK_DIR, key.replace(/\//g, '-'));
+      await fs.writeFile(localPath, body);
+      return `file://${localPath}`;
+    }
+  );
 }
 
-export default s3Client;
+export async function downloadFile(key: string): Promise<Buffer> {
+  return s3CircuitBreaker.call(
+    async () => {
+      const client = getS3Client();
+      const bucket = process.env.AWS_S3_BUCKET;
+      if (!bucket) throw new Error('AWS_S3_BUCKET not set');
+
+      const response = await client.send(new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }));
+
+      return Buffer.from(await response.Body!.transformToByteArray());
+    },
+    async () => {
+      const localPath = path.join(FALLBACK_DIR, key.replace(/\//g, '-'));
+      return fs.readFile(localPath);
+    }
+  );
+}
+
+export async function getFallbackFiles(): Promise<string[]> {
+  try {
+    return fs.readdir(FALLBACK_DIR);
+  } catch {
+    return [];
+  }
+}

@@ -1,5 +1,8 @@
 import prisma from '@/lib/prisma';
 import { CreditTransaction, Plan } from '@prisma/client';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'credits' });
 
 // ============================================
 // Types
@@ -66,7 +69,7 @@ export async function debitCredits(
         data: {
           userId,
           amount: -1,
-          type: 'DEBIT_AUDIT',
+          type: 'AUDIT_DEBIT',
           auditId,
         },
       });
@@ -76,7 +79,7 @@ export async function debitCredits(
 
     return result.success;
   } catch (error) {
-    console.error('[Credits] Debit failed:', error);
+    logger.error({ error }, 'Debit failed');
     return false;
   }
 }
@@ -107,7 +110,7 @@ export async function refundCredits(
       },
     });
 
-    console.log(`[Credits] Refund issued: user=${userId}, audit=${auditId}, reason=${reason}`);
+    logger.info({ userId, auditId, reason }, 'Refund issued');
   });
 }
 
@@ -137,7 +140,7 @@ export async function refillCredits(
       },
     });
 
-    console.log(`[Credits] Refill: user=${userId}, amount=${amount}, type=${type}`);
+    logger.info({ userId, amount, type }, 'Refill');
   });
 }
 
@@ -220,7 +223,7 @@ export async function batchDebitCredits(
             data: {
               userId,
               amount: -1,
-              type: 'DEBIT_AUDIT',
+              type: 'AUDIT_DEBIT',
               auditId,
             },
           })
@@ -237,7 +240,7 @@ export async function batchDebitCredits(
 
     return result;
   } catch (error) {
-    console.error('[Credits] Batch debit failed:', error);
+    logger.error({ error }, 'Batch debit failed');
     return {
       success: false,
       debited: 0,
@@ -274,7 +277,7 @@ export async function batchRefundCredits(
       )
     );
 
-    console.log(`[Credits] Batch refund: user=${userId}, count=${auditIds.length}, reason=${reason}`);
+    logger.info({ userId, count: auditIds.length, reason }, 'Batch refund');
   });
 }
 
@@ -367,7 +370,7 @@ export async function resetCreditsForAllPlans(): Promise<ResetCreditsResult> {
     })
   );
 
-  console.log(`[Credits] Monthly reset completed: ${reset} users reset, ${skipped} skipped`);
+  logger.info({ reset, skipped }, 'Monthly reset completed');
   return { reset, skipped };
 }
 
