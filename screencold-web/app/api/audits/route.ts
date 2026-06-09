@@ -11,6 +11,9 @@ import {
   paginatedResponse,
 } from '@/lib/pagination';
 import { getCorrelationId } from '@/lib/correlation-id';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'audits-api' });
 
 // ============================================
 // Validation Schema
@@ -281,9 +284,9 @@ export async function POST(request: NextRequest) {
         }
       );
 
-      console.log(`[Audit] Enqueued: auditId=${audit.id}, prospectId=${prospect.id}`);
+      logger.info({ auditId: audit.id, prospectId: prospect.id }, 'Audit enqueued');
     } catch (queueError) {
-      console.error('[Audit] Failed to enqueue job:', queueError);
+      logger.error({ error: queueError }, 'Failed to enqueue job');
       // Don't rollback here - the audit is created and can be retried
     }
 
@@ -304,7 +307,7 @@ export async function POST(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('[Audits] POST error:', error);
+    logger.error({ error }, 'POST error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Une erreur est survenue' },
       { status: 500 }
@@ -437,7 +440,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Audits] GET error:', error);
+    logger.error({ error }, 'GET error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Une erreur est survenue' },
       { status: 500 },

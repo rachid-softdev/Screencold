@@ -6,6 +6,9 @@ import {
   parsePaginationParams,
   paginatedResponse,
 } from '@/lib/pagination';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger({ module: 'campaigns-api' });
 
 // ============================================
 // Types
@@ -125,7 +128,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Campaigns] GET error:', error);
+    logger.error({ error }, 'GET error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Une erreur est survenue' },
       { status: 500 }
@@ -180,7 +183,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(`[Campaign] Created: id=${campaign.id}, name=${name}, userId=${userId}`);
+    logger.info({ campaignId: campaign.id, name, userId }, 'Campaign created');
 
     return NextResponse.json(
       {
@@ -198,7 +201,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[Campaigns] POST error:', error);
+    logger.error({ error }, 'POST error');
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Une erreur est survenue' },
       { status: 500 }

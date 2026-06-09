@@ -1,0 +1,27 @@
+{
+  "title": "ScreenCold - Tracing",
+  "version": 1,
+  "panels": [
+    {
+      "title": "Trace Duration by Service",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "histogram_quantile(0.99, sum(rate(traces_duration_seconds_bucket[5m])) by (le, service_name))", "legendFormat": "{{service_name}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "title": "Span Count by Service",
+      "type": "graph",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(rate(traces_span_count_total[5m])) by (service_name)", "legendFormat": "{{service_name}}" }],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "title": "Error Spans",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [{ "expr": "sum(rate(traces_span_error_total[5m]))", "legendFormat": "Errors" }],
+      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 8 }
+    }
+  ]
+}

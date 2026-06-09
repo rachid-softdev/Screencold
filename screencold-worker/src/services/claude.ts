@@ -1,5 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic, {
+  RateLimitError,
+  InternalServerError,
+  APIConnectionError,
+} from "@anthropic-ai/sdk";
 import { createLogger } from "../utils/logger";
+import { withRetry } from "../utils/retry";
 import type { AnalyzeResult, UXIssue, IssueSeverity, IssueCategory } from "@screencold/types";
 
 const logger = createLogger();
@@ -104,17 +109,26 @@ export async function analyzeWithAI(
       });
     }
 
-    const message = await anthropic.messages.create({
-      model: "claude-opus-4-20251114",
-      max_tokens: 4096,
-      system: ANALYSIS_SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content,
-        },
-      ],
-    });
+    const message = await withRetry(
+      () =>
+        anthropic.messages.create({
+          model: "claude-opus-4-20251114",
+          max_tokens: 4096,
+          system: ANALYSIS_SYSTEM_PROMPT,
+          messages: [
+            {
+              role: "user",
+              content,
+            },
+          ],
+        }),
+      {
+        shouldRetry: (error) =>
+          error instanceof RateLimitError ||
+          error instanceof InternalServerError ||
+          error instanceof APIConnectionError,
+      }
+    );
 
     // Parse the response
     const responseText = message.content

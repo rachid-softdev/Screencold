@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { apiMiddleware } from '@/middleware';
+
+const patchNotificationSchema = z.object({
+  notificationId: z.string().min(1).optional(),
+  markAllRead: z.boolean().optional(),
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -52,7 +58,16 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { notificationId, markAllRead } = body;
+    const validationResult = patchNotificationSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'VALIDATION_ERROR', message: 'Invalid data', details: validationResult.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { notificationId, markAllRead } = validationResult.data;
 
     if (markAllRead) {
       await prisma.notification.updateMany({

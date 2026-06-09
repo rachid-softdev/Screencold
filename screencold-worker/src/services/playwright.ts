@@ -1,5 +1,6 @@
 import { chromium, type Browser, type Page } from "playwright";
 import { createLogger } from "../utils/logger";
+import { withRetry } from "../utils/retry";
 import type { CaptureResult } from "@screencold/types";
 
 const logger = createLogger();
@@ -96,18 +97,31 @@ export async function captureWebsite(
     logger.debug("Navigating to URL", { url: targetUrl });
 
     // Navigate with timeout
-    const navigationPromise = page.goto(targetUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
+    await withRetry(
+      async () => {
+        const navigationPromise = page.goto(targetUrl, {
+          waitUntil: "domcontentloaded",
+          timeout: 30000,
+        });
 
-    // Wait for network to be idle
-    await Promise.race([
-      navigationPromise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Navigation timeout")), 30000)
-      ),
-    ]);
+        await Promise.race([
+          navigationPromise,
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Navigation timeout")), 30000)
+          ),
+        ]);
+      },
+      {
+        shouldRetry: (error) =>
+          error instanceof Error &&
+          (error.message.includes("timeout") ||
+            error.message.includes("ETIMEDOUT") ||
+            error.message.includes("ENOTFOUND") ||
+            error.message.includes("ECONNREFUSED") ||
+            error.message.includes("ECONNRESET") ||
+            error.message.includes("net::")),
+      }
+    );
 
     // Wait a bit for any lazy-loaded content
     await page.waitForTimeout(2000);
@@ -117,18 +131,38 @@ export async function captureWebsite(
     const loadTime = Date.now() - startTime;
 
     // Capture desktop screenshot
-    const desktopScreenshot = await page.screenshot({
-      type: "png",
-      fullPage: false,
-    });
+    const desktopScreenshot = await withRetry(
+      () =>
+        page.screenshot({
+          type: "png",
+          fullPage: false,
+        }),
+      {
+        shouldRetry: (error) =>
+          error instanceof Error &&
+          (error.message.includes("timeout") ||
+            error.message.includes("Target closed") ||
+            error.message.includes("net::")),
+      }
+    );
 
     // Capture mobile screenshot
     await page.setViewportSize({ width: 375, height: 812 });
     await page.waitForTimeout(500);
-    const mobileScreenshot = await page.screenshot({
-      type: "png",
-      fullPage: false,
-    });
+    const mobileScreenshot = await withRetry(
+      () =>
+        page.screenshot({
+          type: "png",
+          fullPage: false,
+        }),
+      {
+        shouldRetry: (error) =>
+          error instanceof Error &&
+          (error.message.includes("timeout") ||
+            error.message.includes("Target closed") ||
+            error.message.includes("net::")),
+      }
+    );
 
     // Close page
     await page.close();
@@ -211,10 +245,23 @@ export async function captureWithAnnotations(url: string): Promise<string> {
       targetUrl = `https://${url}`;
     }
 
-    await page.goto(targetUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
+    await withRetry(
+      () =>
+        page.goto(targetUrl, {
+          waitUntil: "domcontentloaded",
+          timeout: 30000,
+        }),
+      {
+        shouldRetry: (error) =>
+          error instanceof Error &&
+          (error.message.includes("timeout") ||
+            error.message.includes("ETIMEDOUT") ||
+            error.message.includes("ENOTFOUND") ||
+            error.message.includes("ECONNREFUSED") ||
+            error.message.includes("ECONNRESET") ||
+            error.message.includes("net::")),
+      }
+    );
 
     // Add visual markers for issues
     // @ts-expect-error - page.evaluate runs in browser context where document exists

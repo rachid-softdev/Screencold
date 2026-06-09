@@ -10,6 +10,7 @@ import {
   getCorrelationId,
   runWithCorrelationId,
 } from '@/lib/correlation-id';
+import { getRequestVersion, addVersionHeaders } from '@/lib/api-version';
 
 // ============================================
 // Security Headers
@@ -278,3 +279,76 @@ export function getResponseHeaders(): Record<string, string> {
   const correlationId = getCorrelationId();
   return correlationId ? { 'x-correlation-id': correlationId } : {};
 }
+
+// ============================================
+// Main Middleware Handler (Next.js App Router)
+// ============================================
+
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/pricing', '/api/auth', '/api/health'];
+const API_ROUTES = ['/api/'];
+
+export async function middleware(request: NextRequest): Promise<NextResponse | undefined> {
+  const { pathname } = request.nextUrl;
+
+  const isApiRoute = API_ROUTES.some((prefix) => pathname.startsWith(prefix));
+  const isPublicRoute = PUBLIC_ROUTES.some((prefix) => pathname.startsWith(prefix));
+
+  // Detect API version and apply versioning
+  const version = getRequestVersion(request);
+  const versionMatch = pathname.match(/\/api\/(v\d+)\//);
+  if (isApiRoute && !pathname.startsWith('/api/auth') && !pathname.startsWith('/api/health')) {
+    if (!versionMatch) {
+      const newUrl = new URL(request.url);
+      newUrl.pathname = `/api/${version}${pathname}`;
+      return NextResponse.redirect(newUrl);
+    }
+  }
+
+  // Generate and set correlation ID
+  const correlationId = request.headers.get('x-correlation-id') || crypto.randomUUID();
+  request.headers.set('x-correlation-id', correlationId);
+
+  // Apply rate limiting to API routes
+  if (isApiRoute) {
+    const allowed = await checkRateLimit(request);
+    if (!allowed) {
+      const rateHeaders = await getRateLimitHeaders(request);
+      const response = NextResponse.json(
+        { error: 'RATE_LIMITED', message: 'Too many requests, please try again later.' },
+        { status: 429, headers: rateHeaders }
+      );
+      addSecurityHeaders(response, request);
+      return response;
+    }
+  }
+
+  // CSRF check on mutation routes
+  if (isApiRoute && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+    const csrfValid = await verifyCsrfToken(request);
+    if (!csrfValid) {
+      const response = NextResponse.json(
+        { error: 'CSRF_FAILED', message: 'Invalid or missing CSRF token.' },
+        { status: 403 }
+      );
+      addSecurityHeaders(response, request);
+      return response;
+    }
+  }
+
+  // Build response with headers
+  const response = NextResponse.next();
+  response.headers.set('x-correlation-id', correlationId);
+
+  if (versionMatch) {
+    addVersionHeaders(response, version);
+  }
+
+  addSecurityHeaders(response, request);
+  return response;
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+  ],
+};
