@@ -3,9 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { Check, Zap, CreditCard, ArrowUpRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Badge } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
 
 const planOrder: Plan[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
@@ -129,7 +129,7 @@ function BillingPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-info-600" />
       </div>
     );
   }
@@ -141,23 +141,23 @@ function BillingPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Facturation</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-neutral-900">Facturation</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           Gérez votre abonnement et vos crédits
         </p>
       </div>
 
       {/* Current Plan */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6">
+      <div className="rounded-xl border border-neutral-200 bg-white p-6">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-neutral-900">
                 Plan {currentPlan?.name || 'Gratuit'}
               </h2>
               <Badge variant="success">Actif</Badge>
             </div>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-neutral-500">
               {userData?.stripeSubscriptionId 
                 ? `Abonnement mensuel - Renouvellement le ${userData.creditsResetsAt ? new Date(userData.creditsResetsAt).toLocaleDateString('fr-FR') : 'prochain mois'}`
                 : 'Plan gratuit'
@@ -174,22 +174,22 @@ function BillingPage() {
         {/* Credits usage */}
         <div className="mt-6">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Crédits utilisés ce mois</span>
-            <span className="font-medium text-gray-900">
+            <span className="text-neutral-600">Crédits utilisés ce mois</span>
+            <span className="font-medium text-neutral-900">
               {creditsUsed} / {creditsTotal}
             </span>
           </div>
           {currentPlan?.credits !== -1 && (
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
               <div
                 className={`h-full rounded-full ${
-                  (creditsUsed / (currentPlan?.credits || 1)) > 0.8 ? "bg-red-500" : "bg-blue-500"
+                  (creditsUsed / (currentPlan?.credits || 1)) > 0.8 ? "bg-error-500" : "bg-info-500"
                 }`}
                 style={{ width: `${Math.min((creditsUsed / (currentPlan?.credits || 1)) * 100, 100)}%` }}
               />
             </div>
           )}
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs text-neutral-500">
             {currentPlan?.credits === -1 
               ? 'Crédits illimités'
               : `${(currentPlan?.credits || 5) - creditsUsed} crédits restants ce mois`
@@ -200,22 +200,22 @@ function BillingPage() {
 
       {/* Buy Additional Credits */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold text-neutral-900 mb-4">
           Acheter des crédits supplémentaires
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CREDIT_PACKAGES.map((pkg, index) => (
             <div
               key={index}
-              className="rounded-xl border border-gray-200 bg-white p-4 text-center"
+              className="rounded-xl border border-neutral-200 bg-white p-4 text-center"
             >
               <div className="flex items-center justify-center gap-2">
-                <Zap className="h-5 w-5 text-blue-600" />
-                <span className="text-2xl font-bold text-gray-900">{pkg.credits}</span>
+                <Zap className="h-5 w-5 text-info-600" />
+                <span className="text-2xl font-bold text-neutral-900">{pkg.credits}</span>
               </div>
-              <p className="text-sm text-gray-500">crédits</p>
+              <p className="text-sm text-neutral-500">crédits</p>
               <div className="mt-3">
-                <span className="text-xl font-bold text-gray-900">{pkg.price}€</span>
+                <span className="text-xl font-bold text-neutral-900">{pkg.price}€</span>
               </div>
               <Button
                 className="mt-3 w-full"
@@ -232,13 +232,13 @@ function BillingPage() {
 
       {/* Billing Toggle */}
       <div className="flex items-center justify-center gap-4 mb-6">
-        <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+        <span className={`text-sm font-medium ${!isAnnual ? 'text-neutral-900' : 'text-neutral-500'}`}>
           Mensuel
         </span>
         <button
           onClick={() => setIsAnnual(!isAnnual)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            isAnnual ? 'bg-blue-600' : 'bg-gray-200'
+            isAnnual ? 'bg-info-600' : 'bg-neutral-200'
           }`}
           role="switch"
           aria-checked={isAnnual}
@@ -249,11 +249,11 @@ function BillingPage() {
             }`}
           />
         </button>
-        <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+        <span className={`text-sm font-medium ${isAnnual ? 'text-neutral-900' : 'text-neutral-500'}`}>
           Annuel
         </span>
         {isAnnual && (
-          <Badge variant="default" className="bg-green-100 text-green-700">
+          <Badge variant="default" className="bg-success-100 text-success-700">
             -20%
           </Badge>
         )}
@@ -261,7 +261,7 @@ function BillingPage() {
 
       {/* Plans Comparison */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold text-neutral-900 mb-4">
           Nos plans
         </h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -274,26 +274,26 @@ function BillingPage() {
                 key={planKey}
                 className={`rounded-xl border p-6 ${
                   plan.popular
-                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
-                    : "border-gray-200 bg-white"
-                } ${isCurrentPlan ? "ring-2 ring-blue-500 ring-opacity-50" : ""}`}
+                    ? "border-info-500 bg-info-50/50 dark:bg-info-900/20"
+                    : "border-neutral-200 bg-white"
+                } ${isCurrentPlan ? "ring-2 ring-info-500 ring-opacity-50" : ""}`}
               >
                 {plan.popular && (
-                  <Badge variant="default" className="mb-3 bg-blue-100 text-blue-700">
+                  <Badge variant="default" className="mb-3 bg-info-100 text-info-700">
                     Populaire
                   </Badge>
                 )}
 
-                <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
-                <p className="mt-1 text-sm text-gray-500">{plan.description}</p>
+                <h3 className="text-xl font-bold text-neutral-900">{plan.name}</h3>
+                <p className="mt-1 text-sm text-neutral-500">{plan.description}</p>
 
                 <div className="mt-4">
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-3xl font-bold text-neutral-900">
                     {plan.monthlyPrice === 0 ? '0' : (isAnnual ? plan.yearlyPrice : plan.monthlyPrice)}€
                   </span>
-                  <span className="text-gray-500">/mois</span>
+                  <span className="text-neutral-500">/mois</span>
                   {isAnnual && plan.monthlyPrice > 0 && (
-                    <span className="ml-2 text-xs text-green-600">
+                    <span className="ml-2 text-xs text-success-600">
                       (économisez 20%)
                     </span>
                   )}
@@ -301,14 +301,14 @@ function BillingPage() {
 
                 <ul className="mt-6 space-y-3">
                   <li className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0" />
-                    <span className="text-sm text-gray-600">
+                    <Check className="h-5 w-5 text-success-500 shrink-0" />
+                    <span className="text-sm text-neutral-600">
                       {plan.credits === -1 ? 'Crédits illimités' : `${plan.credits} crédits/mois`}
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-green-500 shrink-0" />
-                    <span className="text-sm text-gray-600">
+                    <Check className="h-5 w-5 text-success-500 shrink-0" />
+                    <span className="text-sm text-neutral-600">
                       {plan.features.teamAccess === -1 
                         ? 'Utilisateurs illimités' 
                         : `${plan.features.teamAccess} utilisateur${plan.features.teamAccess > 1 ? 's' : ''}`
@@ -317,14 +317,14 @@ function BillingPage() {
                   </li>
                   {plan.features.csvExport && (
                     <li className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-500 shrink-0" />
-                      <span className="text-sm text-gray-600">Export CSV</span>
+                      <Check className="h-5 w-5 text-success-500 shrink-0" />
+                      <span className="text-sm text-neutral-600">Export CSV</span>
                     </li>
                   )}
                   {plan.features.apiAccess && (
                     <li className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-500 shrink-0" />
-                      <span className="text-sm text-gray-600">Accès API</span>
+                      <Check className="h-5 w-5 text-success-500 shrink-0" />
+                      <span className="text-sm text-neutral-600">Accès API</span>
                     </li>
                   )}
                 </ul>
@@ -353,41 +353,41 @@ function BillingPage() {
 
       {/* Transaction History */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold text-neutral-900 mb-4">
           Historique des transactions
         </h2>
-        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
           {transactions.length > 0 ? (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <tr className="border-b border-neutral-100 bg-neutral-50/50">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                     Date
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                     Description
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                     Montant
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                     Statut
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-neutral-100">
                 {transactions.map((trans) => (
                   <tr key={trans.id}>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-neutral-600">
                       {new Date(trans.createdAt).toLocaleDateString('fr-FR')}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
+                    <td className="px-4 py-3 text-sm text-neutral-900">
                       {trans.type === 'PURCHASE' && 'Achat de crédits'}
                       {trans.type === 'MONTHLY_REFILL' && 'Renouvellement mensuel'}
                       {trans.type === 'DEBIT' && 'Utilisation'}
                       {trans.type === 'REFUND' && 'Remboursement'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-neutral-600">
                       {trans.type === 'DEBIT' ? `-${trans.amount}` : `+${trans.amount}`} €
                     </td>
                     <td className="px-4 py-3">
@@ -399,8 +399,8 @@ function BillingPage() {
             </table>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
-              <CreditCard className="h-8 w-8 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-500">Aucune transaction</p>
+              <CreditCard className="h-8 w-8 text-neutral-400" />
+              <p className="mt-2 text-sm text-neutral-500">Aucune transaction</p>
             </div>
           )}
         </div>

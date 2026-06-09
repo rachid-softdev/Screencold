@@ -30,9 +30,6 @@ model User {
   password             String?
   image                String?
   plan                 Plan      @default(FREE)
-  // NOTE: A `CHECK (credits >= 0)` constraint must be added via a raw SQL migration.
-  // Prisma does not natively support CHECK constraints.
-  // Migration SQL: ALTER TABLE "User" ADD CONSTRAINT "credits_non_negative" CHECK (credits >= 0);
   credits              Int       @default(5)
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?
@@ -197,19 +194,29 @@ model Audit {
 
   @@index([userId])
   @@index([status])
+  @@index([userId, status])
 }
 
 // ============================================
 // Credit Transactions
 // ============================================
 
+enum CreditTransactionType {
+  AUDIT_DEBIT
+  PURCHASE
+  BONUS
+  REFUND
+  RESET
+  ADMIN_ADJUSTMENT
+}
+
 model CreditTransaction {
-  id        String   @id @default(cuid())
+  id        String               @id @default(cuid())
   userId    String
   amount    Int
-  type      String
-  auditId   String?  @unique
-  createdAt DateTime @default(now())
+  type      CreditTransactionType
+  auditId   String?              @unique
+  createdAt DateTime             @default(now())
 
   // Relations
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -217,6 +224,7 @@ model CreditTransaction {
 
   @@index([userId])
   @@index([type])
+  @@index([userId, createdAt])
 }
 
 // ============================================

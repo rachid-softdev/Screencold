@@ -4,7 +4,7 @@ import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 import prisma from '@/lib/prisma';
 import { debitCredits, checkCredits } from '@/lib/credits';
-import { apiMiddleware, getRateLimitHeaders } from '@/middleware';
+import { apiMiddleware, getRateLimitHeaders, verifyCsrfToken } from '@/middleware';
 import { getCSVLimit } from '@/lib/plans';
 import { checkIpRateLimit } from '@/lib/rate-limit';
 import {
@@ -56,6 +56,13 @@ export async function POST(request: NextRequest) {
 
     if (!authorized || !userId) {
       return errorResponse!;
+    }
+
+    if (!await verifyCsrfToken(request)) {
+      return NextResponse.json(
+        { error: 'CSRF_TOKEN_INVALID', message: 'Invalid or missing CSRF token' },
+        { status: 403 }
+      );
     }
 
     // Apply Redis-based rate limiting

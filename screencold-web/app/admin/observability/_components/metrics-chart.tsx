@@ -9,7 +9,7 @@ interface MetricsChartProps {
   width?: number;
   /** Canvas CSS height in px (default 60). */
   height?: number;
-  /** Stroke color for the line (default blue-500 #3b82f6). */
+  /** Stroke color for the line (default info-500 #3b82f6). */
   color?: string;
 }
 

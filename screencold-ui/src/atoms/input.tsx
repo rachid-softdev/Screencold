@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { forwardRef } from "react";
 import { clsx } from "clsx";
@@ -6,16 +8,17 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   label?: string;
   error?: boolean | string;
   helperText?: string;
+  "aria-label"?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, id, ...props }, ref) => {
+  ({ className, label, error, helperText, id, ["aria-label"]: ariaLabel, ...props }, ref) => {
     const inputId = id || React.useId();
     const hasError = !!error;
 
     return (
       <div className="w-full">
-        {label && (
+        {label && !ariaLabel && (
           <label
             htmlFor={inputId}
             className="block text-sm font-medium text-gray-700 mb-1.5"
@@ -37,6 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500",
             className
           )}
+          aria-label={ariaLabel}
           aria-invalid={hasError ? "true" : undefined}
           aria-describedby={
             typeof error === "string" && error

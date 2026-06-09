@@ -7,11 +7,10 @@ import { chromium, Browser, Page, ViewportSize } from "playwright";
 import { logger } from "../lib/logger";
 import { validateUrl } from "../lib/ssrf";
 import {
-  markJobStarted,
-  markJobCompleted,
+  checkJobIdempotency,
+  markJobComplete,
   markJobFailed,
-  isJobAlreadyProcessed,
-} from "../lib/job-tracker";
+} from "./index";
 
 /**
  * Capture result containing all screenshot data and metadata
@@ -52,9 +51,7 @@ export async function captureWebsite(url: string, jobId?: string, auditId?: stri
 
   // Idempotency check: skip if this capture was already completed
   if (jobId && auditId) {
-    await markJobStarted(jobId, auditId, "capture");
-
-    if (await isJobAlreadyProcessed(jobId, auditId, "capture")) {
+    if (await checkJobIdempotency(jobId, auditId, "capture")) {
       logger.info({ jobId, auditId }, "Capture already processed, skipping");
       return {
         desktopBuffer: Buffer.alloc(0),
@@ -172,7 +169,7 @@ export async function captureWebsite(url: string, jobId?: string, auditId?: stri
 
     // Mark job as completed
     if (jobId && auditId) {
-      await markJobCompleted(jobId, auditId, "capture", {
+      await markJobComplete(jobId, auditId, "capture", {
         loadTime,
         hasSSL: metadata.hasSSL,
         pageTitle: metadata.title,

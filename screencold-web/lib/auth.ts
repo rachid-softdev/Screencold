@@ -49,7 +49,7 @@ validateSecret();
 // ============================================
 // OAuth Token Security
 // ============================================
-// OAuth tokens (access_token, refresh_token) stored in the Account model
+// OAuth tokens (access_token, refresh_token, id_token) stored in the Account model
 // are transparently encrypted at rest using AES-256-GCM.
 //
 // Encryption/decryption is handled automatically by the Prisma client

@@ -7,7 +7,7 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { QuickAuditForm } from '@/components/dashboard/quick-audit-form';
 import { RecentAudits } from '@/components/dashboard/recent-audits';
 import dynamic from 'next/dynamic';
-import { Button } from '@/components/ui/button';
+import { Button } from '@screencold/ui';
 
 // Dynamic import for client components to reduce initial bundle
 const OnboardingTour = dynamic(() => import('@/components/onboarding/onboarding-tour').then(mod => ({ default: mod.OnboardingTour })), {
@@ -93,14 +93,14 @@ export default async function DashboardPage({}: PageProps) {
 
       {/* Recent Audits or Empty State */}
       {isEmpty ? (
-        <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <BarChart3 className="h-8 w-8 text-blue-600" />
+        <div className="rounded-xl border-2 border-dashed border-neutral-200 bg-white p-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-info-100">
+            <BarChart3 className="h-8 w-8 text-info-600" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-gray-900">
+          <h3 className="mt-4 text-lg font-semibold text-neutral-900">
             Aucun audit pour le moment
           </h3>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-neutral-600">
             Commencez par analyser le site web d'un prospect. C'est rapide et
             gratuit avec vos 5 crédits.
           </p>

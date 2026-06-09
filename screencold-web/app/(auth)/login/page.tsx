@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 function LoginPageContent() {
   const router = useRouter();
@@ -71,8 +71,8 @@ function LoginPageContent() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Se connecter</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-neutral-900">Se connecter</h1>
+        <p className="mt-2 text-sm text-neutral-600">
           Bienvenue ! Connectez-vous à votre compte
         </p>
       </div>
@@ -107,17 +107,17 @@ function LoginPageContent() {
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-neutral-200" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-4 text-gray-500">ou</span>
+          <span className="bg-white px-4 text-neutral-500">ou</span>
         </div>
       </div>
 
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="email"
             value={email}
@@ -129,7 +129,7 @@ function LoginPageContent() {
         </div>
 
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="password"
             value={password}
@@ -143,7 +143,7 @@ function LoginPageContent() {
         <div className="flex items-center justify-end">
           <Link
             href="/forgot-password"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium text-info-600 hover:text-info-700"
           >
             Mot de passe oublié ?
           </Link>
@@ -155,9 +155,9 @@ function LoginPageContent() {
       </form>
 
       {/* Register Link */}
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-neutral-600">
         Pas de compte ?{" "}
-        <Link href="/register" className="font-medium text-blue-600 hover:text-blue-700">
+        <Link href="/register" className="font-medium text-info-600 hover:text-info-700">
           S&apos;inscrire
         </Link>
       </p>

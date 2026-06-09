@@ -5,6 +5,11 @@
 
 import { logger } from "../lib/logger";
 import { uploadScreenshot, generateScreenshotKey } from "../lib/s3";
+import {
+  checkJobIdempotency,
+  markJobComplete,
+  markJobFailed,
+} from "./index";
 
 /**
  * Upload result containing URLs
@@ -26,9 +31,19 @@ export async function uploadScreenshots(
   desktopBuffer: Buffer,
   mobileBuffer: Buffer,
   userId: string,
-  prospectId: string
+  prospectId: string,
+  jobId?: string,
+  auditId?: string,
 ): Promise<UploadResult> {
   const startTime = Date.now();
+
+  // Idempotency check
+  if (jobId && auditId) {
+    if (await checkJobIdempotency(jobId, auditId, "upload")) {
+      logger.info({ jobId, auditId }, "Upload already processed, skipping");
+      return { screenshotUrl: "", mobileUrl: "" };
+    }
+  }
 
   try {
     logger.info(
@@ -53,6 +68,11 @@ export async function uploadScreenshots(
       "Screenshots uploaded successfully"
     );
 
+    // Mark job as completed
+    if (jobId && auditId) {
+      await markJobComplete(jobId, auditId, "upload", { screenshotUrl, mobileUrl, duration });
+    }
+
     return {
       screenshotUrl,
       mobileUrl,
@@ -64,6 +84,11 @@ export async function uploadScreenshots(
       { userId, prospectId, error: errorMessage },
       "S3 upload failed"
     );
+
+    // Mark job as failed
+    if (jobId && auditId) {
+      await markJobFailed(jobId, auditId, "upload", errorMessage);
+    }
 
     throw new Error(`Failed to upload screenshots: ${errorMessage}`);
   }
@@ -79,9 +104,19 @@ export async function uploadScreenshots(
 export async function uploadAnnotatedScreenshot(
   annotatedBuffer: Buffer,
   userId: string,
-  prospectId: string
+  prospectId: string,
+  jobId?: string,
+  auditId?: string,
 ): Promise<string> {
   const startTime = Date.now();
+
+  // Idempotency check
+  if (jobId && auditId) {
+    if (await checkJobIdempotency(jobId, auditId, "upload-annotated")) {
+      logger.info({ jobId, auditId }, "Annotated upload already processed, skipping");
+      return "";
+    }
+  }
 
   try {
     logger.info(
@@ -96,6 +131,11 @@ export async function uploadAnnotatedScreenshot(
 
     logger.info({ url, duration }, "Annotated screenshot uploaded");
 
+    // Mark job as completed
+    if (jobId && auditId) {
+      await markJobComplete(jobId, auditId, "upload-annotated", { url, duration });
+    }
+
     return url;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown upload error";
@@ -104,6 +144,11 @@ export async function uploadAnnotatedScreenshot(
       { userId, prospectId, error: errorMessage },
       "Annotated screenshot upload failed"
     );
+
+    // Mark job as failed
+    if (jobId && auditId) {
+      await markJobFailed(jobId, auditId, "upload-annotated", errorMessage);
+    }
 
     throw new Error(`Failed to upload annotated screenshot: ${errorMessage}`);
   }

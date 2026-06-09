@@ -10,7 +10,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/card";
+} from '@screencold/ui';
 import { MetricsChart } from "./_components/metrics-chart";
 
 // ──────────────────────────────────────────────
@@ -317,7 +317,7 @@ export default function ObservabilityPage() {
   if (status === "loading") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
       </div>
     );
   }
@@ -347,10 +347,10 @@ export default function ObservabilityPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-neutral-900">
           Observabilité
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-neutral-500">
           Métriques RED du worker (taux, erreurs, durée)
         </p>
       </div>
@@ -360,27 +360,27 @@ export default function ObservabilityPage() {
         {/* Worker Status */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-neutral-500">
               Worker
             </CardTitle>
             {workerHealthy ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <CheckCircle2 className="h-5 w-5 text-success-500" />
             ) : (
-              <XCircle className="h-5 w-5 text-red-500" />
+              <XCircle className="h-5 w-5 text-error-500" />
             )}
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
               <span
                 className={`text-2xl font-bold ${
-                  workerHealthy ? "text-green-600" : "text-red-600"
+                  workerHealthy ? "text-success-600" : "text-error-600"
                 }`}
               >
                 {workerHealthy ? "Healthy" : "Unreachable"}
               </span>
             </div>
             {errorMessage && (
-              <p className="mt-1 text-xs text-red-500">{errorMessage}</p>
+              <p className="mt-1 text-xs text-error-500">{errorMessage}</p>
             )}
           </CardContent>
         </Card>
@@ -388,13 +388,13 @@ export default function ObservabilityPage() {
         {/* Last Updated */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-neutral-500">
               Dernière mise à jour
             </CardTitle>
-            <Clock className="h-5 w-5 text-gray-400" />
+            <Clock className="h-5 w-5 text-neutral-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-neutral-900">
               {lastUpdated
                 ? formatTimestamp(lastUpdated.toISOString())
                 : "—"}
@@ -408,13 +408,13 @@ export default function ObservabilityPage() {
         {/* Total Rate */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-neutral-500">
               Taux total
             </CardTitle>
-            <Activity className="h-5 w-5 text-blue-500" />
+            <Activity className="h-5 w-5 text-info-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-900">{totalRate}</p>
+            <p className="text-2xl font-bold text-neutral-900">{totalRate}</p>
             <CardDescription className="mt-1">
               Jobs démarrés
             </CardDescription>
@@ -424,13 +424,13 @@ export default function ObservabilityPage() {
         {/* Error Rate */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
+            <CardTitle className="text-sm font-medium text-neutral-500">
               Erreurs
             </CardTitle>
-            <XCircle className="h-5 w-5 text-red-400" />
+            <XCircle className="h-5 w-5 text-error-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-neutral-900">
               {totalErrors} ({errorPercent(totalErrors, totalRate)})
             </p>
             <CardDescription className="mt-1">
@@ -452,40 +452,40 @@ export default function ObservabilityPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="px-4 py-3 font-medium text-gray-500">
+                <tr className="border-b border-neutral-200">
+                  <th className="px-4 py-3 font-medium text-neutral-500">
                     Job Type
                   </th>
-                  <th className="px-4 py-3 font-medium text-gray-500">
+                  <th className="px-4 py-3 font-medium text-neutral-500">
                     Rate
                   </th>
-                  <th className="px-4 py-3 font-medium text-gray-500">
+                  <th className="px-4 py-3 font-medium text-neutral-500">
                     Errors
                   </th>
-                  <th className="px-4 py-3 font-medium text-gray-500">
+                  <th className="px-4 py-3 font-medium text-neutral-500">
                     Error %
                   </th>
-                  <th className="px-4 py-3 font-medium text-gray-500">
+                  <th className="px-4 py-3 font-medium text-neutral-500">
                     Avg Duration
                   </th>
-                  <th className="px-4 py-3 font-medium text-gray-500">
+                  <th className="px-4 py-3 font-medium text-neutral-500">
                     P99 Latency
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {/* Aggregated row */}
-                <tr className="border-b border-gray-100 bg-gray-50 font-semibold">
-                  <td className="px-4 py-3 text-gray-900">All</td>
-                  <td className="px-4 py-3 text-gray-900">{totalRate}</td>
-                  <td className="px-4 py-3 text-gray-900">{totalErrors}</td>
-                  <td className="px-4 py-3 text-gray-900">
+                <tr className="border-b border-neutral-100 bg-neutral-50 font-semibold">
+                  <td className="px-4 py-3 text-neutral-900">All</td>
+                  <td className="px-4 py-3 text-neutral-900">{totalRate}</td>
+                  <td className="px-4 py-3 text-neutral-900">{totalErrors}</td>
+                  <td className="px-4 py-3 text-neutral-900">
                     {errorPercent(totalErrors, totalRate)}
                   </td>
-                  <td className="px-4 py-3 text-gray-900">
+                  <td className="px-4 py-3 text-neutral-900">
                     {formatMs(avgDuration)}
                   </td>
-                  <td className="px-4 py-3 text-gray-900">
+                  <td className="px-4 py-3 text-neutral-900">
                     {formatMs(maxDuration)}
                   </td>
                 </tr>
@@ -495,7 +495,7 @@ export default function ObservabilityPage() {
                   <tr>
                     <td
                       colSpan={6}
-                      className="px-4 py-8 text-center text-gray-400"
+                      className="px-4 py-8 text-center text-neutral-400"
                     >
                       En attente des données du worker…
                     </td>
@@ -504,7 +504,7 @@ export default function ObservabilityPage() {
                   <tr>
                     <td
                       colSpan={6}
-                      className="px-4 py-8 text-center text-gray-400"
+                      className="px-4 py-8 text-center text-neutral-400"
                     >
                       Aucune donnée de job disponible
                     </td>
@@ -515,20 +515,20 @@ export default function ObservabilityPage() {
                     return (
                       <tr
                         key={type}
-                        className="border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                        className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50"
                       >
-                        <td className="px-4 py-3 text-gray-900">{type}</td>
-                        <td className="px-4 py-3 text-gray-700">{jm.rate}</td>
-                        <td className="px-4 py-3 text-gray-700">
+                        <td className="px-4 py-3 text-neutral-900">{type}</td>
+                        <td className="px-4 py-3 text-neutral-700">{jm.rate}</td>
+                        <td className="px-4 py-3 text-neutral-700">
                           {jm.errors}
                         </td>
-                        <td className="px-4 py-3 text-gray-700">
+                        <td className="px-4 py-3 text-neutral-700">
                           {errorPercent(jm.errors, jm.rate)}
                         </td>
-                        <td className="px-4 py-3 text-gray-700">
+                        <td className="px-4 py-3 text-neutral-700">
                           {formatMs(jm.duration.avg)}
                         </td>
-                        <td className="px-4 py-3 text-gray-700">
+                        <td className="px-4 py-3 text-neutral-700">
                           {formatMs(jm.duration.max)}
                         </td>
                       </tr>
@@ -552,7 +552,7 @@ export default function ObservabilityPage() {
         </CardHeader>
         <CardContent>
           {durationHistory.length < 2 ? (
-            <div className="flex h-16 items-center justify-center text-sm text-gray-400">
+            <div className="flex h-16 items-center justify-center text-sm text-neutral-400">
               {workerStatus === "loading"
                 ? "Collecte des données…"
                 : "Données insuffisantes pour le graphique"}
@@ -565,22 +565,22 @@ export default function ObservabilityPage() {
                 height={80}
                 color="#3b82f6"
               />
-              <div className="shrink-0 space-y-1 text-xs text-gray-500">
+              <div className="shrink-0 space-y-1 text-xs text-neutral-500">
                 <div className="flex justify-between gap-4">
                   <span>Max</span>
-                  <span className="font-mono text-gray-700">
+                  <span className="font-mono text-neutral-700">
                     {formatMs(Math.max(...durationHistory))}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4">
                   <span>Min</span>
-                  <span className="font-mono text-gray-700">
+                  <span className="font-mono text-neutral-700">
                     {formatMs(Math.min(...durationHistory))}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4">
                   <span>Actuel</span>
-                  <span className="font-mono text-gray-700">
+                  <span className="font-mono text-neutral-700">
                     {formatMs(durationHistory[durationHistory.length - 1]!)}
                   </span>
                 </div>

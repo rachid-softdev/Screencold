@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@screencold/ui';
 import { CampaignList } from "@/components/campaigns/campaign-list";
 
 function CampaignsPage() {
@@ -37,10 +37,10 @@ function CampaignsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-neutral-900">
             {campaigns.length} campagne{campaigns.length !== 1 ? "s" : ""}
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-neutral-500">
             Gérez vos campagnes d&apos;audit et de prospection
           </p>
         </div>

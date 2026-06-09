@@ -5,9 +5,9 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 function ResetPasswordPageContent() {
   const router = useRouter();
@@ -84,8 +84,8 @@ function ResetPasswordPageContent() {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Lien invalide</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-neutral-900">Lien invalide</h1>
+          <p className="mt-2 text-sm text-neutral-600">
             Le lien de réinitialisation est invalide ou a expiré
           </p>
         </div>
@@ -105,11 +105,11 @@ function ResetPasswordPageContent() {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="h-8 w-8 text-green-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-100">
+            <CheckCircle className="h-8 w-8 text-success-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Mot de passe modifié</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-neutral-900">Mot de passe modifié</h1>
+          <p className="mt-2 text-sm text-neutral-600">
             Votre mot de passe a été mis à jour avec succès. Vous allez être redirigé vers la page de connexion...
           </p>
         </div>
@@ -128,15 +128,15 @@ function ResetPasswordPageContent() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Nouveau mot de passe</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-neutral-900">Nouveau mot de passe</h1>
+        <p className="mt-2 text-sm text-neutral-600">
           Entrez votre nouveau mot de passe
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="password"
             value={password}
@@ -148,7 +148,7 @@ function ResetPasswordPageContent() {
         </div>
 
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="password"
             value={confirmPassword}
@@ -164,8 +164,8 @@ function ResetPasswordPageContent() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-600">
-        <Link href="/login" className="font-medium text-blue-600 hover:text-blue-700">
+      <p className="text-center text-sm text-neutral-600">
+        <Link href="/login" className="font-medium text-info-600 hover:text-info-700">
           Retour à la connexion
         </Link>
       </p>

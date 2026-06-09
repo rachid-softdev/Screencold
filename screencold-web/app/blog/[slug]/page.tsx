@@ -73,7 +73,7 @@ export default async function ArticlePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <div className="relative h-96 bg-gray-900">
+      <div className="relative h-96 bg-neutral-900">
         <Image
           src={article.coverImage}
           alt=""
@@ -85,13 +85,13 @@ export default async function ArticlePage({ params }: PageProps) {
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-4xl mx-auto px-4 pb-12 w-full">
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-sm font-medium text-white bg-blue-600 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium text-white bg-info-600 px-3 py-1 rounded-full">
                 {article.category.replace('-', ' ')}
               </span>
-              <span className="text-sm text-gray-300">{article.readingTime} min</span>
+              <span className="text-sm text-neutral-300">{article.readingTime} min</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{article.title}</h1>
-            <p className="text-xl text-gray-300">{article.subtitle}</p>
+            <p className="text-xl text-neutral-300">{article.subtitle}</p>
           </div>
         </div>
       </div>
@@ -112,9 +112,9 @@ export default async function ArticlePage({ params }: PageProps) {
 
             {/* Takeaway */}
             {article.content?.takeaway && (
-              <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg my-8">
-                <p className="font-semibold text-blue-900 mb-1">💡 Takeaway</p>
-                <p className="text-blue-800">{article.content.takeaway}</p>
+              <div className="bg-info-50 border-l-4 border-info-600 p-6 rounded-r-lg my-8">
+                <p className="font-semibold text-info-900 mb-1">💡 Takeaway</p>
+                <p className="text-info-800">{article.content.takeaway}</p>
               </div>
             )}
 
@@ -122,7 +122,7 @@ export default async function ArticlePage({ params }: PageProps) {
             {article.tags && (
               <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t">
                 {article.tags.map((tag: string) => (
-                  <span key={tag} className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                  <span key={tag} className="text-sm bg-neutral-100 text-neutral-700 px-3 py-1 rounded-full">
                     #{tag}
                   </span>
                 ))}
@@ -130,12 +130,12 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
             {/* CTA final */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mt-12 text-center text-white">
+            <div className="bg-gradient-to-r from-info-600 to-info-700 rounded-2xl p-8 mt-12 text-center text-white">
               <h3 className="text-2xl font-bold mb-2">Prêt à améliorer vos cold emails ?</h3>
-              <p className="text-blue-100 mb-6">Analysez n'importe quel site web en 30 secondes avec ScreenCold.</p>
+              <p className="text-info-100 mb-6">Analysez n'importe quel site web en 30 secondes avec ScreenCold.</p>
               <Link
                 href="/audits/new"
-                className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center gap-2 bg-white text-info-600 px-6 py-3 rounded-lg font-semibold hover:bg-info-50 transition-colors"
               >
                 Créer un audit gratuit →
               </Link>
@@ -144,7 +144,7 @@ export default async function ArticlePage({ params }: PageProps) {
             {/* Related articles */}
             {relatedArticles.length > 0 && (
               <div className="mt-16">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Articles similaires</h3>
+                <h3 className="text-xl font-bold text-neutral-900 mb-6">Articles similaires</h3>
                 <RelatedArticles articles={relatedArticles} />
               </div>
             )}
@@ -156,9 +156,9 @@ export default async function ArticlePage({ params }: PageProps) {
               {h2Headings.length > 0 && (
                 <TableOfContents headings={h2Headings} />
               )}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">À propos</h4>
-                <p className="text-sm text-gray-600">
+              <div className="bg-neutral-50 rounded-xl p-4">
+                <h4 className="font-semibold text-neutral-900 mb-3">À propos</h4>
+                <p className="text-sm text-neutral-600">
                   ScreenCold est un outil SaaS B2B de cold outreach visuel qui analyse automatiquement les sites web de vos prospects.
                 </p>
               </div>
@@ -169,7 +169,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
       {/* Back link */}
       <div className="max-w-4xl mx-auto px-4 pb-12">
-        <Link href="/blog" className="text-blue-600 hover:text-blue-700 flex items-center gap-2">
+        <Link href="/blog" className="text-info-600 hover:text-info-700 flex items-center gap-2">
           ← Retour au blog
         </Link>
       </div>

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
-import { ToastProvider } from "@/components/ui/toast";
+import { ToastProvider } from '@screencold/ui';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,10 +21,10 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   // Show loading state while checking auth
   if (status === "loading") {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
+      <div className="flex h-screen items-center justify-center bg-neutral-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-          <p className="text-sm text-gray-500">Chargement...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
+          <p className="text-sm text-neutral-500">Chargement...</p>
         </div>
       </div>
     );
@@ -55,7 +55,7 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <ToastProvider>
-      <div className="flex h-screen overflow-hidden bg-gray-50">
+      <div className="flex h-screen overflow-hidden bg-neutral-50">
         {/* Sidebar */}
         <div
           className={`${
@@ -80,7 +80,7 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
             onMenuClick={() => setMobileSidebarOpen(true)}
             userMenuItems={userMenuItems}
           />
-          <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+          <main id="main-content" className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
             {children}
           </main>
         </div>

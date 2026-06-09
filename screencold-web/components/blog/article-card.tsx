@@ -15,11 +15,11 @@ interface ArticleCardProps {
 }
 
 const categoryColors: Record<string, string> = {
-  "cold-outreach": "bg-blue-100 text-blue-700",
+  "cold-outreach": "bg-info-100 text-info-700",
   "ux-design": "bg-purple-100 text-purple-700",
-  cro: "bg-green-100 text-green-700",
+  cro: "bg-success-100 text-success-700",
   productivity: "bg-orange-100 text-orange-700",
-  industry: "bg-gray-100 text-gray-700",
+  industry: "bg-neutral-100 text-neutral-700",
 };
 
 const categoryLabels: Record<string, string> = {
@@ -47,7 +47,7 @@ export function ArticleCard({
     year: "numeric",
   });
 
-  const colorClass = categoryColors[category] || "bg-gray-100 text-gray-700";
+  const colorClass = categoryColors[category] || "bg-neutral-100 text-neutral-700";
   const label = categoryLabels[category] || category;
 
   if (featured) {
@@ -71,16 +71,16 @@ export function ArticleCard({
             <span className={`inline-block self-start rounded-full px-3 py-1 text-xs font-semibold ${colorClass}`}>
               {label}
             </span>
-            <h2 className="mt-4 text-2xl font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <h2 className="mt-4 text-2xl font-bold text-neutral-900 line-clamp-2 group-hover:text-info-600 transition-colors">
               {title}
             </h2>
-            <p className="mt-2 text-base text-gray-600 line-clamp-2">
+            <p className="mt-2 text-base text-neutral-600 line-clamp-2">
               {subtitle}
             </p>
-            <p className="mt-3 text-sm text-gray-500 line-clamp-2">
+            <p className="mt-3 text-sm text-neutral-500 line-clamp-2">
               {excerpt}
             </p>
-            <div className="mt-6 flex items-center gap-4 text-sm text-gray-500">
+            <div className="mt-6 flex items-center gap-4 text-sm text-neutral-500">
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
                 <span>{readingTime} min</span>
@@ -115,13 +115,13 @@ export function ArticleCard({
         <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${colorClass}`}>
           {label}
         </span>
-        <h3 className="mt-3 text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="mt-3 text-lg font-bold text-neutral-900 line-clamp-2 group-hover:text-info-600 transition-colors">
           {title}
         </h3>
-        <p className="mt-2 text-sm text-gray-500 line-clamp-2">
+        <p className="mt-2 text-sm text-neutral-500 line-clamp-2">
           {excerpt}
         </p>
-        <div className="mt-4 flex items-center gap-3 text-xs text-gray-500">
+        <div className="mt-4 flex items-center gap-3 text-xs text-neutral-500">
           <div className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
             <span>{readingTime} min</span>

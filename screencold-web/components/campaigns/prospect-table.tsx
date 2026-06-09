@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { Eye, RotateCcw, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@screencold/ui';
+import { Button } from '@screencold/ui';
 
 type ProspectStatus = "PENDING" | "PROCESSING" | "DONE" | "FAILED";
 
@@ -51,8 +51,8 @@ function ProspectTable({
 
   if (prospects.length === 0) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-        <p className="text-sm text-gray-500">
+      <div className="rounded-xl border border-neutral-200 bg-white p-8 text-center">
+        <p className="text-sm text-neutral-500">
           Aucun prospect dans cette campagne.
         </p>
       </div>
@@ -60,43 +60,43 @@ function ProspectTable({
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+    <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50/50">
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+            <tr className="border-b border-neutral-100 bg-neutral-50/50">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                 URL
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                 Entreprise
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                 Statut
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-neutral-500">
                 Score
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-neutral-500">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-neutral-100">
             {paginatedProspects.map((prospect) => {
               const status = statusConfig[prospect.status];
               return (
                 <tr
                   key={prospect.id}
-                  className="transition-colors hover:bg-gray-50"
+                  className="transition-colors hover:bg-neutral-50"
                 >
                   <td className="whitespace-nowrap px-4 py-3">
-                    <span className="text-sm text-gray-900 truncate max-w-[200px] block">
+                    <span className="text-sm text-neutral-900 truncate max-w-[200px] block">
                       {prospect.url}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-neutral-600">
                       {prospect.companyName || "—"}
                     </span>
                   </td>
@@ -117,7 +117,7 @@ function ProspectTable({
                         {prospect.score}/100
                       </Badge>
                     ) : (
-                      <span className="text-sm text-gray-400">—</span>
+                      <span className="text-sm text-neutral-400">—</span>
                     )}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
@@ -147,7 +147,7 @@ function ProspectTable({
                           variant="ghost"
                           size="sm"
                           onClick={() => onDelete(prospect)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-error-600 hover:text-error-700 hover:bg-error-50"
                           leftIcon={<Trash2 className="h-4 w-4" />}
                         />
                       )}
@@ -162,8 +162,8 @@ function ProspectTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
-          <p className="text-sm text-gray-500">
+        <div className="flex items-center justify-between border-t border-neutral-100 px-4 py-3">
+          <p className="text-sm text-neutral-500">
             Affichage {(currentPage - 1) * pageSize + 1} -{" "}
             {Math.min(currentPage * pageSize, prospects.length)} sur{" "}
             {prospects.length}
@@ -178,7 +178,7 @@ function ProspectTable({
             >
               Préc
             </Button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-neutral-600">
               {currentPage} / {totalPages}
             </span>
             <Button

@@ -3,8 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { Check, Zap, ArrowRight, Star, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from '@screencold/ui';
+import { Badge } from '@screencold/ui';
 import { OrganizationSchema, FAQSchema } from "@/components/seo/schema";
 import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
 
@@ -93,12 +93,12 @@ function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-neutral-900">
       {/* Header */}
-      <header className="border-b border-gray-100 dark:border-gray-800">
+      <header className="border-b border-neutral-100 dark:border-neutral-800">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
               <svg
                 viewBox="0 0 24 24"
                 className="h-5 w-5 text-white"
@@ -111,10 +111,10 @@ function PricingPage() {
                 <line x1="12" y1="17" x2="12" y2="21" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">ScreenCold</span>
+            <span className="text-xl font-bold text-neutral-900 dark:text-white">ScreenCold</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+            <Link href="/login" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white">
               Se connecter
             </Link>
             <Link href="/register">
@@ -127,27 +127,27 @@ function PricingPage() {
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
-          <Badge variant="default" className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-300">
+          <Badge variant="default" className="mb-4 bg-info-100 text-info-700 hover:bg-info-100 dark:bg-info-900 dark:text-info-300">
             <Zap className="mr-1 h-3 w-3" />
             tarifs simples et transparents
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl dark:text-white">
+          <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl dark:text-white">
             Trouvez le plan idéal pour votre agency
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-600 dark:text-neutral-300">
             Des audits de site automatisés aux emails de prospection personnalises,
             ScreenCold vous fait gagner du temps et augmenter vos conversions.
           </p>
           
           {/* Billing Toggle */}
           <div className="mt-8 flex items-center justify-center gap-4">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-neutral-900 dark:text-white' : 'text-neutral-500'}`}>
               Mensuel
             </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isAnnual ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                isAnnual ? 'bg-info-600' : 'bg-neutral-200 dark:bg-neutral-700'
               }`}
               role="switch"
               aria-checked={isAnnual}
@@ -158,11 +158,11 @@ function PricingPage() {
                 }`}
               />
             </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-neutral-900 dark:text-white' : 'text-neutral-500'}`}>
               Annuel
             </span>
             {isAnnual && (
-              <Badge variant="default" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+              <Badge variant="default" className="bg-success-100 text-success-700 dark:bg-success-900 dark:text-success-300">
                 -20%
               </Badge>
             )}
@@ -184,29 +184,29 @@ function PricingPage() {
                 key={planKey}
                 className={`relative rounded-2xl border p-6 ${
                   isPopular
-                    ? "border-blue-500 bg-blue-50 shadow-lg shadow-blue-100 dark:bg-blue-900/20 dark:border-blue-500"
-                    : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
+                    ? "border-info-500 bg-info-50 shadow-lg shadow-info-100 dark:bg-info-900/20 dark:border-info-500"
+                    : "border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800"
                 }`}
               >
                 {isPopular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-blue-600 text-white hover:bg-blue-600">
+                    <Badge className="bg-info-600 text-white hover:bg-info-600">
                       <Star className="mr-1 h-3 w-3" />
                       Populaire
                     </Badge>
                   </div>
                 )}
 
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{plan.description}</p>
+                <h3 className="text-xl font-bold text-neutral-900 dark:text-white">{plan.name}</h3>
+                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{plan.description}</p>
 
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-4xl font-bold text-neutral-900 dark:text-white">
                     {price}€
                   </span>
-                  <span className="text-gray-500 dark:text-gray-400">/mois</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">/mois</span>
                   {isAnnual && plan.monthlyPrice > 0 && (
-                    <span className="ml-2 text-sm text-green-600 dark:text-green-400">
+                    <span className="ml-2 text-sm text-success-600 dark:text-success-400">
                       (-{getAnnualSavings(plan)}€/an)
                     </span>
                   )}
@@ -215,8 +215,8 @@ function PricingPage() {
                 <ul className="mt-6 space-y-3">
                   {features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-500 shrink-0" />
-                      <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
+                      <Check className="h-5 w-5 text-success-500 shrink-0" />
+                      <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -235,7 +235,7 @@ function PricingPage() {
           })}
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
           Tous les plans incluent un essai gratuit de 14 jours. Sans carte bancaire.
         </p>
       </section>
@@ -243,12 +243,12 @@ function PricingPage() {
       {/* Social Proof */}
       <section className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm font-medium text-gray-500 dark:text-gray-400">
+          <p className="text-center text-sm font-medium text-neutral-500 dark:text-neutral-400">
             Utilise par 500+ agences et freelances
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale">
             {["WebBoost", "DigitalPro", "StudioUX", "AgenceSEO", "PixelCraft"].map((name) => (
-              <span key={name} className="text-lg font-bold text-gray-400">
+              <span key={name} className="text-lg font-bold text-neutral-400">
                 {name}
               </span>
             ))}
@@ -257,21 +257,21 @@ function PricingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-gray-50 py-20 dark:bg-gray-800">
+      <section className="bg-neutral-50 py-20 dark:bg-neutral-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-center text-2xl font-bold text-neutral-900 dark:text-white">
             Ce que disent nos clients
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-700"
+                className="rounded-xl bg-white p-6 shadow-sm dark:bg-neutral-700"
               >
-                <p className="text-gray-600 dark:text-gray-300">&ldquo;{testimonial.quote}&rdquo;</p>
+                <p className="text-neutral-600 dark:text-neutral-300">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div className="mt-4">
-                  <p className="font-medium text-gray-900 dark:text-white">{testimonial.author}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
+                  <p className="font-medium text-neutral-900 dark:text-white">{testimonial.author}</p>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">{testimonial.role}</p>
                 </div>
               </div>
             ))}
@@ -282,90 +282,90 @@ function PricingPage() {
       {/* Features comparison */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-center text-2xl font-bold text-neutral-900 dark:text-white">
             Comparaison des fonctionnalites
           </h2>
           <div className="mt-10 overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="py-4 text-left text-sm font-medium text-gray-900 dark:text-white">
+                <tr className="border-b border-neutral-200 dark:border-neutral-700">
+                  <th className="py-4 text-left text-sm font-medium text-neutral-900 dark:text-white">
                     Fonctionnalite
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900 dark:text-white">
                     Gratuit
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900 dark:text-white">
                     Starter
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900 dark:text-white">
                     Pro
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-gray-900 dark:text-white">
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900 dark:text-white">
                     Agency
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-700">
                 <tr>
-                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Credits/mois</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">5</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">50</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">500</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">Illimites</td>
+                  <td className="py-4 text-sm text-neutral-600 dark:text-neutral-300">Credits/mois</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">5</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">50</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">500</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">Illimites</td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Utilisateurs</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">1</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">1</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">5</td>
-                  <td className="py-4 text-center text-sm text-gray-600 dark:text-gray-300">
-                    <Users className="mx-auto h-4 w-4 text-gray-600 dark:text-gray-300" />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Campagnes</td>
-                  <td className="py-4 text-center">
-                    <span className="text-gray-400">—</span>
-                  </td>
-                  <td className="py-4 text-center">
-                    <span className="text-gray-400">—</span>
-                  </td>
-                  <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
-                  </td>
-                  <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
+                  <td className="py-4 text-sm text-neutral-600 dark:text-neutral-300">Utilisateurs</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">1</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">1</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">5</td>
+                  <td className="py-4 text-center text-sm text-neutral-600 dark:text-neutral-300">
+                    <Users className="mx-auto h-4 w-4 text-neutral-600 dark:text-neutral-300" />
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">Export CSV</td>
+                  <td className="py-4 text-sm text-neutral-600 dark:text-neutral-300">Campagnes</td>
                   <td className="py-4 text-center">
-                    <span className="text-gray-400">—</span>
+                    <span className="text-neutral-400">—</span>
                   </td>
                   <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
+                    <span className="text-neutral-400">—</span>
                   </td>
                   <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
                   </td>
                   <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-4 text-sm text-gray-600 dark:text-gray-300">API Access</td>
+                  <td className="py-4 text-sm text-neutral-600 dark:text-neutral-300">Export CSV</td>
                   <td className="py-4 text-center">
-                    <span className="text-gray-400">—</span>
+                    <span className="text-neutral-400">—</span>
                   </td>
                   <td className="py-4 text-center">
-                    <span className="text-gray-400">—</span>
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
                   </td>
                   <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
                   </td>
                   <td className="py-4 text-center">
-                    <Check className="mx-auto h-4 w-4 text-green-500" />
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-4 text-sm text-neutral-600 dark:text-neutral-300">API Access</td>
+                  <td className="py-4 text-center">
+                    <span className="text-neutral-400">—</span>
+                  </td>
+                  <td className="py-4 text-center">
+                    <span className="text-neutral-400">—</span>
+                  </td>
+                  <td className="py-4 text-center">
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
+                  </td>
+                  <td className="py-4 text-center">
+                    <Check className="mx-auto h-4 w-4 text-success-500" />
                   </td>
                 </tr>
               </tbody>
@@ -375,16 +375,16 @@ function PricingPage() {
       </section>
 
       {/* FAQs */}
-      <section className="bg-gray-50 py-20 dark:bg-gray-800">
+      <section className="bg-neutral-50 py-20 dark:bg-neutral-800">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-center text-2xl font-bold text-neutral-900 dark:text-white">
             Questions frequentes
           </h2>
           <div className="mt-10 space-y-6">
             {faqs.map((faq, index) => (
-              <div key={index} className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-700">
-                <h3 className="font-medium text-gray-900 dark:text-white">{faq.q}</h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{faq.a}</p>
+              <div key={index} className="rounded-xl bg-white p-6 shadow-sm dark:bg-neutral-700">
+                <h3 className="font-medium text-neutral-900 dark:text-white">{faq.q}</h3>
+                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -394,10 +394,10 @@ function PricingPage() {
       {/* CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">
             Pret a transformer votre prospection ?
           </h2>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">
+          <p className="mt-4 text-neutral-600 dark:text-neutral-300">
             Commencez gratuitement et decouvrez comment ScreenCold peut vous faire
             gagner du temps.
           </p>
@@ -418,11 +418,11 @@ function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 dark:border-gray-700">
+      <footer className="border-t border-neutral-200 py-12 dark:border-neutral-700">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
                 <svg
                   viewBox="0 0 24 24"
                   className="h-5 w-5 text-white"
@@ -435,9 +435,9 @@ function PricingPage() {
                   <line x1="12" y1="17" x2="12" y2="21" />
                 </svg>
               </div>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">ScreenCold</span>
+              <span className="text-lg font-bold text-neutral-900 dark:text-white">ScreenCold</span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
               2024 ScreenCold. Tous droits reserves.
             </p>
           </div>

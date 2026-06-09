@@ -3,9 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 function ForgotPasswordPage() {
   const { addToast } = useToast();
@@ -61,13 +61,13 @@ function ForgotPasswordPage() {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-100">
+            <svg className="h-8 w-8 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Email envoyé</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-neutral-900">Email envoyé</h1>
+          <p className="mt-2 text-sm text-neutral-600">
             Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans les prochaines minutes.
           </p>
         </div>
@@ -87,15 +87,15 @@ function ForgotPasswordPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Mot de passe oublié</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-neutral-900">Mot de passe oublié</h1>
+        <p className="mt-2 text-sm text-neutral-600">
           Entrez votre email et nous vous enverrons un lien de réinitialisation
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
           <Input
             type="email"
             value={email}
@@ -111,8 +111,8 @@ function ForgotPasswordPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-600">
-        <Link href="/login" className="font-medium text-blue-600 hover:text-blue-700">
+      <p className="text-center text-sm text-neutral-600">
+        <Link href="/login" className="font-medium text-info-600 hover:text-info-700">
           Retour à la connexion
         </Link>
       </p>

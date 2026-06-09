@@ -17,11 +17,11 @@ interface ArticleHeroProps {
 }
 
 const categoryColors: Record<string, string> = {
-  "cold-outreach": "bg-blue-500/20 text-blue-100 border-blue-400/30",
+  "cold-outreach": "bg-info-500/20 text-info-100 border-info-400/30",
   "ux-design": "bg-purple-500/20 text-purple-100 border-purple-400/30",
-  cro: "bg-green-500/20 text-green-100 border-green-400/30",
+  cro: "bg-success-500/20 text-success-100 border-success-400/30",
   productivity: "bg-orange-500/20 text-orange-100 border-orange-400/30",
-  industry: "bg-gray-500/20 text-gray-100 border-gray-400/30",
+  industry: "bg-neutral-500/20 text-neutral-100 border-neutral-400/30",
 };
 
 const categoryLabels: Record<string, string> = {
@@ -49,7 +49,7 @@ export function ArticleHero({
     year: "numeric",
   });
 
-  const colorClass = categoryColors[category] || "bg-gray-500/20 text-gray-100 border-gray-400/30";
+  const colorClass = categoryColors[category] || "bg-neutral-500/20 text-neutral-100 border-neutral-400/30";
   const label = categoryLabels[category] || category;
 
   return (
@@ -63,7 +63,7 @@ export function ArticleHero({
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-gray-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/70 to-neutral-900/20" />
       </div>
       
       <div className="relative w-full max-w-4xl mx-auto px-6 py-16 md:py-24">
@@ -71,7 +71,7 @@ export function ArticleHero({
           <span className={`px-3 py-1 rounded-full text-sm font-medium border ${colorClass}`}>
             {label}
           </span>
-          <div className="flex items-center gap-1.5 text-sm text-gray-300">
+          <div className="flex items-center gap-1.5 text-sm text-neutral-300">
             <Clock className="h-4 w-4" />
             <span>{readingTime} min de lecture</span>
           </div>
@@ -81,23 +81,23 @@ export function ArticleHero({
           {title}
         </h1>
         
-        <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl">
+        <p className="text-lg md:text-xl text-neutral-200 mb-8 max-w-2xl">
           {subtitle}
         </p>
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white font-semibold">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-info-500 text-white font-semibold">
               {author.charAt(0)}
             </div>
             <div>
               <p className="text-white font-medium">{author}</p>
-              <p className="text-sm text-gray-400">{authorRole}</p>
+              <p className="text-sm text-neutral-400">{authorRole}</p>
             </div>
           </div>
           
           <div className="flex flex-col sm:items-end gap-2">
-            <div className="flex items-center gap-1.5 text-sm text-gray-300">
+            <div className="flex items-center gap-1.5 text-sm text-neutral-300">
               <Calendar className="h-4 w-4" />
               <span>{formattedDate}</span>
             </div>

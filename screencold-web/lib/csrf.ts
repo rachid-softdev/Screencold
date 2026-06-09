@@ -68,18 +68,26 @@ export function isRequestSafe(request: Request): boolean {
     return true;
   }
   
-  // For API routes without origin/referer, check if it's a browser request
+  // For browser requests, origin or referer matching APP_URL is required
   const userAgent = request.headers.get('user-agent') || '';
   const isBrowser = userAgent.includes('Mozilla') || userAgent.includes('Chrome') || userAgent.includes('Safari');
   
-  // Non-browser clients (curl, axios, etc.) might not have origin
-  // In production, you might want to be more strict
-  if (process.env.NODE_ENV === 'production') {
-    // In production, require origin for browser requests
-    if (isBrowser && !origin) {
+  if (isBrowser) {
+    return false;
+  }
+  
+  // For non-browser requests (API clients, curl), check for CSRF token
+  const csrfToken = request.headers.get('x-csrf-token');
+  if (csrfToken) {
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) {
       return false;
+    }
+    const parts = csrfToken.split(':');
+    if (parts.length === 2) {
+      return verifyCsrfToken(parts[0], secret, parts[1]);
     }
   }
   
-  return true;
+  return false;
 }

@@ -4,9 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Filter, Search, BarChart3, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Button } from '@screencold/ui';
+import { Badge } from '@screencold/ui';
+import { Input } from '@screencold/ui';
 
 interface Audit {
   id: string;
@@ -70,10 +70,10 @@ function AuditsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-neutral-900">
             {total} audit{total !== 1 ? "s" : ""}
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-neutral-500">
             Tous vos audits réalisés
           </p>
         </div>
@@ -87,7 +87,7 @@ function AuditsPage() {
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
           <Input
             type="text"
             value={searchQuery}
@@ -104,17 +104,17 @@ function AuditsPage() {
       {/* Audits Grid */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
         </div>
       ) : filteredAudits.length === 0 && !searchQuery ? (
-        <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <BarChart3 className="h-8 w-8 text-blue-600" />
+        <div className="rounded-xl border-2 border-dashed border-neutral-200 bg-white p-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-info-100">
+            <BarChart3 className="h-8 w-8 text-info-600" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-gray-900">
+          <h3 className="mt-4 text-lg font-semibold text-neutral-900">
             Aucun audit pour le moment
           </h3>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-neutral-600">
             Commencez par analyser le site web d'un prospect. En 30 secondes,
             vous obtiendrez un rapport complet et un email prêt à envoyer.
           </p>
@@ -129,8 +129,8 @@ function AuditsPage() {
           </div>
         </div>
       ) : filteredAudits.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <p className="text-gray-500">
+        <div className="rounded-xl border border-neutral-200 bg-white p-8 text-center">
+          <p className="text-neutral-500">
             Aucun audit ne correspond à votre recherche
           </p>
         </div>
@@ -140,10 +140,10 @@ function AuditsPage() {
             <Link
               key={audit.id}
               href={`/audits/${audit.id}`}
-              className="group rounded-xl border border-gray-200 bg-white overflow-hidden transition-all hover:border-blue-200 hover:shadow-md"
+              className="group rounded-xl border border-neutral-200 bg-white overflow-hidden transition-all hover:border-info-200 hover:shadow-md"
             >
               {/* Screenshot Preview */}
-              <div className="relative h-32 bg-gray-100">
+              <div className="relative h-32 bg-neutral-100">
                 {audit.screenshotUrl ? (
                   <Image
                     src={audit.screenshotUrl}
@@ -155,7 +155,7 @@ function AuditsPage() {
                   <div className="flex h-full w-full items-center justify-center">
                     <svg
                       viewBox="0 0 24 24"
-                      className="h-12 w-12 text-gray-300"
+                      className="h-12 w-12 text-neutral-300"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="1.5"
@@ -168,7 +168,7 @@ function AuditsPage() {
                 )}
                 {audit.status === "PROCESSING" && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
                   </div>
                 )}
               </div>
@@ -177,10 +177,10 @@ function AuditsPage() {
               <div className="p-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-medium text-gray-900 group-hover:text-blue-600">
+                    <h3 className="font-medium text-neutral-900 group-hover:text-info-600">
                       {audit.companyName || "Entreprise"}
                     </h3>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-neutral-500">
                       {formatDate(audit.createdAt)}
                     </p>
                   </div>

@@ -6,11 +6,10 @@
 import { logger } from "../lib/logger";
 import { analyzeScreenshot, AnalyzeResult, UXIssue } from "../lib/anthropic";
 import {
-  markJobStarted,
-  markJobCompleted,
+  checkJobIdempotency,
+  markJobComplete,
   markJobFailed,
-  isJobAlreadyProcessed,
-} from "../lib/job-tracker";
+} from "./index";
 
 /**
  * Analysis result with parsed data
@@ -74,9 +73,7 @@ export async function analyzeSite(
 
   // Idempotency check
   if (jobId && auditId) {
-    await markJobStarted(jobId, auditId, "analyze");
-
-    if (await isJobAlreadyProcessed(jobId, auditId, "analyze")) {
+    if (await checkJobIdempotency(jobId, auditId, "analyze")) {
       logger.info({ jobId, auditId }, "Analysis already processed, skipping");
       return {
         siteType: "Unknown",
@@ -119,7 +116,7 @@ export async function analyzeSite(
 
     // Mark job as completed
     if (jobId && auditId) {
-      await markJobCompleted(jobId, auditId, "analyze", {
+      await markJobComplete(jobId, auditId, "analyze", {
         siteType: result.siteType,
         overallScore: result.overallScore,
         issuesCount: validatedIssues.length,

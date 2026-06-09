@@ -5,6 +5,11 @@
 
 import { logger } from "../lib/logger";
 import { generateEmail, EmailContext, EmailResult } from "../lib/anthropic";
+import {
+  checkJobIdempotency,
+  markJobComplete,
+  markJobFailed,
+} from "./index";
 
 /**
  * Email generation result
@@ -31,9 +36,24 @@ export async function generateOutreachEmail(
   url: string,
   primaryIssue: string,
   overallScore: number,
-  annotatedImageUrl: string
+  annotatedImageUrl: string,
+  jobId?: string,
+  auditId?: string,
 ): Promise<EmailGenerationResult> {
   const startTime = Date.now();
+
+  // Idempotency check
+  if (jobId && auditId) {
+    if (await checkJobIdempotency(jobId, auditId, "email-gen")) {
+      logger.info({ jobId, auditId }, "Email generation already processed, skipping");
+      return {
+        subject: "",
+        body: "",
+        ps: undefined,
+        duration: 0,
+      };
+    }
+  }
 
   try {
     logger.info(
@@ -60,6 +80,15 @@ export async function generateOutreachEmail(
       "Email generation completed"
     );
 
+    // Mark job as completed
+    if (jobId && auditId) {
+      await markJobComplete(jobId, auditId, "email-gen", {
+        subjectLength: result.subject.length,
+        bodyLength: result.body.length,
+        duration,
+      });
+    }
+
     return {
       ...result,
       duration,
@@ -68,6 +97,11 @@ export async function generateOutreachEmail(
     const errorMessage = error instanceof Error ? error.message : "Unknown email generation error";
 
     logger.error({ error: errorMessage }, "Email generation failed");
+
+    // Mark job as failed
+    if (jobId && auditId) {
+      await markJobFailed(jobId, auditId, "email-gen", errorMessage);
+    }
 
     throw new Error(`Failed to generate email: ${errorMessage}`);
   }

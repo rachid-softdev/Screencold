@@ -4,10 +4,10 @@ import * as React from "react";
 import { Mail, Key, ExternalLink, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Card, CardContent, CardHeader, CardTitle } from '@screencold/ui';
+import { Badge } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 interface Integration {
   id: string;
@@ -123,7 +123,7 @@ function IntegrationsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
       </div>
     );
   }
@@ -132,8 +132,8 @@ function IntegrationsPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Intégrations</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-neutral-900">Intégrations</h1>
+        <p className="text-sm text-neutral-500">
           Connectez vos comptes et gérez vos clés API
         </p>
       </div>
@@ -149,7 +149,7 @@ function IntegrationsPage() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-neutral-600">
                 Connectez votre compte Gmail pour envoyer des emails de prospection
                 directement depuis votre boîte mail.
               </p>
@@ -164,7 +164,7 @@ function IntegrationsPage() {
                 <Button
                   variant="secondary"
                   onClick={handleGmailDisconnect}
-                  className="text-red-600"
+                  className="text-error-600"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Déconnecter
@@ -178,9 +178,9 @@ function IntegrationsPage() {
             </div>
           </div>
 
-          <div className="mt-4 rounded-lg bg-blue-50 p-4">
-            <h4 className="font-medium text-blue-900">Pourquoi utiliser Gmail ?</h4>
-            <ul className="mt-2 list-disc pl-4 text-sm text-blue-800">
+          <div className="mt-4 rounded-lg bg-info-50 p-4">
+            <h4 className="font-medium text-info-900">Pourquoi utiliser Gmail ?</h4>
+            <ul className="mt-2 list-disc pl-4 text-sm text-info-800">
               <li>Emails délivrables directement dans la boîte de réception</li>
               <li>Conservation du historique dans votre compte Gmail</li>
               <li>Possibilité de répondre directement depuis Gmail</li>
@@ -205,8 +205,8 @@ function IntegrationsPage() {
         <CardContent>
           {apiKeys.length === 0 ? (
             <div className="text-center py-6">
-              <Key className="mx-auto h-8 w-8 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-500">
+              <Key className="mx-auto h-8 w-8 text-neutral-400" />
+              <p className="mt-2 text-sm text-neutral-500">
                 Aucune clé API générée
               </p>
               <Link href="/settings/api-keys" className="mt-2 inline-block">
@@ -223,14 +223,14 @@ function IntegrationsPage() {
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">{key.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-neutral-900">{key.name}</p>
+                    <p className="text-sm text-neutral-500">
                       {key.keyPrefix}...  {key.rateLimit} req/min
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     {key.lastUsedAt && (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-neutral-400">
                         Dernière utilisation:{" "}
                         {new Date(key.lastUsedAt).toLocaleDateString("fr-FR")}
                       </span>
@@ -239,7 +239,7 @@ function IntegrationsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteApiKey(key.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-error-600 hover:text-error-700"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -256,8 +256,8 @@ function IntegrationsPage() {
         <CardContent className="py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-gray-900">Documentation API</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-medium text-neutral-900">Documentation API</h3>
+              <p className="text-sm text-neutral-500">
                 Apprenez à utiliser l&apos;API ScreenCold dans vos applications
               </p>
             </div>

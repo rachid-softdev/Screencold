@@ -5,12 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Download, RefreshCw, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
-import { Button } from "@/components/ui/button";
+import { Button } from '@screencold/ui';
 import { ScreenshotViewer } from "@/components/audit/screenshot-viewer";
 import { ScoreGauge } from "@/components/audit/score-gauge";
 import { IssueList } from "@/components/audit/issue-list";
 import { EmailEditor } from "@/components/audit/email-editor";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from '@screencold/ui';
 
 interface Issue {
   id: string;
@@ -142,8 +142,8 @@ function AuditResultPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-gray-500">Chargement de l'audit...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-info-600" />
+          <p className="text-neutral-500">Chargement de l'audit...</p>
         </div>
       </div>
     );
@@ -152,7 +152,7 @@ function AuditResultPage() {
   if (error || !audit) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-red-600 mb-4">{error || "Audit non trouvé"}</p>
+        <p className="text-error-600 mb-4">{error || "Audit non trouvé"}</p>
         <Link href="/audits">
           <Button variant="secondary">Retour aux audits</Button>
         </Link>
@@ -169,19 +169,19 @@ function AuditResultPage() {
       <div className="space-y-6">
         <Link
           href="/audits"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+          className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour aux audits
         </Link>
 
         <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900">Audit en cours...</h2>
-          <p className="text-gray-500 mt-2">
+          <Loader2 className="h-12 w-12 animate-spin text-info-600 mb-4" />
+          <h2 className="text-xl font-semibold text-neutral-900">Audit en cours...</h2>
+          <p className="text-neutral-500 mt-2">
             Nous analysons actuellement {companyName}
           </p>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-neutral-400 mt-1">
             Cette opération peut prendre quelques secondes
           </p>
         </div>
@@ -195,20 +195,20 @@ function AuditResultPage() {
       <div className="space-y-6">
         <Link
           href="/audits"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+          className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour aux audits
         </Link>
 
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="rounded-full bg-red-100 p-4 mb-4">
-            <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="rounded-full bg-error-100 p-4 mb-4">
+            <svg className="h-8 w-8 text-error-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900">Échec de l'audit</h2>
-          <p className="text-gray-500 mt-2 max-w-md text-center">
+          <h2 className="text-xl font-semibold text-neutral-900">Échec de l'audit</h2>
+          <p className="text-neutral-500 mt-2 max-w-md text-center">
             {audit.errorMessage || "Une erreur est survenue lors de l'analyse du site"}
           </p>
           <Button 
@@ -227,7 +227,7 @@ function AuditResultPage() {
       {/* Back link */}
       <Link
         href="/audits"
-        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+        className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour aux audits
@@ -236,10 +236,10 @@ function AuditResultPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-neutral-900">
             {companyName}
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-neutral-500">
             {websiteUrl}
           </p>
         </div>
@@ -268,14 +268,14 @@ function AuditResultPage() {
         {/* Left Column - Screenshot Viewer */}
         <div className="lg:col-span-3 space-y-4">
           {/* View Mode Toggle */}
-          <div className="flex rounded-lg border border-gray-200 p-1 w-fit bg-white">
+          <div className="flex rounded-lg border border-neutral-200 p-1 w-fit bg-white">
             <button
               onClick={() => setViewMode("screenshot")}
               className={clsx(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                 viewMode === "screenshot"
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-neutral-100 text-neutral-900"
+                  : "text-neutral-600 hover:text-neutral-900"
               )}
             >
               Capture
@@ -285,8 +285,8 @@ function AuditResultPage() {
               className={clsx(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                 viewMode === "annotated"
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-neutral-100 text-neutral-900"
+                  : "text-neutral-600 hover:text-neutral-900"
               )}
               disabled={!audit.annotatedUrl}
             >
@@ -310,8 +310,8 @@ function AuditResultPage() {
               error={null}
             />
           ) : (
-            <div className="rounded-xl border border-gray-200 bg-gray-100 p-8 text-center">
-              <p className="text-gray-500">Vue annotée non disponible</p>
+            <div className="rounded-xl border border-neutral-200 bg-neutral-100 p-8 text-center">
+              <p className="text-neutral-500">Vue annotée non disponible</p>
             </div>
           )}
         </div>
@@ -319,43 +319,43 @@ function AuditResultPage() {
         {/* Right Column - Score + Issues */}
         <div className="lg:col-span-2 space-y-6">
           {/* Score Gauge */}
-          <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
-            <h3 className="text-sm font-medium text-gray-900 mb-4">Score global</h3>
+          <div className="rounded-xl border border-neutral-200 bg-white p-6 text-center">
+            <h3 className="text-sm font-medium text-neutral-900 mb-4">Score global</h3>
             <div className="flex justify-center">
               <ScoreGauge score={audit.overallScore ?? 0} size="lg" />
             </div>
             {audit.processingTime && (
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-neutral-400 mt-2">
                 Temps d'analyse: {(audit.processingTime / 1000).toFixed(1)}s
               </p>
             )}
           </div>
 
           {/* Issues List */}
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-6">
+            <h3 className="text-sm font-medium text-neutral-900 mb-4">
               Problèmes détectés ({audit.issues?.length || 0})
             </h3>
             {audit.issues && audit.issues.length > 0 ? (
               <IssueList issues={audit.issues} />
             ) : (
-              <p className="text-gray-500 text-sm">Aucun problème majeur détecté</p>
+              <p className="text-neutral-500 text-sm">Aucun problème majeur détecté</p>
             )}
           </div>
 
           {/* Site Type */}
           {audit.siteType && (
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <p className="text-sm text-gray-500">Type de site</p>
-              <p className="font-medium text-gray-900">{audit.siteType}</p>
+            <div className="rounded-xl border border-neutral-200 bg-white p-4">
+              <p className="text-sm text-neutral-500">Type de site</p>
+              <p className="font-medium text-neutral-900">{audit.siteType}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Email Editor - Full Width */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <h3 className="text-sm font-medium text-gray-900 mb-4">
+      <div className="rounded-xl border border-neutral-200 bg-white p-6">
+        <h3 className="text-sm font-medium text-neutral-900 mb-4">
           Email de prospection généré
         </h3>
         <EmailEditor

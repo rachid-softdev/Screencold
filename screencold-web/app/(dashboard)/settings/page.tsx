@@ -3,10 +3,10 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { User, Mail, Trash2, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { useToast } from "@/components/ui/toast";
+import { Button } from '@screencold/ui';
+import { Input } from '@screencold/ui';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@screencold/ui';
+import { useToast } from '@screencold/ui';
 
 interface UserProfile {
   id: string;
@@ -107,7 +107,7 @@ function SettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-info-600" />
       </div>
     );
   }
@@ -115,8 +115,8 @@ function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Paramètres</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-neutral-900">Paramètres</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           Gérez vos informations personnelles et vos préférences
         </p>
       </div>
@@ -132,7 +132,7 @@ function SettingsPage() {
         <form onSubmit={handleSave}>
           <CardContent className="space-y-4">
             <div className="relative">
-              <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <User className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
               <Input
                 type="text"
                 value={name}
@@ -143,7 +143,7 @@ function SettingsPage() {
               />
             </div>
             <div className="relative">
-              <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Mail className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
               <Input
                 type="email"
                 value={email}
@@ -151,7 +151,7 @@ function SettingsPage() {
                 className="pl-10"
                 disabled
               />
-              <p className="mt-1 text-xs text-gray-400">
+              <p className="mt-1 text-xs text-neutral-400">
                 L'email ne peut pas être modifié
               </p>
             </div>
@@ -174,17 +174,17 @@ function SettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-neutral-200 p-4">
               <div>
-                <p className="font-medium text-gray-900">Zapier</p>
-                <p className="text-sm text-gray-500">Automatisez vos workflows</p>
+                <p className="font-medium text-neutral-900">Zapier</p>
+                <p className="text-sm text-neutral-500">Automatisez vos workflows</p>
               </div>
               <Button variant="secondary" size="sm" disabled>Coming soon</Button>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-neutral-200 p-4">
               <div>
-                <p className="font-medium text-gray-900">HubSpot</p>
-                <p className="text-sm text-gray-500">Synchronisez vos contacts</p>
+                <p className="font-medium text-neutral-900">HubSpot</p>
+                <p className="text-sm text-neutral-500">Synchronisez vos contacts</p>
               </div>
               <Button variant="secondary" size="sm" disabled>Coming soon</Button>
             </div>
@@ -193,15 +193,15 @@ function SettingsPage() {
       </Card>
 
       {/* Danger Zone */}
-      <Card className="border-red-200">
+      <Card className="border-error-200">
         <CardHeader>
-          <CardTitle className="text-red-600">Zone dangereuse</CardTitle>
+          <CardTitle className="text-error-600">Zone dangereuse</CardTitle>
           <CardDescription>
             Actions irréversibles
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-neutral-600">
             La suppression de votre compte est définitive. Toutes vos données,
             audits et campagnes seront perdus.
           </p>

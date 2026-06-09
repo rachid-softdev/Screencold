@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from '@screencold/ui';
 import { ArrowRight, Zap, Clock, TrendingUp } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -53,13 +53,13 @@ export default function FreelancesPage() {
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl">
+          <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Freelances : prospectez{" "}
-            <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-success-600 to-info-600 bg-clip-text text-transparent">
               sans vous ruiner en temps
             </span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-600">
             En tant que freelance, votre temps est précieux. ScreenCold
             automatise l'analyse de vos prospects et la rédaction de vos emails
             de prospection.
@@ -77,28 +77,28 @@ export default function FreelancesPage() {
               </Button>
             </Link>
           </div>
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-neutral-500">
             5 crédits gratuits • Sans engagement • Annulation à tout moment
           </p>
         </div>
       </section>
 
       {/* Benefits */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-gray-900">
+          <h2 className="text-center text-3xl font-bold text-neutral-900">
             Pourquoi les freelances choisissent ScreenCold
           </h2>
           <div className="mt-16 grid gap-8 sm:grid-cols-3">
             {benefits.map((benefit, i) => (
               <div key={i} className="rounded-xl bg-white p-6 shadow-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 text-green-600">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success-100 text-success-600">
                   {benefit.icon}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                <h3 className="mt-4 text-lg font-semibold text-neutral-900">
                   {benefit.title}
                 </h3>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-neutral-600">
                   {benefit.description}
                 </p>
               </div>
@@ -110,44 +110,44 @@ export default function FreelancesPage() {
       {/* ROI */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-gray-900">
+          <h2 className="text-center text-3xl font-bold text-neutral-900">
             Le calcul est simple
           </h2>
           <div className="mx-auto mt-10 max-w-2xl">
-            <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+            <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Temps gagné par audit</span>
-                  <span className="font-bold text-gray-900">20 minutes</span>
+                  <span className="text-neutral-600">Temps gagné par audit</span>
+                  <span className="font-bold text-neutral-900">20 minutes</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Audits par mois (Starter)</span>
-                  <span className="font-bold text-gray-900">50</span>
+                  <span className="text-neutral-600">Audits par mois (Starter)</span>
+                  <span className="font-bold text-neutral-900">50</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Temps économisé</span>
-                  <span className="font-bold text-green-600">
+                  <span className="text-neutral-600">Temps économisé</span>
+                  <span className="font-bold text-success-600">
                     16 heures / mois
                   </span>
                 </div>
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-neutral-200 pt-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Coût du plan Starter</span>
-                    <span className="font-bold text-gray-900">29€ / mois</span>
+                    <span className="text-neutral-600">Coût du plan Starter</span>
+                    <span className="font-bold text-neutral-900">29€ / mois</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">
+                    <span className="text-neutral-600">
                       Coût horaire si 50€/h
                     </span>
-                    <span className="font-bold text-gray-900">800€ / mois</span>
+                    <span className="font-bold text-neutral-900">800€ / mois</span>
                   </div>
                 </div>
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-neutral-200 pt-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-neutral-900">
                       ROI estimé
                     </span>
-                    <span className="text-2xl font-bold text-green-600">
+                    <span className="text-2xl font-bold text-success-600">
                       x27
                     </span>
                   </div>
@@ -159,12 +159,12 @@ export default function FreelancesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-neutral-900">
             Prêt à booster votre activité ?
           </h2>
-          <p className="mt-4 text-lg text-gray-600">
+          <p className="mt-4 text-lg text-neutral-600">
             Rejoignez les freelances qui utilisent ScreenCold pour prospecter
             efficacement.
           </p>

@@ -4,8 +4,8 @@ import * as React from "react";
 import { useParams } from "next/navigation";
 import { ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@screencold/ui';
+import { Card, CardContent, CardHeader, CardTitle } from '@screencold/ui';
 
 type InvitationStatus = "loading" | "valid" | "invalid" | "already_member" | "accepted";
 
@@ -83,10 +83,10 @@ function TeamJoinPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50">
         <div className="text-center">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600" />
-          <p className="mt-4 text-gray-600">Validation de l&apos;invitation...</p>
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-info-600" />
+          <p className="mt-4 text-neutral-600">Validation de l&apos;invitation...</p>
         </div>
       </div>
     );
@@ -94,14 +94,14 @@ function TeamJoinPage() {
 
   if (status === "invalid" || status === "already_member") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50">
         <Card className="mx-auto w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <XCircle className="mx-auto h-12 w-12 text-red-500" />
-            <h2 className="mt-4 text-xl font-bold text-gray-900">
+            <XCircle className="mx-auto h-12 w-12 text-error-500" />
+            <h2 className="mt-4 text-xl font-bold text-neutral-900">
               {status === "already_member" ? "Déjà membre" : "Invitation invalide"}
             </h2>
-            <p className="mt-2 text-gray-600">{error}</p>
+            <p className="mt-2 text-neutral-600">{error}</p>
             <div className="mt-6 flex justify-center gap-4">
               <Link href="/login">
                 <Button variant="secondary">
@@ -121,14 +121,14 @@ function TeamJoinPage() {
 
   if (status === "accepted") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50">
         <Card className="mx-auto w-full max-w-md">
           <CardContent className="pt-6 text-center">
-            <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-            <h2 className="mt-4 text-xl font-bold text-gray-900">
+            <CheckCircle className="mx-auto h-12 w-12 text-success-500" />
+            <h2 className="mt-4 text-xl font-bold text-neutral-900">
               Invitation acceptée !
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-neutral-600">
               Vous êtes maintenant membre de &quot;{invitation?.teamName}&quot;
             </p>
             <div className="mt-6">
@@ -144,7 +144,7 @@ function TeamJoinPage() {
 
   // Status is "valid" - show accept form
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-neutral-50">
       <Card className="mx-auto w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">Invitation à une équipe</CardTitle>
@@ -152,19 +152,19 @@ function TeamJoinPage() {
         <CardContent className="text-center">
           {invitation && (
             <>
-              <div className="mb-6 rounded-lg bg-gray-50 p-4">
-                <p className="text-gray-600">
-                  <span className="font-medium text-gray-900">{invitation.inviterName}</span>{" "}
+              <div className="mb-6 rounded-lg bg-neutral-50 p-4">
+                <p className="text-neutral-600">
+                  <span className="font-medium text-neutral-900">{invitation.inviterName}</span>{" "}
                   vous invite à rejoindre l&apos;équipe &quot;{invitation.teamName}&quot;
                 </p>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-neutral-500">
                   Rôle: {invitation.role === "ADMIN" ? "Administrateur" : "Membre"}
                 </p>
               </div>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-neutral-500">
                 Vous êtes actuellement connecté en tant que: <br />
-                <span className="font-medium text-gray-900">(Email du compte)</span>
+                <span className="font-medium text-neutral-900">(Email du compte)</span>
               </p>
 
               <div className="mt-6 flex flex-col gap-2">

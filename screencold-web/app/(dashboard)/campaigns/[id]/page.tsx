@@ -4,12 +4,12 @@ import * as React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
+import { Button } from '@screencold/ui';
+import { Modal } from '@screencold/ui';
 import { CampaignProgress } from "@/components/campaigns/campaign-progress";
 import { ProspectTable } from "@/components/campaigns/prospect-table";
 import { CSVImportForm } from "@/components/forms/csv-import-form";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from '@screencold/ui';
 
 type ProspectStatus = "PENDING" | "PROCESSING" | "DONE" | "FAILED";
 
@@ -90,7 +90,7 @@ function CampaignDetailPage() {
       {/* Back link */}
       <Link
         href="/campaigns"
-        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+        className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour aux campagnes
@@ -99,8 +99,8 @@ function CampaignDetailPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{campaign.name}</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-neutral-900">{campaign.name}</h1>
+          <p className="mt-1 text-sm text-neutral-500">
             Créée le {new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(campaign.createdAt))}
           </p>
         </div>

@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { Key, Plus, Trash2, Copy, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from '@screencold/ui';
+import { Card, CardContent } from '@screencold/ui';
 
 interface ApiKey {
   id: string;
@@ -85,7 +85,7 @@ export default function ApiKeysPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-info-600 border-t-transparent" />
       </div>
     );
   }
@@ -94,8 +94,8 @@ export default function ApiKeysPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Clés API</h1>
-          <p className="mt-2 text-gray-600">Gérez vos clés API pour l'accès programmatique</p>
+          <h1 className="text-3xl font-bold text-neutral-900">Clés API</h1>
+          <p className="mt-2 text-neutral-600">Gérez vos clés API pour l'accès programmatique</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -103,12 +103,12 @@ export default function ApiKeysPage() {
         </Button>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <div className="bg-warning-50 border border-warning-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0 mt-0.5" />
+          <AlertTriangle className="h-5 w-5 text-warning-600 shrink-0 mt-0.5" />
           <div>
-            <p className="font-medium text-yellow-800">Plan requis</p>
-            <p className="text-sm text-yellow-700">
+            <p className="font-medium text-warning-800">Plan requis</p>
+            <p className="text-sm text-warning-700">
               L'accès API est disponible uniquement pour les plans Pro et Agency.
             </p>
           </div>
@@ -117,9 +117,9 @@ export default function ApiKeysPage() {
 
       {apiKeys.length === 0 ? (
         <div className="text-center py-12">
-          <Key className="h-12 w-12 mx-auto text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Aucune clé API</h3>
-          <p className="mt-2 text-gray-600">Créez votre première clé API pour accéder au programme.</p>
+          <Key className="h-12 w-12 mx-auto text-neutral-400" />
+          <h3 className="mt-4 text-lg font-medium text-neutral-900">Aucune clé API</h3>
+          <p className="mt-2 text-neutral-600">Créez votre première clé API pour accéder au programme.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -129,8 +129,8 @@ export default function ApiKeysPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{key.name}</p>
-                    <p className="text-sm text-gray-500">{key.keyPrefix}... (masquée)</p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-sm text-neutral-500">{key.keyPrefix}... (masquée)</p>
+                    <p className="text-xs text-neutral-400 mt-1">
                       {key.rateLimit} requêtes/min • Créée le{" "}
                       {new Date(key.createdAt).toLocaleDateString("fr-FR")}
                       {key.lastUsedAt && ` • Dernière utilisation ${new Date(key.lastUsedAt).toLocaleDateString("fr-FR")}`}
@@ -140,7 +140,7 @@ export default function ApiKeysPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => deleteApiKey(key.id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    className="text-error-500 hover:text-error-700 hover:bg-error-50"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -157,14 +157,14 @@ export default function ApiKeysPage() {
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             {newKeyValue ? (
               <>
-                <h2 className="text-xl font-bold mb-4 text-green-600">Clé API créée!</h2>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-yellow-800 font-medium">
+                <h2 className="text-xl font-bold mb-4 text-success-600">Clé API créée!</h2>
+                <div className="bg-warning-50 border border-warning-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-warning-800 font-medium">
                     ⚠️ Important: Conservez cette clé en lieu sûr. Elle ne sera affichée qu'une seule fois!
                   </p>
                 </div>
                 <div className="flex items-center gap-2 mb-4">
-                  <code className="flex-1 p-2 bg-gray-100 rounded text-sm break-all">
+                  <code className="flex-1 p-2 bg-neutral-100 rounded text-sm break-all">
                     {newKeyValue}
                   </code>
                   <Button variant="outline" size="icon" onClick={() => copyToClipboard(newKeyValue)}>
