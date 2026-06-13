@@ -1,6 +1,6 @@
 'use client';
 
-import { Component, ReactNode } from 'react';
+import { Component, ReactNode, useState } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -27,17 +27,15 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('[ErrorBoundary] Caught error:', error, errorInfo);
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    console.error('[ErrorBoundary] Erreur interceptée:', error, errorInfo);
     
-    // Send to Sentry if available
     if (typeof window !== 'undefined' && (window as any).Sentry) {
       (window as any).Sentry.captureException(error, {
         extra: errorInfo,
       });
     }
     
-    // Call custom error handler
     this.props.onError?.(error, errorInfo);
   }
 
@@ -45,15 +43,15 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({ hasError: false, error: undefined });
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+        <div className="flex min-h-screen items-center justify-center bg-neutral-50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-lg">
             <div className="mb-4">
               <svg
                 className="mx-auto h-12 w-12 text-error-500"
@@ -70,27 +68,27 @@ export class ErrorBoundary extends Component<Props, State> {
               </svg>
             </div>
             
-            <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-              Something went wrong
+            <h2 className="mb-2 text-xl font-semibold text-neutral-900">
+              Une erreur est survenue
             </h2>
             
-            <p className="text-neutral-600 mb-4">
-              {this.state.error?.message || 'An unexpected error occurred'}
+            <p className="mb-4 text-neutral-600">
+              {this.state.error?.message || 'Une erreur inattendue s\'est produite.'}
             </p>
             
-            <div className="flex gap-3 justify-center">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={this.handleReset}
-                className="px-4 py-2 bg-info-600 text-white rounded-md hover:bg-info-700 transition-colors"
+                className="rounded-md bg-info-600 px-4 py-2 text-white transition-colors hover:bg-info-700"
               >
-                Try again
+                Réessayer
               </button>
               
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-md hover:bg-neutral-50 transition-colors"
+                className="rounded-md border border-neutral-300 px-4 py-2 text-neutral-700 transition-colors hover:bg-neutral-50"
               >
-                Reload page
+                Recharger
               </button>
             </div>
           </div>
@@ -106,7 +104,7 @@ export class ErrorBoundary extends Component<Props, State> {
  * Hook for using error boundary functionality
  */
 export function useErrorHandler() {
-  const [error, setError] = React.useState<Error | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const handleError = (err: Error) => {
     console.error('[useErrorHandler]', err);
@@ -119,8 +117,5 @@ export function useErrorHandler() {
 
   return { error, handleError, clearError };
 }
-
-// Need to import React for hooks
-import React from 'react';
 
 export default ErrorBoundary;

@@ -56,7 +56,7 @@ export default function WebDesignersPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Web designers : transformez vos audits UX en{" "}
-            <span className="bg-gradient-to-r from-purple-600 to-info-600 bg-clip-text text-transparent">
+            <span className="text-info-600">
               opportunités commerciales
             </span>
           </h1>

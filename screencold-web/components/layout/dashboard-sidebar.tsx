@@ -16,6 +16,7 @@ import {
   CreditCard,
   Key,
   Users,
+  Keyboard,
 } from "lucide-react";
 import { Badge } from '@screencold/ui';
 import { Dropdown } from '@screencold/ui';
@@ -58,9 +59,10 @@ interface DashboardSidebarProps {
   };
   collapsed?: boolean;
   onToggle?: () => void;
+  onOpenShortcuts?: () => void;
 }
 
-function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSidebarProps) {
+function DashboardSidebar({ user, collapsed = false, onToggle, onOpenShortcuts }: DashboardSidebarProps) {
   const pathname = usePathname();
 
   const userMenuItems = [
@@ -137,6 +139,35 @@ function DashboardSidebar({ user, collapsed = false, onToggle }: DashboardSideba
           );
         })}
       </nav>
+
+      {/* Shortcut Reference */}
+      {onOpenShortcuts && !collapsed && (
+        <div className="border-t border-neutral-100 px-3 py-2">
+          <button
+            onClick={onOpenShortcuts}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-600"
+          >
+            <Keyboard className="h-3.5 w-3.5" />
+            <span>Raccourcis clavier</span>
+            <kbd className="ml-auto rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 text-[10px]">
+              ?
+            </kbd>
+          </button>
+        </div>
+      )}
+
+      {/* Collapsed shortcut button */}
+      {onOpenShortcuts && collapsed && (
+        <div className="border-t border-neutral-100 px-2 py-2">
+          <button
+            onClick={onOpenShortcuts}
+            className="flex w-full items-center justify-center rounded-lg px-2 py-2 text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-600"
+            aria-label="Raccourcis clavier"
+          >
+            <Keyboard className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* User */}
       <div className="border-t border-neutral-100 p-3">

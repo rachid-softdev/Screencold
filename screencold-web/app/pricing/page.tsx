@@ -3,8 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Check, Zap, ArrowRight, Star, Users } from "lucide-react";
-import { Button } from '@screencold/ui';
-import { Badge } from '@screencold/ui';
+import { Button, Badge, Header } from '@screencold/ui';
 import { OrganizationSchema, FAQSchema } from "@/components/seo/schema";
 import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
 
@@ -94,35 +93,7 @@ function PricingPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-900">
-      {/* Header */}
-      <header className="border-b border-neutral-100 dark:border-neutral-800">
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-neutral-900 dark:text-white">ScreenCold</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white">
-              Se connecter
-            </Link>
-            <Link href="/register">
-              <Button size="sm">Commencer</Button>
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <Header navLinks={[]} />
 
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -422,7 +393,7 @@ function PricingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-600">
                 <svg
                   viewBox="0 0 24 24"
                   className="h-5 w-5 text-white"

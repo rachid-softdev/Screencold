@@ -34,11 +34,11 @@ function Header({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-600">
             <svg
               viewBox="0 0 24 24"
               className="h-5 w-5 text-white"
@@ -51,7 +51,7 @@ function Header({
               <line x1="12" y1="17" x2="12" y2="21" />
             </svg>
           </div>
-          <span className="text-xl font-bold text-gray-900">{logoText}</span>
+          <span className="text-xl font-bold text-neutral-900">{logoText}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -60,7 +60,7 @@ function Header({
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+              className="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
             >
               {link.label}
             </Link>
@@ -69,7 +69,7 @@ function Header({
 
         {/* CTA */}
         <div className="flex items-center gap-4">
-          <Link href={loginHref} className="hidden text-sm font-medium text-gray-600 hover:text-gray-900 sm:block">
+          <Link href={loginHref} className="hidden text-sm font-medium text-neutral-600 hover:text-neutral-900 sm:block">
             {loginText}
           </Link>
           <Link href={ctaHref}>
@@ -78,7 +78,7 @@ function Header({
 
           {/* Mobile Menu Button */}
           <button
-            className="flex items-center justify-center p-2 text-gray-600 md:hidden"
+            className="flex items-center justify-center p-2 text-neutral-600 md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menu"
           >
@@ -93,13 +93,13 @@ function Header({
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-gray-100 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-neutral-100 bg-white px-4 py-4 md:hidden">
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-base font-medium text-gray-600 hover:text-gray-900"
+                className="text-base font-medium text-neutral-600 hover:text-neutral-900"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
@@ -107,7 +107,7 @@ function Header({
             ))}
             <Link
               href={loginHref}
-              className="text-base font-medium text-gray-600 hover:text-gray-900"
+              className="text-base font-medium text-neutral-600 hover:text-neutral-900"
               onClick={() => setMobileMenuOpen(false)}
             >
               {loginText}

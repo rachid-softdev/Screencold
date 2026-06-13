@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { clsx } from "clsx";
 import { Users, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Campaign {
   id: string;
@@ -15,21 +15,73 @@ interface Campaign {
 
 interface CampaignListProps {
   campaigns: Campaign[];
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
-function CampaignCard({ campaign }: { campaign: Campaign }) {
+function CampaignCard({
+  campaign,
+  isSelected,
+  onToggleSelect,
+}: {
+  campaign: Campaign;
+  isSelected: boolean;
+  onToggleSelect?: (id: string) => void;
+}) {
+  const router = useRouter();
   const progress = campaign.prospectCount > 0
     ? (campaign.doneCount / campaign.prospectCount) * 100
     : 0;
 
+  const handleClick = () => {
+    router.push(`/campaigns/${campaign.id}`);
+  };
+
   return (
-    <Link
-      href={`/campaigns/${campaign.id}`}
-      className="group rounded-xl border border-neutral-200 bg-white p-6 transition-all hover:border-info-200 hover:shadow-md"
+    <div
+      className={clsx(
+        "group relative cursor-pointer rounded-xl border p-6 transition-all",
+        isSelected
+          ? "border-info-400 bg-info-50/50 shadow-sm"
+          : "border-neutral-200 bg-white hover:border-info-200 hover:shadow-md"
+      )}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter") handleClick(); }}
     >
+      {/* Checkbox */}
+      {onToggleSelect && (
+        <div
+          className="absolute right-4 top-4 z-10"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSelect(campaign.id);
+          }}
+        >
+          <div
+            className={clsx(
+              "flex h-6 w-6 items-center justify-center rounded-md border-2 transition-colors",
+              isSelected
+                ? "border-info-600 bg-info-600 text-white"
+                : "border-neutral-300 bg-white/90 opacity-0 group-hover:opacity-100"
+            )}
+          >
+            {isSelected && (
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex items-start justify-between">
-        <div>
-          <h3 className="font-semibold text-neutral-900 group-hover:text-info-600 transition-colors">
+        <div className="flex-1">
+          <h3 className={clsx(
+            "font-semibold transition-colors",
+            isSelected ? "text-info-700" : "text-neutral-900 group-hover:text-info-600"
+          )}>
             {campaign.name}
           </h3>
           <div className="mt-2 flex items-center gap-2 text-sm text-neutral-500">
@@ -39,7 +91,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
             </span>
           </div>
         </div>
-        <ArrowRight className="h-5 w-5 text-neutral-400 transition-transform group-hover:translate-x-1 group-hover:text-info-500" />
+        <ArrowRight className="ml-3 h-5 w-5 shrink-0 text-neutral-400 transition-transform group-hover:translate-x-1 group-hover:text-info-500" />
       </div>
 
       {/* Progress bar */}
@@ -61,11 +113,11 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
           {Math.round(progress)}% complété
         </p>
       </div>
-    </Link>
+    </div>
   );
 }
 
-function CampaignList({ campaigns }: CampaignListProps) {
+function CampaignList({ campaigns, selectedIds, onToggleSelect }: CampaignListProps) {
   if (campaigns.length === 0) {
     return (
       <div className="rounded-xl border border-neutral-200 bg-white p-8 text-center">
@@ -95,7 +147,12 @@ function CampaignList({ campaigns }: CampaignListProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {campaigns.map((campaign) => (
-        <CampaignCard key={campaign.id} campaign={campaign} />
+        <CampaignCard
+          key={campaign.id}
+          campaign={campaign}
+          isSelected={selectedIds?.has(campaign.id) ?? false}
+          onToggleSelect={onToggleSelect}
+        />
       ))}
     </div>
   );

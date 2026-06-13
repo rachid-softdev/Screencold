@@ -3,9 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
-import { Button } from '@screencold/ui';
-import { Input } from '@screencold/ui';
-import { useToast } from '@screencold/ui';
+import { Button, Input, Header, useToast } from '@screencold/ui';
 
 function ContactPage() {
   const { addToast } = useToast();
@@ -60,29 +58,7 @@ function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-neutral-900">ScreenCold</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
-              Se connecter
-            </Link>
-            <Link href="/register">
-              <Button size="sm">Commencer</Button>
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       {/* Content */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

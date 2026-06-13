@@ -1,11 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { CommandPalette } from "@/components/layout/command-palette";
+import { ShortcutsPanel } from "@/components/layout/shortcuts-panel";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { ToastProvider } from '@screencold/ui';
 
 interface DashboardLayoutProps {
@@ -17,6 +20,19 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: session, status } = useSession();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [shortcutsPanelOpen, setShortcutsPanelOpen] = useState(false);
+
+  // Global keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: "k", meta: true, handler: () => setCommandPaletteOpen(true) },
+    { key: "?", handler: () => setShortcutsPanelOpen((p) => !p) },
+    { key: "n", handler: () => router.push("/audits/new") },
+    { key: "N", shift: true, handler: () => router.push("/campaigns/new") },
+  ]);
+
+  const handleClosePalette = useCallback(() => setCommandPaletteOpen(false), []);
+  const handleCloseShortcuts = useCallback(() => setShortcutsPanelOpen(false), []);
 
   // Show loading state while checking auth
   if (status === "loading") {
@@ -55,6 +71,12 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <ToastProvider>
+      {/* Command Palette (Cmd+K) */}
+      <CommandPalette open={commandPaletteOpen} onClose={handleClosePalette} />
+
+      {/* Shortcuts Reference Panel (?) */}
+      <ShortcutsPanel open={shortcutsPanelOpen} onClose={handleCloseShortcuts} />
+
       <div className="flex h-screen overflow-hidden bg-neutral-50">
         {/* Sidebar */}
         <div
@@ -70,6 +92,7 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
             user={user}
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onOpenShortcuts={() => setShortcutsPanelOpen(true)}
           />
         </div>
 

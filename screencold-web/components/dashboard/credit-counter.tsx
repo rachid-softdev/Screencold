@@ -45,6 +45,12 @@ function CreditCounter({ credits, plan, maxCredits }: CreditCounterProps) {
         <div>
           <p className="text-sm font-medium text-neutral-500">
             Crédits disponibles
+            <span
+              className="ml-1.5 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-neutral-200 text-[10px] font-bold text-neutral-500"
+              title="1 crédit = 1 audit de site web. Les audits échoués ne sont pas débités."
+            >
+              ?
+            </span>
           </p>
           <div className="flex items-baseline gap-2">
             <span

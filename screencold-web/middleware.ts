@@ -25,11 +25,11 @@ export function addSecurityHeaders(response: NextResponse, _request: NextRequest
   // Content-Security-Policy
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://js.screencold.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://js.screencold.com http://localhost:8400",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' blob: data: https:",
     "font-src 'self' https://fonts.gstatic.com",
-    "connect-src 'self' https://api.stripe.com https://api.resend.dev https://api.screencold.com wss://*.screencold.com",
+    "connect-src 'self' https://api.stripe.com https://api.resend.dev https://api.screencold.com wss://*.screencold.com http://localhost:8400",
     "frame-src https://js.stripe.com https://hooks.stripe.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",

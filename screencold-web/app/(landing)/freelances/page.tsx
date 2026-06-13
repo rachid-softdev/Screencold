@@ -55,7 +55,7 @@ export default function FreelancesPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Freelances : prospectez{" "}
-            <span className="bg-gradient-to-r from-success-600 to-info-600 bg-clip-text text-transparent">
+            <span className="text-info-600">
               sans vous ruiner en temps
             </span>
           </h1>

@@ -67,7 +67,7 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
   };
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-gradient-to-r from-info-600 to-info-700 p-6 sm:p-8">
+    <div className="rounded-xl bg-info-600 p-6 sm:p-8">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-white sm:text-2xl">
           Analysez un site en quelques secondes

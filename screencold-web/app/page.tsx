@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Button } from '@screencold/ui';
+import { Button, Header } from '@screencold/ui';
 import { ArrowRight, CheckCircle, Zap, Target, Mail } from 'lucide-react';
 import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/schema';
 
@@ -76,42 +76,14 @@ const testimonials = [
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-sm">
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="2" y="3" width="20" height="14" rx="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-neutral-900">ScreenCold</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden text-sm font-medium text-neutral-600 hover:text-neutral-900 sm:block">
-              Se connecter
-            </Link>
-            <Link href="/register">
-              <Button size="sm">Commencer</Button>
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <Header navLinks={[]} ctaText="Commencer" />
 
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Audit de sites et emails de prospection{' '}
-            <span className="bg-gradient-to-r from-info-600 to-info-700 bg-clip-text text-transparent">
+            <span className="text-info-600">
               en quelques secondes
             </span>
           </h1>
@@ -148,20 +120,38 @@ export default function HomePage() {
               ScreenCold automatise vos audits et votre prospection
             </p>
           </div>
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature, index) => (
-              <div key={index} className="rounded-xl bg-white p-6 shadow-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-info-100 text-info-600">
-                  {feature.icon}
+          <div className="mt-16 space-y-6">
+            {/* Hero feature — takes full width on all screens */}
+            <div className="relative overflow-hidden rounded-2xl bg-info-600 px-8 py-10 sm:px-12">
+              <div className="relative z-10 max-w-2xl">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 text-white">
+                  <Target className="h-7 w-7" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-neutral-900">
-                  {feature.title}
+                <h3 className="mt-4 text-2xl font-bold text-white sm:text-3xl">
+                  {features[0].title}
                 </h3>
-                <p className="mt-2 text-sm text-neutral-600">
-                  {feature.description}
+                <p className="mt-3 text-lg text-white/80">
+                  {features[0].description}
                 </p>
               </div>
-            ))}
+            </div>
+
+            {/* Secondary features — 3-column grid */}
+            <div className="grid gap-6 sm:grid-cols-3">
+              {features.slice(1).map((feature) => (
+                <div key={feature.title} className="rounded-xl border border-neutral-200 bg-white p-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-info-100 text-info-600">
+                    {feature.icon}
+                  </div>
+                  <h3 className="mt-3 text-base font-semibold text-neutral-900">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-neutral-600">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -280,20 +270,20 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-5 w-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <rect x="2" y="3" width="20" height="14" rx="2" />
-                  <line x1="8" y1="21" x2="16" y2="21" />
-                  <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-neutral-900">ScreenCold</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-600">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <span className="text-lg font-bold text-neutral-900">ScreenCold</span>
             </div>
             <div className="flex gap-8 text-sm text-neutral-600">
               <Link href="/pricing" className="hover:text-neutral-900">

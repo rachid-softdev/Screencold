@@ -61,7 +61,7 @@ export default function AgencesSEOPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Agence SEO : signez plus de clients avec{" "}
-            <span className="bg-gradient-to-r from-info-600 to-info-700 bg-clip-text text-transparent">
+            <span className="text-info-600">
               des audits automatisés
             </span>
           </h1>
