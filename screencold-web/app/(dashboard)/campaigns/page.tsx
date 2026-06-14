@@ -14,33 +14,55 @@ interface Campaign {
   createdAt: string;
 }
 
+interface ApiCampaign {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  stats: {
+    total: number;
+    pending: number;
+    processing: number;
+    done: number;
+    failed: number;
+  };
+}
+
 function CampaignsPage() {
   const { addToast } = useToast();
+  const [campaigns, setCampaigns] = React.useState<Campaign[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [batchLoading, setBatchLoading] = React.useState(false);
-  // Mock data - replace with actual data fetching
-  const [campaigns] = React.useState<Campaign[]>([
-    {
-      id: "1",
-      name: "Prospects Janvier 2024",
-      prospectCount: 25,
-      doneCount: 18,
-      createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-    },
-    {
-      id: "2",
-      name: "Agence Web Design",
-      prospectCount: 12,
-      doneCount: 12,
-      createdAt: new Date(Date.now() - 86400000 * 14).toISOString(),
-    },
-    {
-      id: "3",
-      name: "Startup Tech",
-      prospectCount: 8,
-      doneCount: 3,
-      createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    },
-  ]);
+
+  React.useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch("/api/campaigns");
+        if (!res.ok) throw new Error("Une erreur est survenue lors du chargement");
+        const json = await res.json();
+        const list: ApiCampaign[] = json.data ?? json.campaigns ?? [];
+        setCampaigns(
+          list.map((c) => ({
+            id: c.id,
+            name: c.name,
+            prospectCount: c.stats.total,
+            doneCount: c.stats.done,
+            createdAt: c.createdAt,
+          }))
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Erreur de chargement";
+        setError(msg);
+        addToast(msg, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCampaigns();
+  }, [addToast]);
 
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const allSelected = campaigns.length > 0 && campaigns.every((c) => selectedIds.has(c.id));
@@ -173,12 +195,39 @@ function CampaignsPage() {
         </div>
       )}
 
-      {/* Campaign List */}
-      <CampaignList
-        campaigns={campaigns}
-        selectedIds={selectedIds}
-        onToggleSelect={toggleSelect}
-      />
+      {/* Loading State */}
+      {loading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="animate-pulse rounded-xl border border-neutral-200 bg-white p-6">
+              <div className="h-5 w-3/4 rounded bg-neutral-200" />
+              <div className="mt-3 h-4 w-1/2 rounded bg-neutral-100" />
+              <div className="mt-4 h-2 rounded-full bg-neutral-100" />
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        /* Error State */
+        <div className="rounded-xl border border-neutral-200 bg-white p-8 text-center">
+          <h3 className="text-sm font-medium text-neutral-900">
+            Erreur de chargement
+          </h3>
+          <p className="mt-1 text-sm text-neutral-500">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 rounded-lg bg-info-600 px-4 py-2 text-sm text-white hover:bg-info-700"
+          >
+            Réessayer
+          </button>
+        </div>
+      ) : (
+        /* Campaign List */
+        <CampaignList
+          campaigns={campaigns}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+        />
+      )}
     </div>
   );
 }

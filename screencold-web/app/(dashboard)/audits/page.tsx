@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Filter, Search, BarChart3, ArrowRight, Download, Trash2, CheckSquare } from "lucide-react";
-import { Button, Badge, Input, useToast } from '@screencold/ui';
+import { Button, Badge, Input, Modal, useToast } from '@screencold/ui';
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -103,8 +103,10 @@ function AuditsPage() {
   };
 
   const clearSelection = () => setSelectedIds(new Set());
+  const [confirmAnalyse, setConfirmAnalyse] = React.useState(false);
 
   const handleBatchAnalyse = async () => {
+    setConfirmAnalyse(false);
     setBatchLoading(true);
     try {
       const ids = [...selectedIds];
@@ -227,7 +229,7 @@ function AuditsPage() {
               {selectionCount} audit{selectionCount > 1 ? "s" : ""} sélectionné{selectionCount > 1 ? "s" : ""}
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="secondary" onClick={handleBatchAnalyse} disabled={batchLoading}>
+              <Button size="sm" variant="secondary" onClick={() => setConfirmAnalyse(true)} disabled={batchLoading}>
                 {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <BarChart3 className="mr-1.5 h-4 w-4" />}
                 Analyser
               </Button>
@@ -377,6 +379,29 @@ function AuditsPage() {
           })}
         </div>
       )}
+
+      {/* Confirm Batch Analyse Modal */}
+      <Modal open={confirmAnalyse} onClose={() => setConfirmAnalyse(false)}>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-neutral-900">
+            Lancer l'analyse en masse
+          </h3>
+          <p className="mt-2 text-sm text-neutral-600">
+            Cette action va analyser <strong>{selectedIds.size} audit{selectedIds.size > 1 ? "s" : ""}</strong> et consommer <strong>{selectedIds.size} crédit{selectedIds.size > 1 ? "s" : ""}</strong>.
+          </p>
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              onClick={() => setConfirmAnalyse(false)}
+              className="rounded-lg px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100"
+            >
+              Annuler
+            </button>
+            <Button onClick={handleBatchAnalyse}>
+              Confirmer l'analyse
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

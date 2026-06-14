@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 
 interface Shortcut {
   /** Keyboard key(s), e.g. "k", "n", "?" */
@@ -24,11 +24,12 @@ const LEADER_TIMEOUT = 600; // ms to wait for second key after leader
  * Supports leader key sequences (e.g. "g" then "d").
  * Skips firing when focus is in an editable element (unless allowInInputs is true).
  */
-export function useKeyboardShortcuts(shortcuts: Shortcut[]): void {
+export function useKeyboardShortcuts(shortcuts: Shortcut[]): string | null {
   const shortcutsRef = useRef(shortcuts);
   shortcutsRef.current = shortcuts;
 
   const leaderRef = useRef<{ key: string; timer: ReturnType<typeof setTimeout> | null } | null>(null);
+  const [leaderKey, setLeaderKey] = useState<string | null>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
@@ -47,9 +48,10 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]): void {
     if (leader) {
       const leaderKey = leader.key;
 
-      // Clear leader timer
+      // Clear leader timer + state
       if (leader.timer) clearTimeout(leader.timer);
       leaderRef.current = null;
+      setLeaderKey(null);
 
       // Check if the current key completes a leader sequence
       for (const s of shortcutsRef.current) {
@@ -83,8 +85,10 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]): void {
         key,
         timer: setTimeout(() => {
           leaderRef.current = null;
+          setLeaderKey(null);
         }, LEADER_TIMEOUT),
       };
+      setLeaderKey(key);
       return;
     }
 
@@ -119,6 +123,7 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]): void {
         clearTimeout(leaderRef.current.timer);
       }
       leaderRef.current = null;
+      setLeaderKey(null);
     };
     window.addEventListener("blur", handleBlur);
     return () => window.removeEventListener("blur", handleBlur);
@@ -128,4 +133,6 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]): void {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
+
+  return leaderKey;
 }
