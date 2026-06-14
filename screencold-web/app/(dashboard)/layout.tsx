@@ -75,7 +75,6 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const userMenuItems = [
-    { label: "Mon profil", href: "/settings" },
     { label: "Paramètres", href: "/settings" },
     { label: "", separator: true },
     { label: "Se déconnecter", onClick: handleLogout },

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Plus, Download, Trash2, CheckSquare, Loader2 } from "lucide-react";
-import { Button, useToast } from '@screencold/ui';
+import { Button, Modal, useToast } from '@screencold/ui';
 import { CampaignList } from "@/components/campaigns/campaign-list";
 
 interface Campaign {
@@ -95,6 +95,7 @@ function CampaignsPage() {
   };
 
   const clearSelection = () => setSelectedIds(new Set());
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
 
   const handleBatchExport = async () => {
     setBatchLoading(true);
@@ -119,8 +120,8 @@ function CampaignsPage() {
   };
 
   const handleBatchDelete = async () => {
+    setConfirmDelete(false);
     const ids = [...selectedIds];
-    if (!window.confirm(`Supprimer ${ids.length} campagne${ids.length > 1 ? "s" : ""} définitivement ?`)) return;
     setBatchLoading(true);
     try {
       const response = await fetch("/api/campaigns/batch", {
@@ -180,7 +181,7 @@ function CampaignsPage() {
                 {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
                 Exporter (CSV)
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleBatchDelete} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
+              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
                 {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
                 Supprimer
               </Button>
@@ -228,6 +229,29 @@ function CampaignsPage() {
           onToggleSelect={toggleSelect}
         />
       )}
+
+      {/* Confirm Batch Delete Modal */}
+      <Modal open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-neutral-900">
+            Supprimer des campagnes
+          </h3>
+          <p className="mt-2 text-sm text-neutral-600">
+            Cette action va supprimer <strong>{selectedIds.size} campagne{selectedIds.size > 1 ? "s" : ""}</strong> définitivement. Les prospects associés seront également retirés.
+          </p>
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              onClick={() => setConfirmDelete(false)}
+              className="rounded-lg px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100"
+            >
+              Annuler
+            </button>
+            <Button onClick={handleBatchDelete} className="bg-error-600 hover:bg-error-700 text-white">
+              Supprimer
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Filter, Search, BarChart3, ArrowRight, Download, Trash2, CheckSquare } from "lucide-react";
+import { Plus, Search, BarChart3, ArrowRight, Download, Trash2, CheckSquare } from "lucide-react";
 import { Button, Badge, Input, Modal, useToast } from '@screencold/ui';
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -40,6 +40,7 @@ function AuditsPage() {
       setTotal(data.pagination.total);
     } catch (err) {
       console.error(err);
+      addToast("Impossible de charger les audits", "error");
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +60,13 @@ function AuditsPage() {
     if (score >= 70) return "success";
     if (score >= 40) return "warning";
     return "destructive";
+  };
+
+  const formatScore = (score: number | null) => {
+    if (score === null) return "En cours";
+    if (score >= 70) return `Bon : ${score}/100`;
+    if (score >= 40) return `Moyen : ${score}/100`;
+    return `Faible : ${score}/100`;
   };
 
   const formatDate = (dateString: string) => {
@@ -216,9 +224,6 @@ function AuditsPage() {
             className="pl-10"
           />
         </div>
-        <Button variant="secondary" leftIcon={<Filter className="h-4 w-4" />}>
-          Filtres
-        </Button>
       </div>
 
       {/* Batch Action Bar */}
@@ -370,7 +375,7 @@ function AuditsPage() {
                       </p>
                     </div>
                     <Badge variant={getScoreVariant(audit.overallScore ?? null)}>
-                      {audit.overallScore != null ? `${audit.overallScore}/100` : "En cours"}
+                      {formatScore(audit.overallScore ?? null)}
                     </Badge>
                   </div>
                 </div>
