@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Search, LayoutDashboard, FileSearch, Megaphone, Settings, Plus } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 interface CommandItem {
   id: string;
@@ -33,6 +34,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const paletteRef = useFocusTrap(open);
 
   useEffect(() => {
     setMounted(true);
@@ -195,6 +197,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
       {/* Palette */}
       <div
+        ref={paletteRef}
         className="relative z-10 w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-neutral-200/50"
         role="dialog"
         aria-modal="true"

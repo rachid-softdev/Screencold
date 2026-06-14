@@ -4,6 +4,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, Keyboard } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 interface ShortcutsPanelProps {
   open: boolean;
@@ -44,10 +45,7 @@ const shortcutGroups: ShortcutGroup[] = [
 
 export function ShortcutsPanel({ open, onClose }: ShortcutsPanelProps) {
   const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const panelRef = useFocusTrap(open);
 
   useEffect(() => {
     if (!open) return;
@@ -74,6 +72,7 @@ export function ShortcutsPanel({ open, onClose }: ShortcutsPanelProps) {
 
       {/* Panel */}
       <div
+        ref={panelRef}
         className="relative z-10 w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl"
         role="dialog"
         aria-modal="true"

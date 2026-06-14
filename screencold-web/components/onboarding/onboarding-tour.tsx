@@ -3,6 +3,7 @@
 import * as React from "react";
 import { X, ArrowRight, ArrowLeft, Search, BarChart3, Mail } from "lucide-react";
 import { Button } from '@screencold/ui';
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 interface Step {
   title: string;
@@ -38,6 +39,7 @@ const STORAGE_KEY = "screencold-onboarding-completed";
 export function OnboardingTour() {
   const [show, setShow] = React.useState(false);
   const [currentStep, setCurrentStep] = React.useState(0);
+  const tourRef = useFocusTrap(show);
 
   React.useEffect(() => {
     const completed = localStorage.getItem(STORAGE_KEY);
@@ -82,7 +84,7 @@ export function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <div ref={tourRef} className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <span className="text-sm text-neutral-500">
             {currentStep + 1} / {steps.length}
