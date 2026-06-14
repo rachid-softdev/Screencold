@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, Trash2, Loader2 } from "lucide-react";
+import { clsx } from "clsx";
+import { User, Mail, Trash2, Loader2, Keyboard, RotateCcw } from "lucide-react";
 import { Button } from '@screencold/ui';
 import { Input } from '@screencold/ui';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@screencold/ui';
 import { useToast } from '@screencold/ui';
+import { loadShortcuts, saveShortcuts, resetShortcuts, type ShortcutEntry } from "@/lib/shortcut-config";
 
 interface UserProfile {
   id: string;
@@ -192,6 +194,9 @@ function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* Keyboard Shortcuts */}
+      <ShortcutSettingsCard />
+
       {/* Danger Zone */}
       <Card className="border-error-200">
         <CardHeader>
@@ -218,6 +223,122 @@ function SettingsPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+function ShortcutSettingsCard() {
+  const [shortcuts, setShortcuts] = React.useState<ShortcutEntry[]>([]);
+  const [recording, setRecording] = React.useState<string | null>(null);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+    setShortcuts(loadShortcuts());
+  }, []);
+
+  const startRecording = (id: string) => {
+    setRecording(id);
+  };
+
+  const handleRecord = (e: React.KeyboardEvent) => {
+    if (!recording) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const parts: string[] = [];
+    if (e.metaKey || e.ctrlKey) parts.push("mod");
+    if (e.shiftKey && e.key !== "Shift") parts.push("shift");
+    const key = e.key.toLowerCase();
+    if (!["control", "meta", "shift", "alt"].includes(key)) {
+      parts.push(key);
+      const newKeys = parts.join("+");
+      setShortcuts((prev) =>
+        prev.map((s) => (s.id === recording ? { ...s, keys: newKeys } : s))
+      );
+      setRecording(null);
+    }
+  };
+
+  const handleSave = () => {
+    saveShortcuts(shortcuts);
+    setRecording(null);
+  };
+
+  const handleReset = () => {
+    resetShortcuts();
+    setShortcuts(loadShortcuts());
+  };
+
+  const displayKey = (keys: string) => {
+    return keys
+      .replace("mod", "⌘")
+      .replace("shift", "⇧")
+      .replace(/\+/g, " + ")
+      .toUpperCase();
+  };
+
+  if (!mounted) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-info-100 text-info-600">
+            <Keyboard className="h-5 w-5" />
+          </div>
+          <div>
+            <CardTitle>Raccourcis clavier</CardTitle>
+            <CardDescription>
+              Personnalisez vos raccourcis pour accélérer votre navigation
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {shortcuts.map((sc) => (
+            <div
+              key={sc.id}
+              className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-2.5"
+            >
+              <span className="text-sm text-neutral-700">{sc.label}</span>
+              <div className="flex items-center gap-2">
+                {recording === sc.id ? (
+                  <span
+                    className="rounded-md border-2 border-info-400 bg-info-50 px-3 py-1 text-sm font-medium text-info-700"
+                    onKeyDown={handleRecord}
+                    autoFocus
+                    tabIndex={0}
+                  >
+                    Appuyez...
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => startRecording(sc.id)}
+                    className={clsx(
+                      "rounded-md border px-3 py-1 text-sm font-medium transition-colors",
+                      sc.keys !== sc.defaultKeys
+                        ? "border-warning-300 bg-warning-50 text-warning-700"
+                        : "border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300"
+                    )}
+                  >
+                    {displayKey(sc.keys)}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="secondary" size="sm" leftIcon={<RotateCcw className="h-4 w-4" />} onClick={handleReset}>
+          Réinitialiser
+        </Button>
+        <Button size="sm" onClick={handleSave}>
+          Enregistrer les raccourcis
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
 

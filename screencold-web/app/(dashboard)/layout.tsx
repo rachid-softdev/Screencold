@@ -9,6 +9,7 @@ import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { ShortcutsPanel } from "@/components/layout/shortcuts-panel";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { loadShortcuts, toShortcutDef } from "@/lib/shortcut-config";
 import { ToastProvider } from '@screencold/ui';
 
 interface DashboardLayoutProps {
@@ -23,18 +24,24 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [shortcutsPanelOpen, setShortcutsPanelOpen] = useState(false);
 
+  // Build shortcut definitions from config (supports user customization)
+  // Runs on every render so loadShortcuts picks up the latest localStorage changes
+  const shortcutDefs = loadShortcuts().map((entry) => {
+    switch (entry.id) {
+      case "command-palette": return toShortcutDef(entry, () => setCommandPaletteOpen(true));
+      case "shortcuts-panel": return toShortcutDef(entry, () => setShortcutsPanelOpen((p) => !p));
+      case "new-audit": return toShortcutDef(entry, () => router.push("/audits/new"));
+      case "new-campaign": return toShortcutDef(entry, () => router.push("/campaigns/new"));
+      case "go-dashboard": return toShortcutDef(entry, () => router.push("/dashboard"));
+      case "go-audits": return toShortcutDef(entry, () => router.push("/audits"));
+      case "go-campaigns": return toShortcutDef(entry, () => router.push("/campaigns"));
+      case "go-settings": return toShortcutDef(entry, () => router.push("/settings"));
+      default: return null;
+    }
+  }).filter(Boolean) as { key: string; meta?: boolean; shift?: boolean; leader?: string; handler: () => void; allowInInputs?: boolean }[];
+
   // Global keyboard shortcuts
-  const leaderKey = useKeyboardShortcuts([
-    { key: "k", meta: true, handler: () => setCommandPaletteOpen(true) },
-    { key: "?", handler: () => setShortcutsPanelOpen((p) => !p) },
-    { key: "n", handler: () => router.push("/audits/new") },
-    { key: "N", shift: true, handler: () => router.push("/campaigns/new") },
-    // Leader key sequences: press "g" then the target key within 600ms
-    { key: "d", leader: "g", handler: () => router.push("/dashboard") },
-    { key: "a", leader: "g", handler: () => router.push("/audits") },
-    { key: "c", leader: "g", handler: () => router.push("/campaigns") },
-    { key: "p", leader: "g", handler: () => router.push("/settings") },
-  ]);
+  const leaderKey = useKeyboardShortcuts(shortcutDefs);
 
   const handleClosePalette = useCallback(() => setCommandPaletteOpen(false), []);
   const handleCloseShortcuts = useCallback(() => setShortcutsPanelOpen(false), []);
