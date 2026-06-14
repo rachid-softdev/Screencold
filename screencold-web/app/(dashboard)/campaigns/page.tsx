@@ -97,6 +97,33 @@ function CampaignsPage() {
   const clearSelection = () => setSelectedIds(new Set());
   const [confirmDelete, setConfirmDelete] = React.useState(false);
 
+  // Keyboard shortcuts for batch actions
+  React.useEffect(() => {
+    if (!showBatchBar) return;
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      switch (e.key.toLowerCase()) {
+        case "e":
+          e.preventDefault();
+          handleBatchExport();
+          break;
+        case "delete":
+        case "backspace":
+          e.preventDefault();
+          setConfirmDelete(true);
+          break;
+        case "escape":
+          e.preventDefault();
+          clearSelection();
+          break;
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [showBatchBar]);
+
   const handleBatchExport = async () => {
     setBatchLoading(true);
     try {

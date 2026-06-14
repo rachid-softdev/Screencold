@@ -112,6 +112,39 @@ function AuditsPage() {
 
   const clearSelection = () => setSelectedIds(new Set());
   const [confirmAnalyse, setConfirmAnalyse] = React.useState(false);
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+
+  // Keyboard shortcuts for batch actions
+  React.useEffect(() => {
+    if (!showBatchBar) return;
+    const handler = (e: KeyboardEvent) => {
+      // Don't trigger if focus is in an input
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      switch (e.key.toLowerCase()) {
+        case "a":
+          e.preventDefault();
+          setConfirmAnalyse(true);
+          break;
+        case "e":
+          e.preventDefault();
+          handleBatchExport();
+          break;
+        case "delete":
+        case "backspace":
+          e.preventDefault();
+          setConfirmDelete(true);
+          break;
+        case "escape":
+          e.preventDefault();
+          clearSelection();
+          break;
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [showBatchBar]);
 
   const handleBatchAnalyse = async () => {
     setConfirmAnalyse(false);
@@ -157,8 +190,8 @@ function AuditsPage() {
   };
 
   const handleBatchDelete = async () => {
+    setConfirmDelete(false);
     const ids = [...selectedIds];
-    if (!window.confirm(`Supprimer ${ids.length} audit${ids.length > 1 ? "s" : ""} définitivement ?`)) return;
     setBatchLoading(true);
     try {
       const response = await fetch("/api/audits/batch", {
@@ -242,7 +275,7 @@ function AuditsPage() {
                 {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
                 Exporter (CSV)
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleBatchDelete} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
+              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
                 {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
                 Supprimer
               </Button>
@@ -384,6 +417,29 @@ function AuditsPage() {
           })}
         </div>
       )}
+
+      {/* Confirm Batch Delete Modal */}
+      <Modal open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-neutral-900">
+            Supprimer des audits
+          </h3>
+          <p className="mt-2 text-sm text-neutral-600">
+            Cette action va supprimer <strong>{selectedIds.size} audit{selectedIds.size > 1 ? "s" : ""}</strong> définitivement.
+          </p>
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              onClick={() => setConfirmDelete(false)}
+              className="rounded-lg px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-100"
+            >
+              Annuler
+            </button>
+            <Button onClick={handleBatchDelete} className="bg-error-600 hover:bg-error-700 text-white">
+              Supprimer
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Confirm Batch Analyse Modal */}
       <Modal open={confirmAnalyse} onClose={() => setConfirmAnalyse(false)}>
