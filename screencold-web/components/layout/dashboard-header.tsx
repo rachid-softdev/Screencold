@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Menu, Bell, User } from "lucide-react";
+import { Menu, Bell, User, HelpCircle, BookOpen, RotateCcw } from "lucide-react";
 import { Dropdown } from '@screencold/ui';
 
 interface Breadcrumb {
@@ -13,6 +13,7 @@ interface DashboardHeaderProps {
   title: string;
   breadcrumbs?: Breadcrumb[];
   onMenuClick?: () => void;
+  onRestartOnboarding?: () => void;
   userMenuItems?: Array<{
     label: string;
     onClick?: () => void;
@@ -26,6 +27,7 @@ function DashboardHeader({
   title,
   breadcrumbs = [],
   onMenuClick,
+  onRestartOnboarding,
   userMenuItems = [],
 }: DashboardHeaderProps) {
   return (
@@ -83,6 +85,35 @@ function DashboardHeader({
 
       {/* Right side */}
       <div className="flex items-center gap-2">
+        {/* Help */}
+        <Dropdown
+          trigger={
+            <button
+              className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"
+              aria-label="Aide"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </button>
+          }
+          items={[
+            {
+              label: "Aide et FAQ",
+              href: "/faq",
+              icon: <BookOpen className="h-4 w-4" />,
+            },
+            ...(onRestartOnboarding
+              ? [
+                  {
+                    label: "Revoir l'introduction",
+                    onClick: onRestartOnboarding,
+                    icon: <RotateCcw className="h-4 w-4" />,
+                  } as const,
+                ]
+              : []),
+          ]}
+          align="left"
+        />
+
         {/* Notifications */}
         <button
           className="relative rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"

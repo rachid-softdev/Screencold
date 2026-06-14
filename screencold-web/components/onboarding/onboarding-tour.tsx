@@ -46,6 +46,17 @@ export function OnboardingTour() {
     }
   }, []);
 
+  // Listen for manual restart from header help menu
+  React.useEffect(() => {
+    const handler = () => {
+      localStorage.removeItem(STORAGE_KEY);
+      setCurrentStep(0);
+      setShow(true);
+    };
+    window.addEventListener("restart-onboarding", handler);
+    return () => window.removeEventListener("restart-onboarding", handler);
+  }, []);
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep((s) => s + 1);

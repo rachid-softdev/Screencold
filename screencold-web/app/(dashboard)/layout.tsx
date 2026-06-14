@@ -39,6 +39,13 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   const handleClosePalette = useCallback(() => setCommandPaletteOpen(false), []);
   const handleCloseShortcuts = useCallback(() => setShortcutsPanelOpen(false), []);
 
+  const handleRestartOnboarding = useCallback(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("screencold-onboarding-completed");
+      window.dispatchEvent(new CustomEvent("restart-onboarding"));
+    }
+  }, []);
+
   // Show loading state while checking auth
   if (status === "loading") {
     return (
@@ -106,6 +113,7 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
           <DashboardHeader
             title=""
             onMenuClick={() => setMobileSidebarOpen(true)}
+            onRestartOnboarding={handleRestartOnboarding}
             userMenuItems={userMenuItems}
           />
           <main id="main-content" className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
