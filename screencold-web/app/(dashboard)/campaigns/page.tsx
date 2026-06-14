@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, Download, Trash2, CheckSquare } from "lucide-react";
-import { Button } from '@screencold/ui';
+import { Plus, Download, Trash2, CheckSquare, Loader2 } from "lucide-react";
+import { Button, useToast } from '@screencold/ui';
 import { CampaignList } from "@/components/campaigns/campaign-list";
 
 interface Campaign {
@@ -15,6 +15,8 @@ interface Campaign {
 }
 
 function CampaignsPage() {
+  const { addToast } = useToast();
+  const [batchLoading, setBatchLoading] = React.useState(false);
   // Mock data - replace with actual data fetching
   const [campaigns] = React.useState<Campaign[]>([
     {
@@ -72,15 +74,46 @@ function CampaignsPage() {
 
   const clearSelection = () => setSelectedIds(new Set());
 
-  const handleBatchExport = () => {
-    console.log("Batch export campaigns:", [...selectedIds]);
-    clearSelection();
+  const handleBatchExport = async () => {
+    setBatchLoading(true);
+    try {
+      const ids = [...selectedIds];
+      const response = await fetch(`/api/campaigns/export?ids=${ids.join(",")}`);
+      if (!response.ok) throw new Error("Erreur lors de l'export");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "campagnes-export.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      addToast("Export CSV téléchargé", "success");
+      clearSelection();
+    } catch (err) {
+      addToast("Une erreur est survenue lors de l'export", "error");
+    } finally {
+      setBatchLoading(false);
+    }
   };
 
-  const handleBatchDelete = () => {
-    if (!window.confirm(`Supprimer ${selectionCount} campagne${selectionCount > 1 ? "s" : ""} ?`)) return;
-    console.log("Batch delete campaigns:", [...selectedIds]);
-    clearSelection();
+  const handleBatchDelete = async () => {
+    const ids = [...selectedIds];
+    if (!window.confirm(`Supprimer ${ids.length} campagne${ids.length > 1 ? "s" : ""} définitivement ?`)) return;
+    setBatchLoading(true);
+    try {
+      const response = await fetch("/api/campaigns/batch", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ campaignIds: ids }),
+      });
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+      addToast(`${ids.length} campagne${ids.length > 1 ? "s" : ""} supprimée${ids.length > 1 ? "s" : ""}`, "success");
+      clearSelection();
+    } catch (err) {
+      addToast("Une erreur est survenue lors de la suppression", "error");
+    } finally {
+      setBatchLoading(false);
+    }
   };
 
   return (
@@ -121,12 +154,12 @@ function CampaignsPage() {
               {selectionCount} campagne{selectionCount > 1 ? "s" : ""} sélectionné{selectionCount > 1 ? "s" : ""}
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="secondary" onClick={handleBatchExport}>
-                <Download className="mr-1.5 h-4 w-4" />
+              <Button size="sm" variant="secondary" onClick={handleBatchExport} disabled={batchLoading}>
+                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
                 Exporter (CSV)
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleBatchDelete} className="text-error-600 hover:bg-error-50">
-                <Trash2 className="mr-1.5 h-4 w-4" />
+              <Button size="sm" variant="secondary" onClick={handleBatchDelete} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
+                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
                 Supprimer
               </Button>
               <button

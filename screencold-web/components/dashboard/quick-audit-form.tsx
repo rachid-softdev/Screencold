@@ -21,21 +21,30 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
   const [loading, setLoading] = useState(false);
 
   const validateUrl = (value: string): boolean => {
-    if (!value.trim()) {
-      setError("L'URL est requise");
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      setError("Veuillez entrer une URL");
+      return false;
+    }
+
+    // Check for obvious typos (no dots, no TLD)
+    if (!trimmed.includes(".") && !trimmed.includes("://")) {
+      setError("L'URL doit contenir un nom de domaine (ex : www.exemple.com)");
       return false;
     }
 
     try {
-      const parsedUrl = new URL(value.startsWith("http") ? value : `https://${value}`);
+      const normalized = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+      const parsedUrl = new URL(normalized);
       if (!parsedUrl.hostname.includes(".")) {
-        setError("URL invalide");
+        setError("Le nom de domaine semble incomplet (ex : www.exemple.com)");
         return false;
       }
       setError("");
       return true;
     } catch {
-      setError("URL invalide");
+      setError("Format d'URL incorrect. Vérifiez la saisie (ex : www.exemple.com)");
       return false;
     }
   };

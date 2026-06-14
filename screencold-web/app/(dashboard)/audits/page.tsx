@@ -4,10 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Filter, Search, BarChart3, ArrowRight, Download, Trash2, CheckSquare } from "lucide-react";
-import { Button } from '@screencold/ui';
-import { Badge } from '@screencold/ui';
-import { Input } from '@screencold/ui';
+import { Button, Badge, Input, useToast } from '@screencold/ui';
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 interface Audit {
   id: string;
@@ -23,11 +22,13 @@ interface Audit {
 
 function AuditsPage() {
   const router = useRouter();
+  const { addToast } = useToast();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [audits, setAudits] = React.useState<Audit[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [total, setTotal] = React.useState(0);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+  const [batchLoading, setBatchLoading] = React.useState(false);
 
   const fetchAudits = async (page = 1) => {
     setIsLoading(true);
@@ -104,21 +105,66 @@ function AuditsPage() {
   const clearSelection = () => setSelectedIds(new Set());
 
   const handleBatchAnalyse = async () => {
-    // Placeholder: trigger re-audit for selected items
-    console.log("Batch analyse:", [...selectedIds]);
-    clearSelection();
+    setBatchLoading(true);
+    try {
+      const ids = [...selectedIds];
+      const response = await fetch("/api/audits/batch/analyse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auditIds: ids }),
+      });
+      if (!response.ok) throw new Error("Erreur lors de l'analyse");
+      addToast(`${ids.length} audit${ids.length > 1 ? "s" : ""} analysé${ids.length > 1 ? "s" : ""} avec succès`, "success");
+      clearSelection();
+      await fetchAudits();
+    } catch (err) {
+      addToast("Une erreur est survenue lors de l'analyse", "error");
+    } finally {
+      setBatchLoading(false);
+    }
   };
 
   const handleBatchExport = async () => {
-    // Placeholder: export selected audits as CSV
-    console.log("Batch export CSV:", [...selectedIds]);
-    clearSelection();
+    setBatchLoading(true);
+    try {
+      const ids = [...selectedIds];
+      const response = await fetch(`/api/audits/export?ids=${ids.join(",")}`);
+      if (!response.ok) throw new Error("Erreur lors de l'export");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "audits-export.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      addToast("Export CSV téléchargé", "success");
+      clearSelection();
+    } catch (err) {
+      addToast("Une erreur est survenue lors de l'export", "error");
+    } finally {
+      setBatchLoading(false);
+    }
   };
 
   const handleBatchDelete = async () => {
-    if (!window.confirm(`Supprimer ${selectionCount} audit${selectionCount > 1 ? "s" : ""} ?`)) return;
-    console.log("Batch delete:", [...selectedIds]);
-    clearSelection();
+    const ids = [...selectedIds];
+    if (!window.confirm(`Supprimer ${ids.length} audit${ids.length > 1 ? "s" : ""} définitivement ?`)) return;
+    setBatchLoading(true);
+    try {
+      const response = await fetch("/api/audits/batch", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auditIds: ids }),
+      });
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+      addToast(`${ids.length} audit${ids.length > 1 ? "s" : ""} supprimé${ids.length > 1 ? "s" : ""}`, "success");
+      clearSelection();
+      await fetchAudits();
+    } catch (err) {
+      addToast("Une erreur est survenue lors de la suppression", "error");
+    } finally {
+      setBatchLoading(false);
+    }
   };
 
   // Handle card click: navigate to audit detail
@@ -181,16 +227,16 @@ function AuditsPage() {
               {selectionCount} audit{selectionCount > 1 ? "s" : ""} sélectionné{selectionCount > 1 ? "s" : ""}
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="secondary" onClick={handleBatchAnalyse}>
-                <BarChart3 className="mr-1.5 h-4 w-4" />
+              <Button size="sm" variant="secondary" onClick={handleBatchAnalyse} disabled={batchLoading}>
+                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <BarChart3 className="mr-1.5 h-4 w-4" />}
                 Analyser
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleBatchExport}>
-                <Download className="mr-1.5 h-4 w-4" />
+              <Button size="sm" variant="secondary" onClick={handleBatchExport} disabled={batchLoading}>
+                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
                 Exporter (CSV)
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleBatchDelete} className="text-error-600 hover:bg-error-50">
-                <Trash2 className="mr-1.5 h-4 w-4" />
+              <Button size="sm" variant="secondary" onClick={handleBatchDelete} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
+                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
                 Supprimer
               </Button>
               <button

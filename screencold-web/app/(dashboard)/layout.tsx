@@ -29,6 +29,11 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
     { key: "?", handler: () => setShortcutsPanelOpen((p) => !p) },
     { key: "n", handler: () => router.push("/audits/new") },
     { key: "N", shift: true, handler: () => router.push("/campaigns/new") },
+    // Leader key sequences: press "g" then the target key within 600ms
+    { key: "d", leader: "g", handler: () => router.push("/dashboard") },
+    { key: "a", leader: "g", handler: () => router.push("/audits") },
+    { key: "c", leader: "g", handler: () => router.push("/campaigns") },
+    { key: "p", leader: "g", handler: () => router.push("/settings") },
   ]);
 
   const handleClosePalette = useCallback(() => setCommandPaletteOpen(false), []);
