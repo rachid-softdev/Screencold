@@ -110,7 +110,7 @@ function QuickAuditForm({ onSubmit, disabled }: QuickAuditFormProps) {
               />
             </div>
             {error && (
-              <p className="mt-1.5 text-sm text-warning-200">{error}</p>
+              <p className="mt-1.5 text-sm text-warning-100">{error}</p>
             )}
           </div>
 

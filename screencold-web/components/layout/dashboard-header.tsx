@@ -37,7 +37,7 @@ function DashboardHeader({
         {onMenuClick && (
           <button
             onClick={onMenuClick}
-            className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 lg:hidden"
+            className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info-500 focus-visible:ring-offset-2 lg:hidden"
             aria-label="Menu"
           >
             <Menu className="h-5 w-5" />
@@ -89,7 +89,7 @@ function DashboardHeader({
         <Dropdown
           trigger={
             <button
-              className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"
+              className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info-500 focus-visible:ring-offset-2"
               aria-label="Aide"
             >
               <HelpCircle className="h-5 w-5" />
@@ -116,7 +116,7 @@ function DashboardHeader({
 
         {/* Notifications */}
         <button
-          className="relative rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"
+          className="relative rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info-500 focus-visible:ring-offset-2"
           aria-label="Notifications"
         >
           <Bell className="h-5 w-5" />
@@ -126,7 +126,10 @@ function DashboardHeader({
         {/* User Menu */}
         <Dropdown
           trigger={
-            <button className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-200 text-neutral-600 hover:bg-neutral-300 transition-colors">
+            <button
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-200 text-neutral-600 hover:bg-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info-500 focus-visible:ring-offset-2 transition-colors"
+              aria-label="Menu utilisateur"
+            >
               <User className="h-4 w-4" />
             </button>
           }
