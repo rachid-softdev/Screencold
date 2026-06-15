@@ -28,7 +28,10 @@ const ScoreBadge = memo(function ScoreBadge({ score }: { score: number | null | 
   const variant =
     score >= 70 ? "success" : score >= 40 ? "warning" : "destructive";
 
-  return <Badge variant={variant}>{score}/100</Badge>;
+  const label =
+    score >= 70 ? `Bon : ${score}/100` : score >= 40 ? `Moyen : ${score}/100` : `Faible : ${score}/100`;
+
+  return <Badge variant={variant}>{label}</Badge>;
 });
 
 // Simple date formatter - no need for memoization as it's just string manipulation

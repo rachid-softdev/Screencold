@@ -84,7 +84,7 @@ function DashboardSidebar({ user, collapsed = false, onToggle, onOpenShortcuts }
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-neutral-100 px-4">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-info-600 to-info-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-600">
             <svg
               viewBox="0 0 24 24"
               className="h-5 w-5 text-white"

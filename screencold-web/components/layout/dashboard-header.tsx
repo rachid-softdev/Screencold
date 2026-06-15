@@ -115,13 +115,23 @@ function DashboardHeader({
         />
 
         {/* Notifications */}
-        <button
-          className="relative rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info-500 focus-visible:ring-offset-2"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-error-500" />
-        </button>
+        <Dropdown
+          trigger={
+            <button
+              className="relative rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info-500 focus-visible:ring-offset-2"
+              aria-label="Notifications"
+            >
+              <Bell className="h-5 w-5" />
+            </button>
+          }
+          items={[
+            {
+              label: "Aucune notification pour le moment",
+              disabled: true,
+            },
+          ]}
+          align="left"
+        />
 
         {/* User Menu */}
         <Dropdown

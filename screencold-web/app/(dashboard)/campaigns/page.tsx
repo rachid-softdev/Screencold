@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Plus, Download, Trash2, CheckSquare, Loader2 } from "lucide-react";
-import { Button, Modal, useToast } from '@screencold/ui';
+import { Plus, Download, Trash2, CheckSquare, Loader2, Search } from "lucide-react";
+import { Button, Input, Modal, useToast } from '@screencold/ui';
 import { CampaignList } from "@/components/campaigns/campaign-list";
 
 interface Campaign {
@@ -30,10 +30,12 @@ interface ApiCampaign {
 
 function CampaignsPage() {
   const { addToast } = useToast();
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [campaigns, setCampaigns] = React.useState<Campaign[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [batchLoading, setBatchLoading] = React.useState(false);
+  const [exportLoading, setExportLoading] = React.useState(false);
+  const [deleteLoading, setDeleteLoading] = React.useState(false);
 
   const fetchCampaigns = React.useCallback(async () => {
     try {
@@ -63,9 +65,19 @@ function CampaignsPage() {
   }, [fetchCampaigns]);
 
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
-  const allSelected = campaigns.length > 0 && campaigns.every((c) => selectedIds.has(c.id));
   const selectionCount = selectedIds.size;
   const showBatchBar = selectionCount > 0;
+
+  const filteredCampaigns = React.useMemo(() => {
+    if (!searchQuery.trim()) return campaigns;
+    const q = searchQuery.toLowerCase();
+    return campaigns.filter((c) =>
+      c.name.toLowerCase().includes(q)
+    );
+  }, [campaigns, searchQuery]);
+
+  const selectableCampaigns = searchQuery.trim() ? filteredCampaigns : campaigns;
+  const allSelected = selectableCampaigns.length > 0 && selectableCampaigns.every((c) => selectedIds.has(c.id));
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -80,13 +92,13 @@ function CampaignsPage() {
     if (allSelected) {
       setSelectedIds((prev) => {
         const next = new Set(prev);
-        for (const c of campaigns) next.delete(c.id);
+        for (const c of selectableCampaigns) next.delete(c.id);
         return next;
       });
     } else {
       setSelectedIds((prev) => {
         const next = new Set(prev);
-        for (const c of campaigns) next.add(c.id);
+        for (const c of selectableCampaigns) next.add(c.id);
         return next;
       });
     }
@@ -96,7 +108,7 @@ function CampaignsPage() {
   const [confirmDelete, setConfirmDelete] = React.useState(false);
 
   const handleBatchExport = async () => {
-    setBatchLoading(true);
+    setExportLoading(true);
     try {
       const ids = [...selectedIds];
       const response = await fetch(`/api/campaigns/export?ids=${ids.join(",")}`);
@@ -113,14 +125,14 @@ function CampaignsPage() {
     } catch (err) {
       addToast("Une erreur est survenue lors de l'export", "error");
     } finally {
-      setBatchLoading(false);
+      setExportLoading(false);
     }
   };
 
   const handleBatchDelete = async () => {
     setConfirmDelete(false);
     const ids = [...selectedIds];
-    setBatchLoading(true);
+    setDeleteLoading(true);
     try {
       const response = await fetch("/api/campaigns/batch", {
         method: "DELETE",
@@ -134,13 +146,14 @@ function CampaignsPage() {
     } catch (err) {
       addToast("Une erreur est survenue lors de la suppression", "error");
     } finally {
-      setBatchLoading(false);
+      setDeleteLoading(false);
     }
   };
 
   // Refs to avoid stale closures in keyboard handler
-  const batchLoadingRef = React.useRef(batchLoading);
-  batchLoadingRef.current = batchLoading;
+  const anyBatchLoading = exportLoading || deleteLoading;
+  const batchLoadingRef = React.useRef(anyBatchLoading);
+  batchLoadingRef.current = anyBatchLoading;
   const actionsRef = React.useRef({ handleBatchExport, clearSelection, handleBatchDelete });
   actionsRef.current = { handleBatchExport, clearSelection, handleBatchDelete };
 
@@ -210,12 +223,12 @@ function CampaignsPage() {
               {selectionCount} campagne{selectionCount > 1 ? "s" : ""} sélectionné{selectionCount > 1 ? "s" : ""}
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="secondary" onClick={handleBatchExport} disabled={batchLoading}>
-                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
+              <Button size="sm" variant="secondary" onClick={handleBatchExport} disabled={anyBatchLoading}>
+                {exportLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
                 Exporter (CSV)
               </Button>
-              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
-                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
+              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)} disabled={anyBatchLoading} className="text-error-600 hover:bg-error-50">
+                {deleteLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
                 Supprimer
               </Button>
               <button
@@ -225,6 +238,22 @@ function CampaignsPage() {
                 Annuler
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search */}
+      {!loading && !error && campaigns.length > 0 && (
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+            <Input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher une campagne..."
+              className="pl-10"
+            />
           </div>
         </div>
       )}
@@ -257,7 +286,7 @@ function CampaignsPage() {
       ) : (
         /* Campaign List */
         <CampaignList
-          campaigns={campaigns}
+          campaigns={filteredCampaigns}
           selectedIds={selectedIds}
           onToggleSelect={toggleSelect}
         />

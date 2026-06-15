@@ -27,13 +27,19 @@ function AuditsPage() {
   const [audits, setAudits] = React.useState<Audit[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [total, setTotal] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
-  const [batchLoading, setBatchLoading] = React.useState(false);
+  const [analyseLoading, setAnalyseLoading] = React.useState(false);
+  const [exportLoading, setExportLoading] = React.useState(false);
+  const [deleteLoading, setDeleteLoading] = React.useState(false);
 
-  const fetchAudits = async (page = 1) => {
+  const limit = 20;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  const fetchAudits = React.useCallback(async (p: number) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/audits?page=${page}&limit=20`);
+      const response = await fetch(`/api/audits?page=${p}&limit=${limit}`);
       if (!response.ok) throw new Error("Failed to fetch");
       const data = await response.json();
       setAudits(data.audits);
@@ -44,11 +50,11 @@ function AuditsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [addToast]);
 
   React.useEffect(() => {
-    fetchAudits();
-  }, []);
+    fetchAudits(page);
+  }, [page, fetchAudits]);
 
   const filteredAudits = audits.filter((audit) =>
     audit.companyName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -117,8 +123,9 @@ function AuditsPage() {
   // Refs for keyboard handler to avoid stale closures
   const selectedIdsRef = React.useRef(selectedIds);
   selectedIdsRef.current = selectedIds;
-  const batchLoadingRef = React.useRef(batchLoading);
-  batchLoadingRef.current = batchLoading;
+  const anyBatchLoading = analyseLoading || exportLoading || deleteLoading;
+  const anyBatchLoadingRef = React.useRef(anyBatchLoading);
+  anyBatchLoadingRef.current = anyBatchLoading;
 
   // Keyboard shortcuts for batch actions
   React.useEffect(() => {
@@ -126,7 +133,7 @@ function AuditsPage() {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (batchLoadingRef.current) return;
+      if (anyBatchLoadingRef.current) return;
 
       switch (e.key.toLowerCase()) {
         case "a":
@@ -157,7 +164,7 @@ function AuditsPage() {
 
   const handleBatchAnalyse = async () => {
     setConfirmAnalyse(false);
-    setBatchLoading(true);
+    setAnalyseLoading(true);
     try {
       const ids = [...selectedIds];
       const response = await fetch("/api/audits/batch/analyse", {
@@ -168,16 +175,16 @@ function AuditsPage() {
       if (!response.ok) throw new Error("Erreur lors de l'analyse");
       addToast(`${ids.length} audit${ids.length > 1 ? "s" : ""} analysé${ids.length > 1 ? "s" : ""} avec succès`, "success");
       clearSelection();
-      await fetchAudits();
+      await fetchAudits(page);
     } catch (err) {
       addToast("Une erreur est survenue lors de l'analyse", "error");
     } finally {
-      setBatchLoading(false);
+      setAnalyseLoading(false);
     }
   };
 
   const handleBatchExport = async () => {
-    setBatchLoading(true);
+    setExportLoading(true);
     try {
       const ids = [...selectedIds];
       const response = await fetch(`/api/audits/export?ids=${ids.join(",")}`);
@@ -194,14 +201,14 @@ function AuditsPage() {
     } catch (err) {
       addToast("Une erreur est survenue lors de l'export", "error");
     } finally {
-      setBatchLoading(false);
+      setExportLoading(false);
     }
   };
 
   const handleBatchDelete = async () => {
     setConfirmDelete(false);
     const ids = [...selectedIds];
-    setBatchLoading(true);
+    setDeleteLoading(true);
     try {
       const response = await fetch("/api/audits/batch", {
         method: "DELETE",
@@ -211,11 +218,11 @@ function AuditsPage() {
       if (!response.ok) throw new Error("Erreur lors de la suppression");
       addToast(`${ids.length} audit${ids.length > 1 ? "s" : ""} supprimé${ids.length > 1 ? "s" : ""}`, "success");
       clearSelection();
-      await fetchAudits();
+      await fetchAudits(page);
     } catch (err) {
       addToast("Une erreur est survenue lors de la suppression", "error");
     } finally {
-      setBatchLoading(false);
+      setDeleteLoading(false);
     }
   };
 
@@ -276,16 +283,16 @@ function AuditsPage() {
               {selectionCount} audit{selectionCount > 1 ? "s" : ""} sélectionné{selectionCount > 1 ? "s" : ""}
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="secondary" onClick={() => setConfirmAnalyse(true)} disabled={batchLoading}>
-                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <BarChart3 className="mr-1.5 h-4 w-4" />}
+              <Button size="sm" variant="secondary" onClick={() => setConfirmAnalyse(true)} disabled={anyBatchLoading}>
+                {analyseLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <BarChart3 className="mr-1.5 h-4 w-4" />}
                 Analyser
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleBatchExport} disabled={batchLoading}>
-                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
+              <Button size="sm" variant="secondary" onClick={handleBatchExport} disabled={anyBatchLoading}>
+                {exportLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Download className="mr-1.5 h-4 w-4" />}
                 Exporter (CSV)
               </Button>
-              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)} disabled={batchLoading} className="text-error-600 hover:bg-error-50">
-                {batchLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
+              <Button size="sm" variant="secondary" onClick={() => setConfirmDelete(true)} disabled={anyBatchLoading} className="text-error-600 hover:bg-error-50">
+                {deleteLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Trash2 className="mr-1.5 h-4 w-4" />}
                 Supprimer
               </Button>
               <button
@@ -424,6 +431,31 @@ function AuditsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {total > limit && (
+        <div className="flex items-center justify-between border-t border-neutral-200 pt-4">
+          <p className="text-sm text-neutral-500">
+            Page {page} sur {totalPages} · {total} audit{total !== 1 ? "s" : ""}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1 || isLoading}
+              className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ← Précédent
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages || isLoading}
+              className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Suivant →
+            </button>
+          </div>
         </div>
       )}
 
