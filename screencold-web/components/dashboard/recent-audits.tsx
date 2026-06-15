@@ -22,7 +22,7 @@ interface RecentAuditsProps {
 
 const ScoreBadge = memo(function ScoreBadge({ score }: { score: number | null | undefined }) {
   if (score === null || score === undefined) {
-    return <Badge variant="outline">En attente</Badge>;
+    return <Badge variant="outline">En cours</Badge>;
   }
 
   const variant =

@@ -52,6 +52,14 @@ function AuditsPage() {
     }
   }, [addToast]);
 
+  // Clamp page when total changes (e.g., after batch delete drops below current page)
+  React.useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(total / limit));
+    if (page > maxPage) {
+      setPage(maxPage);
+    }
+  }, [total]); // eslint-disable-line react-hooks/exhaustive-deps
+
   React.useEffect(() => {
     fetchAudits(page);
   }, [page, fetchAudits]);
