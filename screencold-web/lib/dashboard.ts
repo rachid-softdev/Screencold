@@ -1,10 +1,11 @@
 import prisma from './prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './auth';
+import type { Session } from "next-auth";
 
 // Parallel fetch for dashboard data - eliminates waterfall
 export async function getDashboardData() {
-  const session = await getServerSession(authOptions);
+  const session = (await getServerSession(authOptions)) as Session | null;
   
   if (!session?.user?.id) {
     return null;

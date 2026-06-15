@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { getStripePriceId } from '@/lib/plans';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil',
+  apiVersion: '2025-04-30.basil' as any,
 });
 
 const PLAN_CREDITS: Record<string, { credits: number }> = {

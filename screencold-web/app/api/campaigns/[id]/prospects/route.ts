@@ -198,15 +198,15 @@ export async function POST(
     const { csv } = validationResult.data;
 
     // Parse CSV
-    const parseResult = Papa.parse<CSVRow>(csv, {
+    const parseResult = Papa.parse(csv, {
       header: true,
       skipEmptyLines: true,
-      transformHeader: (header) => header.trim().toLowerCase(),
-    });
+      transformHeader: (header: string) => header.trim().toLowerCase(),
+    }) as unknown as { data: CSVRow[]; errors: { type: string; message: string }[] };
 
     if (parseResult.errors.length > 0) {
       const criticalErrors = parseResult.errors.filter(
-        (e) => e.type === 'Quotes' || e.type === 'FieldMismatch'
+        (e: { type: string }) => e.type === 'Quotes' || e.type === 'FieldMismatch'
       );
 
       if (criticalErrors.length > 0) {
@@ -214,7 +214,7 @@ export async function POST(
           {
             error: 'CSV_PARSE_ERROR',
             message: 'Erreur lors du parsing du CSV',
-            details: criticalErrors.map((e) => e.message),
+            details: criticalErrors.map((e: { message: string }) => e.message),
           },
           { status: 400 }
         );

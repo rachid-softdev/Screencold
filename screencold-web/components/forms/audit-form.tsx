@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
-import { Building2, User, Mail, Globe, ArrowRight } from "lucide-react";
+import { Globe, ArrowRight } from "lucide-react";
 import { Button } from '@screencold/ui';
 import { Input } from '@screencold/ui';
 import { useToast } from '@screencold/ui';
@@ -170,7 +170,6 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
         value={formData.companyName}
         onChange={handleChange("companyName")}
         placeholder="Nom de l'entreprise (optionnel)"
-        leftIcon={<Building2 className="h-4 w-4" />}
       />
 
       {/* Contact Name */}
@@ -179,7 +178,6 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
         value={formData.contactName}
         onChange={handleChange("contactName")}
         placeholder="Nom du contact (optionnel)"
-        leftIcon={<User className="h-4 w-4" />}
       />
 
       {/* Contact Email */}
@@ -189,7 +187,6 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
         onChange={handleChange("contactEmail")}
         placeholder="Email du contact (optionnel)"
         error={errors.contactEmail}
-        leftIcon={<Mail className="h-4 w-4" />}
       />
 
       {/* Agency Type */}

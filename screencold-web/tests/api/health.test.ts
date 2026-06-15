@@ -9,6 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // ============================================
 // Mocks
@@ -72,10 +73,10 @@ describe('Health Check API', () => {
 
       // Import the route handler dynamically
       const { GET } = await import('@/app/api/health/route');
-      const request = { url: 'http://localhost:3000/api/health' } as Request;
+      const request = new NextRequest('http://localhost:3000/api/health');
 
       // Act
-      const response = await GET(request as never);
+      const response = await GET(request);
       const body = await response.json();
 
       // Assert
@@ -97,10 +98,10 @@ describe('Health Check API', () => {
       mockPrisma.$queryRaw.mockRejectedValue(new Error('Connection refused'));
 
       const { GET } = await import('@/app/api/health/route');
-      const request = { url: 'http://localhost:3000/api/health' } as Request;
+      const request = new NextRequest('http://localhost:3000/api/health');
 
       // Act
-      const response = await GET(request as never);
+      const response = await GET(request);
       const body = await response.json();
 
       // Assert
@@ -116,7 +117,7 @@ describe('Health Check API', () => {
       const { GET } = await import('@/app/api/health/route');
 
       // Act
-      const response = await GET({ url: 'http://localhost:3000/api/health' } as Request);
+      const response = await GET(new NextRequest('http://localhost:3000/api/health'));
       const body = await response.json();
 
       // Assert - check response shape
@@ -139,7 +140,7 @@ describe('Health Check API', () => {
       const { GET: GET2 } = await import('@/app/api/health/route');
 
       // Act
-      const response = await GET2({ url: 'http://localhost:3000/api/health' } as Request);
+      const response = await GET2(new NextRequest('http://localhost:3000/api/health'));
       const body = await response.json();
 
       // Assert

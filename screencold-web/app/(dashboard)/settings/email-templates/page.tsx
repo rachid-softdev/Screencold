@@ -231,7 +231,7 @@ function EmailTemplatesPage() {
                       </Badge>
                     )}
                     {template.userId === null && (
-                      <Badge variant="secondary">Global</Badge>
+                      <Badge variant="outline">Global</Badge>
                     )}
                     {!template.isActive && (
                       <Badge variant="outline">Inactif</Badge>
@@ -305,7 +305,7 @@ function EmailTemplatesPage() {
 
       {/* Create/Edit Modal */}
       <Modal
-        isOpen={isModalOpen}
+        open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingTemplate ? "Modifier le template" : "Nouveau template"}
         size="lg"

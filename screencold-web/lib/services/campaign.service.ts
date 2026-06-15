@@ -1,9 +1,12 @@
-import { campaignRepository } from '@/lib/repositories/campaign.repository';
-import { prospectRepository } from '@/lib/repositories/prospect.repository';
+import { CampaignRepository } from '@/lib/repositories/campaign.repository';
+import { ProspectRepository } from '@/lib/repositories/prospect.repository';
 import { createLogger } from '@/lib/logger';
 import type { Campaign, Prospect } from '@prisma/client';
 
 const logger = createLogger({ module: 'campaign-service' });
+
+const campaignRepository = new CampaignRepository();
+const prospectRepository = new ProspectRepository();
 
 export interface CreateCampaignInput {
   name: string;

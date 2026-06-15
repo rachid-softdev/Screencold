@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import { resetCreditsForAllPlans } from '../lib/credits';
-import { createLogger } from '../lib/logger';
+import { resetCreditsForAllPlans } from '../credits';
+import { createLogger } from '../logger';
 
 const logger = createLogger({ module: 'credit-reset-cron' });
 

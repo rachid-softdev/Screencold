@@ -9,14 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@screencold/ui';
 import { Badge } from '@screencold/ui';
 import { useToast } from '@screencold/ui';
 
-interface Integration {
-  id: string;
-  type: string;
-  status: string;
-  createdAt: string;
-  lastSyncAt: string | null;
-}
-
 function IntegrationsPage() {
   const searchParams = useSearchParams();
   const { addToast } = useToast();
@@ -154,7 +146,7 @@ function IntegrationsPage() {
                 directement depuis votre boîte mail.
               </p>
               <div className="mt-2 flex items-center gap-2">
-                <Badge variant={gmailConnected ? "success" : "secondary"}>
+                <Badge variant={gmailConnected ? "success" : "outline"}>
                   {gmailConnected ? "Connecté" : "Non connecté"}
                 </Badge>
               </div>

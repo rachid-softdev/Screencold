@@ -133,10 +133,11 @@ export async function getInvoices(
   customerId: string,
   limit = 10
 ): Promise<Stripe.Invoice[]> {
-  return await stripe.invoices.list({
+  const result = await stripe.invoices.list({
     customer: customerId,
     limit,
   });
+  return result.data;
 }
 
 // Create refund

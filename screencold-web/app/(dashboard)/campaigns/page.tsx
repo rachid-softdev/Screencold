@@ -35,34 +35,32 @@ function CampaignsPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [batchLoading, setBatchLoading] = React.useState(false);
 
+  const fetchCampaigns = React.useCallback(async () => {
+    try {
+      setError(null);
+      const res = await fetch("/api/campaigns");
+      if (!res.ok) throw new Error("Une erreur est survenue lors du chargement");
+      const json = await res.json();
+      const list: ApiCampaign[] = json.data ?? json.campaigns ?? [];
+      setCampaigns(
+        list.map((c) => ({
+          id: c.id,
+          name: c.name,
+          prospectCount: c.stats.total,
+          doneCount: c.stats.done,
+          createdAt: c.createdAt,
+        }))
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erreur de chargement";
+      setError(msg);
+    }
+  }, []);
+
   React.useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch("/api/campaigns");
-        if (!res.ok) throw new Error("Une erreur est survenue lors du chargement");
-        const json = await res.json();
-        const list: ApiCampaign[] = json.data ?? json.campaigns ?? [];
-        setCampaigns(
-          list.map((c) => ({
-            id: c.id,
-            name: c.name,
-            prospectCount: c.stats.total,
-            doneCount: c.stats.done,
-            createdAt: c.createdAt,
-          }))
-        );
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Erreur de chargement";
-        setError(msg);
-        addToast(msg, "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCampaigns();
-  }, [addToast]);
+    setLoading(true);
+    fetchCampaigns().finally(() => setLoading(false));
+  }, [fetchCampaigns]);
 
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const allSelected = campaigns.length > 0 && campaigns.every((c) => selectedIds.has(c.id));
@@ -96,33 +94,6 @@ function CampaignsPage() {
 
   const clearSelection = () => setSelectedIds(new Set());
   const [confirmDelete, setConfirmDelete] = React.useState(false);
-
-  // Keyboard shortcuts for batch actions
-  React.useEffect(() => {
-    if (!showBatchBar) return;
-    const handler = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-
-      switch (e.key.toLowerCase()) {
-        case "e":
-          e.preventDefault();
-          handleBatchExport();
-          break;
-        case "delete":
-        case "backspace":
-          e.preventDefault();
-          setConfirmDelete(true);
-          break;
-        case "escape":
-          e.preventDefault();
-          clearSelection();
-          break;
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [showBatchBar]);
 
   const handleBatchExport = async () => {
     setBatchLoading(true);
@@ -159,12 +130,47 @@ function CampaignsPage() {
       if (!response.ok) throw new Error("Erreur lors de la suppression");
       addToast(`${ids.length} campagne${ids.length > 1 ? "s" : ""} supprimée${ids.length > 1 ? "s" : ""}`, "success");
       clearSelection();
+      await fetchCampaigns();
     } catch (err) {
       addToast("Une erreur est survenue lors de la suppression", "error");
     } finally {
       setBatchLoading(false);
     }
   };
+
+  // Refs to avoid stale closures in keyboard handler
+  const batchLoadingRef = React.useRef(batchLoading);
+  batchLoadingRef.current = batchLoading;
+  const actionsRef = React.useRef({ handleBatchExport, clearSelection, handleBatchDelete });
+  actionsRef.current = { handleBatchExport, clearSelection, handleBatchDelete };
+
+  // Keyboard shortcuts for batch actions
+  React.useEffect(() => {
+    if (!showBatchBar) return;
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (batchLoadingRef.current) return;
+
+      switch (e.key.toLowerCase()) {
+        case "e":
+          e.preventDefault();
+          actionsRef.current.handleBatchExport();
+          break;
+        case "delete":
+        case "backspace":
+          e.preventDefault();
+          setConfirmDelete(true);
+          break;
+        case "escape":
+          e.preventDefault();
+          actionsRef.current.clearSelection();
+          break;
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [showBatchBar]);
 
   return (
     <div className="space-y-6">

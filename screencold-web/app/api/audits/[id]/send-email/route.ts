@@ -140,7 +140,7 @@ export async function POST(
         subject,
         body: fullBody,
         status: 'SENT',
-        messageId: result.messageId,
+        messageId: (result as { messageId?: string }).messageId ?? null,
         sentAt: new Date(),
       },
     });

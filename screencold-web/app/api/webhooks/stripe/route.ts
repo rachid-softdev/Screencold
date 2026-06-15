@@ -6,7 +6,7 @@ import { ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 import { PrismaEntitlementRepository } from '@/lib/entitlements/repository';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil',
+  apiVersion: '2025-04-30.basil' as any,
 });
 
 export async function POST(req: NextRequest) {
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       event.type === 'invoice.payment_failed'
     ) {
       await ensureEntitlementsInitialized();
-      const repo = new PrismaEntitlementRepository(prisma);
+      const repo = new PrismaEntitlementRepository(prisma as any);
       const result = await handleStripeWebhook(repo, body, signature);
 
       if (!result.success) {

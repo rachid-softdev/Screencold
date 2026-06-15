@@ -1,4 +1,4 @@
-import type { DowngradeStrategy, DowngradePreview } from '@screencold/types';
+import type { DowngradeStrategy as _DowngradeStrategy, DowngradePreview } from '@screencold/types';
 import { IEntitlementRepository } from './repository';
 import { getFeatureGateService } from './service';
 
@@ -82,7 +82,7 @@ export class DowngradeService {
       }
 
       // Only include if there's a change
-      if (currentAccess !== postDowngradeAccess || currentLimit !== postDowngradeAccess) {
+      if (currentAccess !== postDowngradeAccess || currentLimit !== (postDowngradeAccess as unknown as number | null)) {
         previews.push({
           featureKey: feature.key,
           currentAccess: feature.type === 'LIMIT' ? currentLimit : currentAccess,

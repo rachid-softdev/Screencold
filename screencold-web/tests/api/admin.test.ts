@@ -13,6 +13,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // ============================================
 // Mocks
@@ -115,8 +116,8 @@ import { requireAdmin, AuthError } from '@/lib/auth/require-admin';
 // Helpers
 // ============================================
 
-function createRequest(method: string, url: string, body?: unknown): Request {
-  return new Request(url, {
+function createRequest(method: string, url: string, body?: unknown): NextRequest {
+  return new NextRequest(url, {
     method,
     headers: { 'content-type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
@@ -136,7 +137,7 @@ function setupAdminForbidden() {
 }
 
 function setupEntitlementsMocks() {
-  mockEnsureEntitlementsInitialized.mockResolvedValue();
+  mockEnsureEntitlementsInitialized.mockResolvedValue(undefined);
   mockGetFeatureGateService.mockReturnValue({
     reloadStaticData: vi.fn().mockResolvedValue(undefined),
     invalidateCache: vi.fn().mockResolvedValue(undefined),

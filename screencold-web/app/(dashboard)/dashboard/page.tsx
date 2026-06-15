@@ -46,14 +46,14 @@ export default async function DashboardPage({}: PageProps) {
     {
       title: 'Total audits',
       value: stats.totalAudits.toString(),
-      change: null,
+      change: undefined,
       icon: <TrendingUp className="h-5 w-5" />,
       variant: 'success' as const,
     },
     {
       title: 'Crédits utilisés',
       value: stats.creditsUsed.toString(),
-      change: null,
+      change: undefined,
       icon: <Zap className="h-5 w-5" />,
       variant: 'warning' as const,
     },

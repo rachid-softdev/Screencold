@@ -155,7 +155,7 @@ export async function listFilesInS3(
   });
 
   const response = await s3Client.send(command);
-  return response.Contents?.map((obj) => obj.Key ?? "") ?? [];
+  return response.Contents?.map((obj: any) => obj.Key ?? "") ?? [];
 }
 
 // Copy file within S3

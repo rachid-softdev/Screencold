@@ -243,7 +243,7 @@ export async function apiMiddleware(
       user: {
         id: token.id as string,
         email: token.email as string,
-        name: token.name,
+        name: (token.name as string | null) ?? null,
         plan: token.plan as string,
         credits: token.credits as number,
       },
@@ -284,14 +284,12 @@ export function getResponseHeaders(): Record<string, string> {
 // Main Middleware Handler (Next.js App Router)
 // ============================================
 
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/pricing', '/api/auth', '/api/health'];
 const API_ROUTES = ['/api/'];
 
 export async function middleware(request: NextRequest): Promise<NextResponse | undefined> {
   const { pathname } = request.nextUrl;
 
   const isApiRoute = API_ROUTES.some((prefix) => pathname.startsWith(prefix));
-  const isPublicRoute = PUBLIC_ROUTES.some((prefix) => pathname.startsWith(prefix));
 
   // Detect API version and apply versioning
   const version = getRequestVersion(request);

@@ -18,12 +18,12 @@ function CreditCounter({ credits, plan, maxCredits }: CreditCounterProps) {
   const isLow = credits < 5;
 
   useEffect(() => {
-    if (displayCredits !== credits) {
-      const timer = setTimeout(() => {
-        setDisplayCredits(credits);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
+    if (displayCredits === credits) return;
+
+    const timer = setTimeout(() => {
+      setDisplayCredits(credits);
+    }, 300);
+    return () => clearTimeout(timer);
   }, [credits, displayCredits]);
 
   return (

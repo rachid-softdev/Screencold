@@ -6,9 +6,9 @@ import { Check, Zap, CreditCard, ArrowUpRight, Loader2 } from "lucide-react";
 import { Button } from '@screencold/ui';
 import { Badge } from '@screencold/ui';
 import { useToast } from '@screencold/ui';
-import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
+import { PLANS, type PlanInfo } from "@/lib/plans";
 
-const planOrder: Plan[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
+const planOrder: (keyof typeof PLANS)[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
 
 interface UserData {
   plan: string;
@@ -76,7 +76,7 @@ function BillingPage() {
   };
 
   const getCurrentPlan = (planKey: string): PlanInfo | undefined => {
-    return PLANS[planKey as Plan];
+    return PLANS[planKey as keyof typeof PLANS];
   };
 
   const handleUpgrade = async (planId: string) => {
@@ -134,7 +134,7 @@ function BillingPage() {
     );
   }
 
-  const currentPlanKey = (userData?.plan || 'FREE') as Plan;
+  const currentPlanKey = (userData?.plan || 'FREE') as keyof typeof PLANS;
   const currentPlan = getCurrentPlan(currentPlanKey);
   const creditsTotal = currentPlan?.credits === -1 ? 'Illimité' : currentPlan?.credits || 5;
 
@@ -266,7 +266,7 @@ function BillingPage() {
         </h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {planOrder.map((planKey) => {
-            const plan = PLANS[planKey];
+            const plan = PLANS[planKey as keyof typeof PLANS];
             const isCurrentPlan = planKey === currentPlanKey;
             
             return (

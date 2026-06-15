@@ -36,12 +36,12 @@ export async function cleanupDatabase() {
   await prisma.account.deleteMany();
   await prisma.verificationToken.deleteMany();
   await prisma.emailTemplate.deleteMany();
-  await prisma.integrationToken.deleteMany().catch(() => {}); // May not exist
-  await prisma.webhookDelivery.deleteMany().catch(() => {});
-  await prisma.webhook.deleteMany().catch(() => {});
-  await prisma.sequenceEnrollment.deleteMany().catch(() => {});
-  await prisma.sequenceStep.deleteMany().catch(() => {});
-  await prisma.emailSequence.deleteMany().catch(() => {});
+  await (prisma as any).integrationToken.deleteMany().catch(() => {}); // May not exist
+  await (prisma as any).webhookDelivery.deleteMany().catch(() => {});
+  await (prisma as any).webhook.deleteMany().catch(() => {});
+  await (prisma as any).sequenceEnrollment.deleteMany().catch(() => {});
+  await (prisma as any).sequenceStep.deleteMany().catch(() => {});
+  await (prisma as any).emailSequence.deleteMany().catch(() => {});
   await prisma.user.deleteMany();
 }
 
@@ -108,21 +108,21 @@ export function createMockToken(userId: string, plan = "FREE", credits = 5) {
 }
 
 // Mock request with auth
-export function createMockRequest(overrides = {}) {
+export function createMockRequest(overrides: Record<string, unknown> = {}): any {
   return {
     headers: {
       get: (key: string) => {
         const headers: Record<string, string> = {
           "content-type": "application/json",
           "x-forwarded-for": "127.0.0.1",
-          ...overrides.headers,
+          ...(overrides.headers as Record<string, string> || {}),
         };
         return headers[key] || null;
       },
     },
     json: async () => overrides.body || {},
     nextUrl: {
-      searchParams: new URLSearchParams(overrides.searchParams || ""),
+      searchParams: new URLSearchParams((overrides.searchParams as string) || ""),
     },
     method: overrides.method || "GET",
     ...overrides,
@@ -132,7 +132,7 @@ export function createMockRequest(overrides = {}) {
 // Setup global mocks
 beforeAll(async () => {
   // Set test environment
-  process.env.NODE_ENV = "test";
+  Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', configurable: true });
   process.env.NEXTAUTH_SECRET = "test-secret-for-testing";
   process.env.DATABASE_URL = TEST_DATABASE_URL;
 

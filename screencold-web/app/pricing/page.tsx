@@ -5,11 +5,11 @@ import Link from "next/link";
 import { Check, Zap, ArrowRight, Star, Users } from "lucide-react";
 import { Button, Badge, Header } from '@screencold/ui';
 import { OrganizationSchema, FAQSchema } from "@/components/seo/schema";
-import { PLANS, type Plan, type PlanInfo } from "@/lib/plans";
+import { PLANS, type PlanInfo } from "@/lib/plans";
 
-const planOrder: Plan[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
+const planOrder: (keyof typeof PLANS)[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
 
-const planFeatures: Record<Plan, string[]> = {
+const planFeatures: Record<string, string[]> = {
   FREE: [
     "5 crédits/mois",
     "1 utilisateur",
@@ -145,7 +145,7 @@ function PricingPage() {
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {planOrder.map((planKey) => {
-            const plan = PLANS[planKey];
+            const plan = PLANS[planKey as keyof typeof PLANS];
             const isPopular = planKey === 'STARTER';
             const price = getPrice(plan);
             const features = planFeatures[planKey];

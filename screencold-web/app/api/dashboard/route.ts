@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         credits: true,
         creditsResetsAt: true,
         createdAt: true,
-        integrations: {
+        userIntegrations: {
           where: { type: 'GMAIL' },
           select: { id: true, status: true },
         },
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Check if Gmail is connected
-    const gmailIntegration = user.integrations?.[0];
+    const gmailIntegration = user.userIntegrations?.[0];
     const gmailConnected = gmailIntegration?.status === 'ACTIVE';
 
     return NextResponse.json({

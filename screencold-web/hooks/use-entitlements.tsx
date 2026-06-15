@@ -164,7 +164,11 @@ interface FeatureGuardProps {
   limit?: string;
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  fallbackComponent?: React.ComponentType;
+  fallbackComponent?: React.ComponentType<{
+    planRequired?: string;
+    limitReached?: boolean;
+    limit?: number;
+  }>;
 }
 
 /**

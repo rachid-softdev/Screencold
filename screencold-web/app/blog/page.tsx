@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BlogArticle } from '@screencold/types';
+import type { BlogArticle } from '@screencold/types';
 import { ArticleCard } from '@/components/blog/article-card';
 
 interface PageProps {
@@ -113,7 +113,17 @@ export default async function BlogPage({ searchParams }: PageProps) {
         {regularArticles.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {regularArticles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
+              <ArticleCard
+                key={article.slug}
+                slug={article.slug}
+                title={article.title}
+                subtitle={article.subtitle}
+                excerpt={article.excerpt}
+                coverImage={article.coverImage}
+                category={article.category}
+                readingTime={article.readingTime}
+                publishedAt={article.publishedAt}
+              />
             ))}
           </div>
         ) : (

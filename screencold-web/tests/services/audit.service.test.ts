@@ -19,6 +19,11 @@ vi.mock('@/lib/repositories/user.repository', () => ({
 }));
 
 vi.mock('@/lib/repositories/credit-transaction.repository', () => ({
+  CreditTransactionRepository: vi.fn(() => ({
+    create: vi.fn(),
+    findManyByUserId: vi.fn(),
+    countByUserIdAndPeriod: vi.fn(),
+  })),
   creditTransactionRepository: {
     create: vi.fn(),
   },

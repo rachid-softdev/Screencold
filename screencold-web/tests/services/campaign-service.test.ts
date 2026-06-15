@@ -569,7 +569,7 @@ describe('CampaignService', () => {
 
       const { Queue } = await import('bullmq');
       const mockAdd = vi.fn().mockResolvedValue({ id: 'bull-job-1' });
-      vi.mocked(Queue).mockImplementation(() => ({ add: mockAdd }) as unknown as ReturnType<typeof Queue>);
+      vi.mocked(Queue).mockImplementation((() => ({ add: mockAdd })) as any);
 
       // Act
       const result = await service.launchCampaign(TEST_CAMPAIGN_ID, TEST_USER_ID);

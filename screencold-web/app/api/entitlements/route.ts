@@ -23,7 +23,6 @@ export async function GET(_request: NextRequest) {
     // Get or create organization for user
     const userOrg = await prisma.userOrganization.findFirst({
       where: { userId: user.id },
-      include: { org: true },
     });
 
     let orgId: string;

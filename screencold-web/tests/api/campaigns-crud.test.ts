@@ -14,6 +14,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // ============================================
 // Mocks
@@ -52,6 +53,7 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/middleware', () => ({
   apiMiddleware: vi.fn(),
+  verifyCsrfToken: vi.fn().mockResolvedValue(true),
 }));
 
 vi.mock('@/lib/pagination', () => ({
@@ -100,8 +102,8 @@ import Papa from 'papaparse';
 // Shared Helpers
 // ============================================
 
-function createRequest(method: string, url: string, body?: unknown): Request {
-  return new Request(url, {
+function createRequest(method: string, url: string, body?: unknown): NextRequest {
+  return new NextRequest(url, {
     method,
     headers: { 'content-type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,

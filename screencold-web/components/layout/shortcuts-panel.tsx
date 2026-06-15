@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Keyboard } from "lucide-react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
@@ -44,7 +44,6 @@ const shortcutGroups: ShortcutGroup[] = [
 ];
 
 export function ShortcutsPanel({ open, onClose }: ShortcutsPanelProps) {
-  const [mounted, setMounted] = useState(false);
   const panelRef = useFocusTrap(open);
 
   useEffect(() => {
@@ -59,7 +58,7 @@ export function ShortcutsPanel({ open, onClose }: ShortcutsPanelProps) {
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  if (!mounted || !open) return null;
+  if (!open) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">

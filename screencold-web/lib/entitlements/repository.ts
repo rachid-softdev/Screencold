@@ -530,12 +530,12 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
       create: {
         eventId,
         type,
-        data,
+        data: data as Prisma.InputJsonValue,
         processed: true,
       },
       update: {
         processed: true,
-        data,
+        data: data as Prisma.InputJsonValue,
       },
     });
   }
@@ -548,7 +548,6 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
     // Check if user already has an organization
     const userOrg = await this.prisma.userOrganization.findFirst({
       where: { userId },
-      include: { org: true },
     });
 
     if (userOrg) {

@@ -132,13 +132,13 @@ async function handlePostPlanFeature(request: NextRequest) {
         featureId: feature.id,
         enabled: body.enabled,
         limitValue: body.limitValue ?? null,
-        configJson: body.configJson ?? null,
+        configJson: (body.configJson ?? null) as any,
         downgradeStrategy: body.downgradeStrategy ?? 'GRACEFUL',
       },
       update: {
         enabled: body.enabled,
         limitValue: body.limitValue ?? null,
-        configJson: body.configJson ?? null,
+        configJson: (body.configJson ?? null) as any,
         downgradeStrategy: body.downgradeStrategy ?? 'GRACEFUL',
       },
     });
@@ -300,7 +300,7 @@ async function handleGetDowngradePreview(_request: NextRequest, { params }: { pa
 
     await ensureEntitlementsInitialized();
 
-    const repo = new PrismaEntitlementRepository(prisma);
+    const repo = new PrismaEntitlementRepository(prisma as any);
     const downgradeService = new DowngradeService(repo);
 
     const preview = await downgradeService.getDowngradePreview(orgId, targetPlan);

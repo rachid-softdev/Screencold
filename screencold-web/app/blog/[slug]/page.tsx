@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BlogArticle } from '@screencold/types';
+import type { BlogArticle } from '@screencold/types';
 import { ArticleContent } from '@/components/blog/article-content';
 import { TableOfContents } from '@/components/blog/table-of-contents';
 import { AuthorCard } from '@/components/blog/author-card';
@@ -103,12 +103,12 @@ export default async function ArticlePage({ params }: PageProps) {
           <article>
             {/* Author + meta */}
             <div className="flex items-center justify-between mb-8 pb-8 border-b">
-              <AuthorCard author={article.author} publishedAt={article.publishedAt} />
+              <AuthorCard author={article.author} authorRole="" publishedAt={article.publishedAt} />
               <ShareButtons title={article.title} />
             </div>
 
             {/* Article content */}
-            <ArticleContent blocks={article.content} />
+            <ArticleContent content={article.content} />
 
             {/* Takeaway */}
             {article.content?.takeaway && (
@@ -145,7 +145,7 @@ export default async function ArticlePage({ params }: PageProps) {
             {relatedArticles.length > 0 && (
               <div className="mt-16">
                 <h3 className="text-xl font-bold text-neutral-900 mb-6">Articles similaires</h3>
-                <RelatedArticles articles={relatedArticles} />
+                <RelatedArticles articles={relatedArticles} currentSlug={slug} />
               </div>
             )}
           </article>
@@ -154,7 +154,7 @@ export default async function ArticlePage({ params }: PageProps) {
           <aside className="hidden md:block">
             <div className="sticky top-8 space-y-6">
               {h2Headings.length > 0 && (
-                <TableOfContents headings={h2Headings} />
+                <TableOfContents content={article.content} />
               )}
               <div className="bg-neutral-50 rounded-xl p-4">
                 <h4 className="font-semibold text-neutral-900 mb-3">À propos</h4>

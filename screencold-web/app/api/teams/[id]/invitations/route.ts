@@ -77,8 +77,7 @@ export async function POST(
 
     // Check if user already has pending invitation
     const existingInvitation = await prisma.teamInvitation.findFirst({
-      where: { teamId, email },
-      expiresAt: { gt: new Date() },
+      where: { teamId, email, expiresAt: { gt: new Date() } },
     });
 
     if (existingInvitation) {

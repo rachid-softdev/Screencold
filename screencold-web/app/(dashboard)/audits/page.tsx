@@ -114,13 +114,19 @@ function AuditsPage() {
   const [confirmAnalyse, setConfirmAnalyse] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
 
+  // Refs for keyboard handler to avoid stale closures
+  const selectedIdsRef = React.useRef(selectedIds);
+  selectedIdsRef.current = selectedIds;
+  const batchLoadingRef = React.useRef(batchLoading);
+  batchLoadingRef.current = batchLoading;
+
   // Keyboard shortcuts for batch actions
   React.useEffect(() => {
     if (!showBatchBar) return;
     const handler = (e: KeyboardEvent) => {
-      // Don't trigger if focus is in an input
       const tag = (e.target as HTMLElement).tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (batchLoadingRef.current) return;
 
       switch (e.key.toLowerCase()) {
         case "a":
@@ -129,6 +135,9 @@ function AuditsPage() {
           break;
         case "e":
           e.preventDefault();
+          // Use ref to get latest selectedIds
+          const exportIds = [...selectedIdsRef.current];
+          if (exportIds.length === 0) return;
           handleBatchExport();
           break;
         case "delete":

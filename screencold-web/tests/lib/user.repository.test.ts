@@ -1,14 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UserRepository } from '@/lib/repositories/user.repository';
-import type { PrismaClient } from '@prisma/client';
 
-const mockPrisma = {
-  user: {
-    findUnique: vi.fn(),
-    findMany: vi.fn(),
-    update: vi.fn(),
-  },
-} as unknown as PrismaClient;
+const mockPrisma = vi.hoisted(() => {
+  const user = { findUnique: vi.fn(), findMany: vi.fn(), update: vi.fn() };
+  return {
+    user,
+    $transaction: vi.fn((cb: (tx: any) => any) => {
+      return cb({
+        user: {
+          findUnique: (args: any) => user.findUnique(args),
+          update: (args: any) => user.update(args),
+        },
+      });
+    }),
+  };
+});
+
+vi.mock('@/lib/prisma', () => ({
+  default: mockPrisma,
+}));
+
+import { UserRepository } from '@/lib/repositories/user.repository';
 
 describe('UserRepository', () => {
   let repo: UserRepository;
@@ -16,7 +27,6 @@ describe('UserRepository', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     repo = new UserRepository();
-    (repo as any).prisma = mockPrisma;
   });
 
   it('findById returns user when found', async () => {
@@ -35,36 +45,38 @@ describe('UserRepository', () => {
     expect(result).toBeNull();
   });
 
-  it('getCredits returns 0 for missing user', async () => {
+  it('findById with credits selection returns 0 for missing user', async () => {
     (mockPrisma.user.findUnique as any).mockResolvedValue(null);
 
-    const credits = await repo.getCredits('1');
-    expect(credits).toBe(0);
+    const user = await repo.findById('1', { credits: true });
+    expect(user).toBeNull();
   });
 
-  it('getCredits returns user credits', async () => {
+  it('findById returns user credits', async () => {
     (mockPrisma.user.findUnique as any).mockResolvedValue({ credits: 42 });
 
-    const credits = await repo.getCredits('1');
-    expect(credits).toBe(42);
+    const user = await repo.findById('1', { credits: true });
+    expect(user?.credits).toBe(42);
   });
 
-  it('decrementCredits calls update with decrement', async () => {
+  it('updateCredits calls update with decrement', async () => {
+    (mockPrisma.user.findUnique as any).mockResolvedValue({ id: '1', credits: 5 });
     (mockPrisma.user.update as any).mockResolvedValue({ credits: 4 });
 
-    const result = await repo.decrementCredits('1', 1);
+    const result = await repo.updateCredits('1', -1);
     expect(result).toBe(4);
     expect(mockPrisma.user.update).toHaveBeenCalledWith({
       where: { id: '1' },
-      data: { credits: { decrement: 1 } },
+      data: { credits: { increment: -1 } },
       select: { credits: true },
     });
   });
 
-  it('incrementCredits calls update with increment', async () => {
+  it('updateCredits calls update with increment', async () => {
+    (mockPrisma.user.findUnique as any).mockResolvedValue({ id: '1', credits: 5 });
     (mockPrisma.user.update as any).mockResolvedValue({ credits: 6 });
 
-    const result = await repo.incrementCredits('1', 1);
+    const result = await repo.updateCredits('1', 1);
     expect(result).toBe(6);
     expect(mockPrisma.user.update).toHaveBeenCalledWith({
       where: { id: '1' },

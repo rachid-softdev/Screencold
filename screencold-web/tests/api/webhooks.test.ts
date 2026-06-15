@@ -13,6 +13,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // ============================================
 // Mocks
@@ -84,14 +85,14 @@ import { ensureEntitlementsInitialized } from '@/lib/entitlements/init';
 
 const VALID_SIGNATURE = 't=123,v1=valid_signature_hex';
 
-function createStripeRequest(body: unknown, signature?: string): Request {
+function createStripeRequest(body: unknown, signature?: string): NextRequest {
   const headers = new Headers({
     'content-type': 'application/json',
   });
   if (signature) {
     headers.set('stripe-signature', signature);
   }
-  return new Request('http://localhost:3000/api/webhooks/stripe', {
+  return new NextRequest('http://localhost:3000/api/webhooks/stripe', {
     method: 'POST',
     headers,
     body: JSON.stringify(body),

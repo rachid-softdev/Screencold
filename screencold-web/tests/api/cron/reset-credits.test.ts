@@ -235,7 +235,7 @@ describe('POST /api/cron/reset-credits', () => {
 
       // Assert - verify each plan got the correct credit reset value
       const updateCalls = mockPrisma.user.update.mock.calls;
-      const getData = (id: string) => updateCalls.find((c: unknown[]) => c[0]?.where?.id === id)?.[0]?.data;
+      const getData = (id: string) => updateCalls.find((c: unknown[]) => (c[0] as any)?.where?.id === id)?.[0]?.data;
       expect(getData('u-free').credits).toBe(5);
       expect(getData('u-starter').credits).toBe(50);
       expect(getData('u-pro').credits).toBe(200);

@@ -48,10 +48,17 @@ export class AuditRepository implements IAuditRepository {
         userId: true,
         prospectId: true,
         screenshotUrl: true,
+        annotatedUrl: true,
+        mobileUrl: true,
+        issues: true,
+        siteType: true,
         overallScore: true,
         status: true,
         errorMessage: true,
         processingTime: true,
+        emailSubject: true,
+        emailBody: true,
+        emailPs: true,
         createdAt: true,
         updatedAt: true,
         prospect: { select: { url: true, companyName: true } },
@@ -62,7 +69,7 @@ export class AuditRepository implements IAuditRepository {
     const data = hasMore ? items.slice(0, limit) : items;
 
     return {
-      data,
+      data: data as Audit[],
       total,
       nextCursor: hasMore ? data[data.length - 1]?.id : undefined,
     };
@@ -82,7 +89,7 @@ export class AuditRepository implements IAuditRepository {
   async updateResults(id: string, data: Partial<Pick<Audit, 'screenshotUrl' | 'annotatedUrl' | 'mobileUrl' | 'issues' | 'overallScore' | 'siteType' | 'processingTime'>>) {
     return prisma.audit.update({
       where: { id },
-      data: { ...data, status: 'READY' },
+      data: { ...data, issues: data.issues as any, status: 'READY' },
     });
   }
 

@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil',
+  apiVersion: '2025-04-30.basil' as any,
 });
 
 const registerSchema = z.object({

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 import { Button, Input, Header, useToast } from '@screencold/ui';
 
@@ -141,7 +140,7 @@ function ContactPage() {
                 <textarea
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  error={errors.message}
+                  aria-invalid={errors.message ? "true" : undefined}
                   rows={5}
                   className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-info-500 focus:outline-none focus:ring-1 focus:ring-info-500"
                   placeholder="Décrivez votre problème ou votre question..."

@@ -64,7 +64,7 @@ validateSecret();
 // ============================================
 
 
-import NextAuth, { getServerSession, type NextAuthConfig, type Session, type User } from "next-auth";
+import NextAuth, { getServerSession, type AuthOptions, type Session, type User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
@@ -102,8 +102,8 @@ type ExtendedUser = User & {
 };
 
 // Authentication configuration
-const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma) as NextAuthConfig["adapter"],
+const authConfig: AuthOptions = {
+  adapter: PrismaAdapter(prisma) as AuthOptions["adapter"],
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -189,8 +189,8 @@ const authConfig: NextAuthConfig = {
         token.id = extUser.id;
         token.plan = extUser.plan;
         token.credits = extUser.credits;
-        token.role = extUser.role;
-        token.roles = [extUser.role as string];
+        token.role = extUser.role as "USER" | "ADMIN";
+        token.roles = [extUser.role as "USER" | "ADMIN"];
       }
 
       // Fetch roles from DB on token refresh
@@ -200,8 +200,8 @@ const authConfig: NextAuthConfig = {
           include: { userRoles: true },
         });
         if (dbUser) {
-          token.role = dbUser.role;
-          token.roles = dbUser.userRoles.map((ur) => ur.role);
+          token.role = dbUser.role as "USER" | "ADMIN";
+          token.roles = dbUser.userRoles.map((ur) => ur.role as "USER" | "ADMIN");
         }
       }
 
@@ -289,8 +289,6 @@ const authConfig: NextAuthConfig = {
   // Debug in development
   debug: process.env.NODE_ENV === "development",
 
-  // Trust host for production
-  trustHost: true,
 };
 
 // Export the auth config for use with getServerSession, etc.
@@ -306,8 +304,8 @@ export async function auth() {
   return getServerSession(authConfig);
 }
 
-export async function getSession() {
-  return getServerSession(authConfig);
+export async function getSession(): Promise<Session | null> {
+  return getServerSession(authConfig) as Promise<Session | null>;
 }
 
 // Helper to get current user (server-side)

@@ -142,9 +142,9 @@ const prisma = basePrisma.$extends({
       async findUnique({ args, query }) {
         const result = await query(args);
         if (result) {
-          result.access_token = maybeDecryptToken(result.access_token);
-          result.refresh_token = maybeDecryptToken(result.refresh_token);
-          result.id_token = maybeDecryptToken(result.id_token);
+          result.access_token = maybeDecryptToken(result.access_token ?? null);
+          result.refresh_token = maybeDecryptToken(result.refresh_token ?? null);
+          result.id_token = maybeDecryptToken(result.id_token ?? null);
         }
         return result;
       },
@@ -153,9 +153,9 @@ const prisma = basePrisma.$extends({
       async findFirst({ args, query }) {
         const result = await query(args);
         if (result) {
-          result.access_token = maybeDecryptToken(result.access_token);
-          result.refresh_token = maybeDecryptToken(result.refresh_token);
-          result.id_token = maybeDecryptToken(result.id_token);
+          result.access_token = maybeDecryptToken(result.access_token ?? null);
+          result.refresh_token = maybeDecryptToken(result.refresh_token ?? null);
+          result.id_token = maybeDecryptToken(result.id_token ?? null);
         }
         return result;
       },
@@ -164,9 +164,9 @@ const prisma = basePrisma.$extends({
       async findMany({ args, query }) {
         const results = await query(args);
         return results.map((result) => {
-          result.access_token = maybeDecryptToken(result.access_token);
-          result.refresh_token = maybeDecryptToken(result.refresh_token);
-          result.id_token = maybeDecryptToken(result.id_token);
+          result.access_token = maybeDecryptToken(result.access_token ?? null);
+          result.refresh_token = maybeDecryptToken(result.refresh_token ?? null);
+          result.id_token = maybeDecryptToken(result.id_token ?? null);
           return result;
         });
       },

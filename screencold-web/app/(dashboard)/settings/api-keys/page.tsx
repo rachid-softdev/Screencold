@@ -138,7 +138,7 @@ export default function ApiKeysPage() {
                   </div>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm"
                     onClick={() => deleteApiKey(key.id)}
                     className="text-error-500 hover:text-error-700 hover:bg-error-50"
                   >
@@ -167,7 +167,7 @@ export default function ApiKeysPage() {
                   <code className="flex-1 p-2 bg-neutral-100 rounded text-sm break-all">
                     {newKeyValue}
                   </code>
-                  <Button variant="outline" size="icon" onClick={() => copyToClipboard(newKeyValue)}>
+                  <Button variant="outline" size="sm" onClick={() => copyToClipboard(newKeyValue)}>
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>

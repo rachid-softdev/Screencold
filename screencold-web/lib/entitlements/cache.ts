@@ -15,7 +15,7 @@ interface CacheEntry<T> {
 }
 
 export class MemoryCache {
-  private cache = new Map<string, CacheEntry<unknown>>();
+  cache = new Map<string, CacheEntry<unknown>>();
   private maxSize = 100; // Max entries
   private defaultTTL = 30000; // 30 seconds
 

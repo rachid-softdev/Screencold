@@ -12,6 +12,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // ============================================
 // Mocks
@@ -49,13 +50,13 @@ function setupValidApiKey() {
   });
 }
 
-function createRequest(method: string, url: string, body?: unknown, headers?: Record<string, string>): Request {
+function createRequest(method: string, url: string, body?: unknown, headers?: Record<string, string>): NextRequest {
   const reqHeaders = new Headers({
     'content-type': 'application/json',
     ...(headers || {}),
   });
 
-  return new Request(url, {
+  return new NextRequest(url, {
     method,
     headers: reqHeaders,
     body: body ? JSON.stringify(body) : undefined,

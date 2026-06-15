@@ -41,7 +41,6 @@ export function ArticleHero({
   category,
   readingTime,
   publishedAt,
-  slug,
 }: ArticleHeroProps) {
   const formattedDate = new Date(publishedAt).toLocaleDateString("fr-FR", {
     day: "numeric",
@@ -101,7 +100,7 @@ export function ArticleHero({
               <Calendar className="h-4 w-4" />
               <span>{formattedDate}</span>
             </div>
-            <ShareButtons slug={slug} title={title} />
+            <ShareButtons title={title} />
           </div>
         </div>
       </div>

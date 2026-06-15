@@ -1,10 +1,10 @@
 import type { PrismaClient } from '@prisma/client';
-import prisma from '@/lib/prisma';
+import rawPrisma from '@/lib/prisma';
 
 export abstract class BaseRepository {
   protected prisma: PrismaClient;
 
   constructor() {
-    this.prisma = prisma;
+    this.prisma = rawPrisma as unknown as PrismaClient;
   }
 }

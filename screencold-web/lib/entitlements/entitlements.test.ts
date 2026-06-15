@@ -46,16 +46,15 @@ vi.mock('./cache', async (importOriginal) => {
 import { FeatureGateService, initializeFeatureGateService, getFeatureGateService } from './service';
 import { DowngradeService } from './downgrade';
 import { MemoryCache, EntitlementsCacheService, clearMemoryCache } from './cache';
+import type { IEntitlementRepository } from './repository';
 import type {
-  IEntitlementRepository,
   FeatureDefinition,
   PlanDefinition,
   PlanFeatureConfig,
   EntitlementOverride,
   SubscriptionInfo,
   UsageInfo,
-  FeatureConfig,
-} from './repository';
+} from '@screencold/types';
 
 // ============================================
 // Mock Repository
@@ -231,7 +230,7 @@ const testPlanFeatures: PlanFeatureConfig[] = [
   { planId: 'plan-2', featureId: 'feat-1', enabled: true, limitValue: null, configJson: null, downgradeStrategy: 'GRACEFUL', sortOrder: 0 },
   { planId: 'plan-2', featureId: 'feat-2', enabled: true, limitValue: null, configJson: null, downgradeStrategy: 'GRACEFUL', sortOrder: 1 },
   { planId: 'plan-2', featureId: 'feat-3', enabled: true, limitValue: 100, configJson: null, downgradeStrategy: 'GRACEFUL', sortOrder: 2 },
-  { planId: 'plan-2', featureId: 'feat-4', enabled: true, configJson: { percentage: 50, seed: 'test' }, downgradeStrategy: 'GRACEFUL', sortOrder: 3 },
+  { planId: 'plan-2', featureId: 'feat-4', enabled: true, limitValue: null, configJson: { percentage: 50, seed: 'test' }, downgradeStrategy: 'GRACEFUL', sortOrder: 3 },
   { planId: 'plan-3', featureId: 'feat-5', enabled: true, limitValue: null, configJson: null, downgradeStrategy: 'IMMEDIATE', sortOrder: 0 },
 ];
 
@@ -734,10 +733,11 @@ describe('FeatureGateService', () => {
 
   describe('getExperimentConfig', () => {
     it('should return config for experiment feature', () => {
-      const config = service.getExperimentConfig('NEW_DASHBOARD');
-
-      expect(config).not.toBeNull();
-      expect(config!.config.percentage).toBe(50);
+      const result = service.getExperimentConfig('NEW_DASHBOARD');
+      expect(result).not.toBeNull();
+      const config = result!;
+      expect(config.config).not.toBeNull();
+      expect(config.config!.percentage).toBe(50);
     });
 
     it('should return null for non-experiment feature', () => {

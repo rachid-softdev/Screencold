@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AuditRepository } from '@/lib/repositories/audit.repository';
 
-const mockPrisma = {
+const mockPrisma = vi.hoisted(() => ({
   audit: {
     findUnique: vi.fn(),
     findMany: vi.fn(),
@@ -9,7 +8,13 @@ const mockPrisma = {
     update: vi.fn(),
     count: vi.fn(),
   },
-} as any;
+}));
+
+vi.mock('@/lib/prisma', () => ({
+  default: mockPrisma,
+}));
+
+import { AuditRepository } from '@/lib/repositories/audit.repository';
 
 describe('AuditRepository', () => {
   let repo: AuditRepository;
@@ -17,7 +22,6 @@ describe('AuditRepository', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     repo = new AuditRepository();
-    (repo as any).prisma = mockPrisma;
   });
 
   it('findById returns audit with relations', async () => {

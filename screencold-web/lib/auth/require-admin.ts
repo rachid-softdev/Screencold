@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import type { Session } from "next-auth";
 
 export class AuthError extends Error {
   status: number;
@@ -9,7 +10,7 @@ export class AuthError extends Error {
 }
 
 export async function requireAdmin(): Promise<{ id: string; email: string }> {
-  const session = await auth();
+  const session = (await auth()) as Session | null;
 
   if (!session?.user?.id) {
     throw new AuthError("Non authentifié", 401);

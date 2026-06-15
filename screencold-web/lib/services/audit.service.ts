@@ -1,11 +1,12 @@
 import { auditRepository } from '@/lib/repositories/audit.repository';
 import { userRepository } from '@/lib/repositories/user.repository';
-import { creditTransactionRepository } from '@/lib/repositories/credit-transaction.repository';
-import prisma from '@/lib/prisma';
+import { CreditTransactionRepository } from '@/lib/repositories/credit-transaction.repository';
 import { createLogger } from '@/lib/logger';
 import type { Audit, AuditStatus } from '@prisma/client';
 
 const logger = createLogger({ module: 'audit-service' });
+
+const creditTransactionRepository = new CreditTransactionRepository();
 
 export interface CreateAuditInput {
   userId: string;
@@ -16,21 +17,16 @@ export interface CreateAuditInput {
 
 export class AuditService {
   async create(input: CreateAuditInput): Promise<Audit> {
-    const { userId, url, prospectId } = input;
+    const { userId, url, prospectId, campaignId } = input;
 
     const credits = await userRepository.updateCredits(userId, -1);
 
     const audit = await auditRepository.create({
       user: { connect: { id: userId } },
       status: 'PROCESSING',
-      ...(prospectId ? { prospect: { connect: { id: prospectId } } } : {
-        prospect: {
-          create: {
-            url,
-            campaign: input.campaignId ? { connect: { id: input.campaignId } } : undefined,
-          },
-        },
-      }),
+      ...(prospectId
+        ? { prospect: { connect: { id: prospectId } } }
+        : { prospect: { create: { url, ...(campaignId ? { campaign: { connect: { id: campaignId } } } : {}) } as any } }),
     });
 
     await creditTransactionRepository.create({

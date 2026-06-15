@@ -1,11 +1,9 @@
 // Feature Flags & Entitlements Module
 // ============================================
 
-// Types
-export * from '@screencold/types';
-
 // Repository
-export { IEntitlementRepository, PrismaEntitlementRepository } from './repository';
+export type { IEntitlementRepository } from './repository';
+export { PrismaEntitlementRepository } from './repository';
 
 // Cache
 export { EntitlementsCacheService, getCacheService, CACHE_CONFIG } from './cache';

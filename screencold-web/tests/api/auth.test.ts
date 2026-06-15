@@ -11,6 +11,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // ============================================
 // Mocks
@@ -60,8 +61,8 @@ vi.mock('stripe', () => ({
 // Helpers
 // ============================================
 
-function createPostRequest(url: string, body: unknown): Request {
-  return new Request(url, {
+function createPostRequest(url: string, body: unknown): NextRequest {
+  return new NextRequest(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),

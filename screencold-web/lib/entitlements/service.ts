@@ -2,12 +2,9 @@ import type {
   FeatureDefinition,
   PlanDefinition,
   PlanFeatureConfig,
-  EntitlementOverride,
-  SubscriptionInfo,
   DebugTrace,
   ConsumeResult,
   EntitlementMap,
-  UsageInfo,
   FeatureConfig,
   ExperimentAssignment,
 } from '@screencold/types';
@@ -124,7 +121,7 @@ export class FeatureGateService {
           value: userOverride.enabled,
           overrideId: userOverride.id,
           expiresAt: userOverride.expiresAt,
-          config: feature.type === 'EXPERIMENT' ? feature.defaultConfig : undefined,
+          config: feature.type === 'EXPERIMENT' ? (feature.defaultConfig ?? undefined) : undefined,
         };
       }
     }
@@ -137,7 +134,7 @@ export class FeatureGateService {
         value: orgOverride.enabled,
         overrideId: orgOverride.id,
         expiresAt: orgOverride.expiresAt,
-        config: feature.type === 'EXPERIMENT' ? feature.defaultConfig : undefined,
+        config: feature.type === 'EXPERIMENT' ? (feature.defaultConfig ?? undefined) : undefined,
       };
     }
 

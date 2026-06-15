@@ -16,9 +16,22 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+/** Extended user from session (plan/credits added by JWT+session callbacks) */
+interface SessionUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  image?: string | null;
+  plan?: string;
+  credits?: number;
+  role?: string;
+  roles?: string[];
+}
+
 function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const sessionUser = session?.user as SessionUser | undefined;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -72,9 +85,9 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   const user = {
-    name: session?.user?.name || "Utilisateur",
-    email: session?.user?.email || "",
-    plan: (session?.user?.plan as string) || "FREE",
+    name: sessionUser?.name || "Utilisateur",
+    email: sessionUser?.email || "",
+    plan: sessionUser?.plan || "FREE",
   };
 
   const handleLogout = async () => {

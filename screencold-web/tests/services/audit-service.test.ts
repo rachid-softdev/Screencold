@@ -77,10 +77,7 @@ vi.mock('@/lib/credits', () => ({
   refundCredits: vi.fn(),
 }));
 
-vi.mock('@/lib/ssrf', () => ({
-  validateUrl: vi.fn(),
-  isPrivateIP: vi.fn(),
-}));
+
 
 vi.mock('bullmq', () => ({
   Queue: vi.fn(() => ({
@@ -106,7 +103,8 @@ vi.mock('@/lib/audit-log', () => ({
 // ============================================
 
 import { checkCredits, debitCredits } from '@/lib/credits';
-import { validateUrl } from '@/lib/ssrf';
+
+const validateUrl = vi.fn();
 
 // ============================================
 // Mock AuditService
@@ -362,7 +360,7 @@ describe('AuditService', () => {
 
       const { Queue } = await import('bullmq');
       const mockAdd = vi.fn();
-      vi.mocked(Queue).mockImplementation(() => ({ add: mockAdd }) as unknown as ReturnType<typeof Queue>);
+      vi.mocked(Queue).mockImplementation((() => ({ add: mockAdd })) as any);
 
       // Act
       await service.createAudit({

@@ -150,7 +150,8 @@ export async function PATCH(
       );
     }
 
-    const { name, description, subject, body: templateBody, variables, isDefault, isActive } = validationResult.data;
+    const { name, description, subject, body: templateBody, variables, isDefault } = validationResult.data;
+    const isActive = (validationResult.data as Record<string, unknown>).isActive as boolean | undefined;
 
     // If setting as default, unset other defaults
     if (isDefault) {

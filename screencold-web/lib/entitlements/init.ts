@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@prisma/client';
+import { prisma as prismaRaw } from '@/lib/prisma';
 import {
   initializeFeatureGateService,
   PrismaEntitlementRepository,
@@ -9,6 +10,8 @@ import {
 // ============================================
 
 let initialized = false;
+
+const prisma = prismaRaw as unknown as PrismaClient;
 
 export async function initializeEntitlements(): Promise<void> {
   if (initialized) return;
