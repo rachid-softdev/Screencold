@@ -142,7 +142,7 @@ function ContactPage() {
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   aria-invalid={errors.message ? "true" : undefined}
                   rows={5}
-                  className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-info-500 focus:outline-none focus:ring-1 focus:ring-info-500"
+                  className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-2 text-neutral-900 placeholder-neutral-400 focus:border-info-500 focus:outline-none focus:ring-2 focus:ring-info-500"
                   placeholder="Décrivez votre problème ou votre question..."
                 />
                 {errors.message && <p className="mt-1 text-sm text-error-600">{errors.message}</p>}
@@ -159,7 +159,7 @@ function ContactPage() {
       {/* Footer */}
       <footer className="border-t border-neutral-200 py-12">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-neutral-500">© 2024 ScreenCold. Tous droits réservés.</p>
+          <p className="text-sm text-neutral-500">© 2026 ScreenCold. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

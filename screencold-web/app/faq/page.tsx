@@ -52,7 +52,7 @@ const faqs = [
     answer: "Oui, nous utilisons des mesures de sécurité strictes pour protéger vos données. Toutes les données sont chiffrées et nous ne partageons jamais vos informations avec des tiers."
   },
   {
-    question: "Puis-je integrer ScreenCold à d'autres outils ?",
+    question: "Puis-je intégrer ScreenCold à d'autres outils ?",
     answer: "L'API disponible sur les plans Pro et Agency vous permet d'intégrer ScreenCold à vos outils existants (CRM, outils d'emailing, etc.)."
   },
   {
@@ -102,7 +102,7 @@ export default function FAQPage() {
       {/* Footer */}
       <footer className="border-t border-neutral-200 py-12">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-neutral-500">© 2024 ScreenCold. Tous droits réservés.</p>
+          <p className="text-sm text-neutral-500">© 2026 ScreenCold. Tous droits réservés.</p>
         </div>
       </footer>
 

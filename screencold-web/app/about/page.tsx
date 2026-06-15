@@ -33,7 +33,7 @@ export default function AboutPage() {
 
             <h2 className="text-2xl font-bold text-neutral-900 mt-8">Notre mission</h2>
             <p className="text-neutral-600">
-              Nous croyons que chaque entreprise mérite un accès facile à des données precisas 
+              Nous croyons que chaque entreprise mérite un accès facile à des données précises 
               sur ses prospects. Notre objectif est de simplifier le processus d'audit de sites 
               web pour permettre aux professionnels de la vente de se concentrer sur ce qui 
               compte vraiment : construire des relations.
@@ -68,7 +68,7 @@ export default function AboutPage() {
       {/* Footer */}
       <footer className="border-t border-neutral-200 py-12">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-sm text-neutral-500">© 2024 ScreenCold. Tous droits réservés.</p>
+          <p className="text-sm text-neutral-500">© 2026 ScreenCold. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

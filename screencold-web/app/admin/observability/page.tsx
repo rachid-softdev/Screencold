@@ -274,7 +274,7 @@ export default function ObservabilityPage() {
         if (parsed === null) {
           if (!cancelled) {
             setWorkerStatus("unreachable");
-            setErrorMessage("Unable to parse metrics response");
+              setErrorMessage("Impossible d'analyser la réponse de métriques");
           }
           return;
         }
@@ -298,7 +298,7 @@ export default function ObservabilityPage() {
         if (cancelled) return;
         setWorkerStatus("unreachable");
         setErrorMessage(
-          error instanceof Error ? error.message : "Failed to fetch metrics",
+          error instanceof Error ? error.message : "Échec de la récupération des métriques",
         );
       }
     };
@@ -376,7 +376,7 @@ export default function ObservabilityPage() {
                   workerHealthy ? "text-success-600" : "text-error-600"
                 }`}
               >
-                {workerHealthy ? "Healthy" : "Unreachable"}
+                {workerHealthy ? "En ligne" : "Indisponible"}
               </span>
             </div>
             {errorMessage && (
