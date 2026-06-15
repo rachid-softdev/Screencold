@@ -83,7 +83,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                 <div className="aspect-video md:aspect-auto bg-neutral-200">
                   <Image
                     src={featuredArticle.coverImage}
-                    alt=""
+                    alt={featuredArticle.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="w-full h-full object-cover"

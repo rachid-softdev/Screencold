@@ -76,7 +76,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <div className="relative h-96 bg-neutral-900">
         <Image
           src={article.coverImage}
-          alt=""
+          alt={article.title}
           fill
           sizes="100vw"
           className="w-full h-full object-cover opacity-60"
@@ -112,8 +112,8 @@ export default async function ArticlePage({ params }: PageProps) {
 
             {/* Takeaway */}
             {article.content?.takeaway && (
-              <div className="bg-info-50 border-l-4 border-info-600 p-6 rounded-r-lg my-8">
-                <p className="font-semibold text-info-900 mb-1">💡 Takeaway</p>
+              <div className="bg-info-50 rounded-lg p-6 my-8">
+                <p className="font-semibold text-info-900 mb-1">À retenir</p>
                 <p className="text-info-800">{article.content.takeaway}</p>
               </div>
             )}
@@ -130,7 +130,7 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
             {/* CTA final */}
-            <div className="bg-gradient-to-r from-info-600 to-info-700 rounded-2xl p-8 mt-12 text-center text-white">
+            <div className="bg-info-600 rounded-2xl p-8 mt-12 text-center text-white">
               <h3 className="text-2xl font-bold mb-2">Prêt à améliorer vos cold emails ?</h3>
               <p className="text-info-100 mb-6">Analysez n'importe quel site web en 30 secondes avec ScreenCold.</p>
               <Link

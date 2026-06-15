@@ -92,7 +92,7 @@ export default function FreelancesPage() {
           <div className="mt-16 grid gap-8 sm:grid-cols-3">
             {benefits.map((benefit, i) => (
               <div key={i} className="rounded-xl bg-white p-6 shadow-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success-100 text-success-600">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-info-100 text-info-600">
                   {benefit.icon}
                 </div>
                 <h3 className="mt-4 text-lg font-semibold text-neutral-900">

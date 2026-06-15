@@ -156,19 +156,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof - Logos */}
+      {/* Social Proof */}
       <section className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm font-medium uppercase tracking-wide text-neutral-500">
+          <p className="text-center text-sm font-medium text-neutral-500">
             Utilisé par des agences et freelances en France et en Europe
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-8 opacity-60 grayscale">
-            {["WebBoost", "DigitalPro", "StudioUX", "AgenceSEO", "PixelCraft"].map((name) => (
-              <span key={name} className="text-xl font-bold text-neutral-400">
-                {name}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -297,7 +290,7 @@ export default function HomePage() {
               </Link>
             </div>
             <p className="text-sm text-neutral-500">
-              © 2024 ScreenCold
+              © 2026 ScreenCold
             </p>
           </div>
         </div>

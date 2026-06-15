@@ -112,7 +112,7 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
       {leaderKey && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-neutral-900 px-4 py-2 text-sm text-white shadow-lg animate-in fade-in slide-in-from-bottom-2">
           <span className="opacity-60">Mode leader&nbsp;·&nbsp;appuyez sur</span>
-          {" "}<kbd className="mx-0.5 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs uppercase">{leaderKey === "g" ? "D" : ""}</kbd>
+          {" "}<kbd className="mx-0.5 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs uppercase">D</kbd>
           <kbd className="mx-0.5 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs uppercase">A</kbd>
           <kbd className="mx-0.5 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs uppercase">C</kbd>
           <kbd className="mx-0.5 rounded bg-white/20 px-1.5 py-0.5 font-mono text-xs uppercase">P</kbd>
