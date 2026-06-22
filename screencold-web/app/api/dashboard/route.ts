@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
       where: {
         userId,
         createdAt: { gte: startOfMonth },
-        type: 'audit',
+        type: 'AUDIT_DEBIT',
       },
       _sum: {
         amount: true,
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
         auditsChange: lastMonthAudits > 0 
           ? Math.round(((thisMonthAudits - lastMonthAudits) / lastMonthAudits) * 100) 
           : 0,
-        creditsUsed: creditsUsed._sum.amount || 0,
+        creditsUsed: creditsUsed._sum?.amount || 0,
       },
       recentAudits: recentAudits.map(mapRecentAudit),
       recentPagination,

@@ -120,7 +120,7 @@ export async function refundCredits(
 export async function refillCredits(
   userId: string,
   amount: number,
-  type: 'PURCHASE' | 'MONTHLY_REFILL' | 'BONUS' | 'PROMO' | 'ADMIN_ADJUSTMENT'
+  type: 'PURCHASE' | 'RESET' | 'BONUS' | 'ADMIN_ADJUSTMENT'
 ): Promise<void> {
   if (amount <= 0) {
     throw new Error('Amount must be positive');
@@ -361,7 +361,7 @@ export async function resetCreditsForAllPlans(): Promise<ResetCreditsResult> {
           data: {
             userId: user.id,
             amount: credits,
-            type: 'MONTHLY_REFILL',
+            type: 'RESET',
           },
         });
 

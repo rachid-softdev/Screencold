@@ -41,15 +41,15 @@ export async function GET(request: NextRequest) {
           description = 'Achat de crédits';
           typeLabel = 'Crédit';
           break;
-        case 'MONTHLY_REFILL':
+        case 'RESET':
           description = 'Renouvellement mensuel';
           typeLabel = 'Crédit';
           break;
-        case 'AUDIT':
+        case 'AUDIT_DEBIT':
           description = 'Audit de site';
           typeLabel = 'Débit';
           break;
-        case 'AUDIT_REFUND':
+        case 'REFUND':
           description = 'Remboursement audit';
           typeLabel = 'Crédit';
           break;
