@@ -81,7 +81,7 @@ export async function getDashboardData() {
           createdAt: {
             gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
           },
-          type: 'audit',
+          type: 'AUDIT_DEBIT',
         },
         _sum: {
           amount: true,
@@ -112,7 +112,7 @@ export async function getDashboardData() {
       lastMonthAudits,
       totalAudits,
       auditsChange,
-      creditsUsed: creditsUsed._sum.amount || 0,
+      creditsUsed: creditsUsed._sum?.amount || 0,
     },
     recentAudits: recentAudits.map((audit) => ({
       id: audit.id,

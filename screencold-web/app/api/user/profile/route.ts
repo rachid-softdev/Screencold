@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       where: {
         userId,
         createdAt: { gte: thisMonthStart },
-        type: 'DEBIT',
+        type: 'AUDIT_DEBIT',
       },
       _sum: { amount: true },
     });
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       ...profile,
-      creditsUsed: usedCredits._sum.amount || 0,
+      creditsUsed: usedCredits._sum?.amount || 0,
     });
   } catch (error) {
     console.error('[Profile] GET error:', error);

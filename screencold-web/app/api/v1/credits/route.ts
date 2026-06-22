@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
       where: {
         userId,
         createdAt: { gte: thisMonthStart },
-        type: 'DEBIT',
+        type: 'AUDIT_DEBIT',
       },
       _sum: { amount: true },
     });
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
         credits: user.credits,
         plan: user.plan,
         creditsResetsAt: user.creditsResetsAt,
-        usedThisMonth: usedThisMonth._sum.amount || 0,
+        usedThisMonth: usedThisMonth._sum?.amount || 0,
         transactions: transactions.map((t) => ({
           id: t.id,
           amount: t.amount,

@@ -387,7 +387,7 @@ export async function refundCredits(
       data: {
         userId,
         amount,
-        type: "audit_refund",
+        type: "REFUND",
         auditId,
       },
     }),
@@ -398,7 +398,7 @@ export async function refundCredits(
 export async function createCreditTransaction(
   userId: string,
   amount: number,
-  type: string,
+  type: 'AUDIT_DEBIT' | 'PURCHASE' | 'BONUS' | 'REFUND' | 'RESET' | 'ADMIN_ADJUSTMENT',
   auditId?: string
 ): Promise<void> {
   await prisma.creditTransaction.create({
