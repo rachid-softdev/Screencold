@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import crypto from 'crypto';
-import prisma from '@/lib/prisma';
-import {
-  getRateLimitHeaders as getRedisRateLimitHeaders,
-  checkRateLimit as checkRedisRateLimit,
-} from '@/lib/redis-rate-limit';
 import {
   getCorrelationId,
   runWithCorrelationId,
@@ -121,9 +115,13 @@ export interface MiddlewareResult {
   errorResponse?: NextResponse;
 }
 
-// Hash function for API key validation
-function hashKey(key: string): string {
-  return crypto.createHash('sha256').update(key).digest('hex');
+// Hash function for API key validation.
+// crypto (node:crypto) is only available in the Node.js runtime, not the Edge
+// runtime used by Next.js middleware. Load it lazily so the Edge bundle never
+// imports node:crypto at module-eval time.
+async function hashKey(key: string): Promise<string> {
+  const { createHash } = await import('crypto');
+  return createHash('sha256').update(key).digest('hex');
 }
 
 // Validate API key
@@ -135,7 +133,12 @@ async function validateApiKey(request: NextRequest): Promise<{ valid: boolean; u
   }
 
   const apiKey = authHeader.replace('Bearer ', '');
-  const hashedKey = hashKey(apiKey);
+  const hashedKey = await hashKey(apiKey);
+
+  // prisma is dynamically imported so it is never evaluated in the Edge runtime
+  // (PrismaClient cannot run on Edge). API key validation runs in the Node.js
+  // runtime for API routes.
+  const { default: prisma } = await import('@/lib/prisma');
 
   const keyRecord = await prisma.apiKey.findUnique({
     where: { key: hashedKey },
@@ -165,7 +168,7 @@ export async function apiMiddleware(
 ): Promise<MiddlewareResult> {
   // Generate correlation ID for this request
   const correlationId =
-    request.headers.get('x-correlation-id') || crypto.randomUUID();
+    request.headers.get('x-correlation-id') || globalThis.crypto.randomUUID();
   request.headers.set('x-correlation-id', correlationId);
 
   // Execute in async context so downstream code can retrieve the ID
@@ -178,6 +181,7 @@ export async function apiMiddleware(
       const apiKeyValidation = await validateApiKey(request);
       
       if (apiKeyValidation.valid && apiKeyValidation.userId) {
+        const { default: prisma } = await import('@/lib/prisma');
         const user = await prisma.user.findUnique({
           where: { id: apiKeyValidation.userId },
           select: { id: true, email: true, name: true, plan: true, credits: true },
@@ -258,16 +262,21 @@ export async function apiMiddleware(
 /**
  * Get rate limit headers using Redis-backed distributed rate limiter.
  * Falls back to fail-open if Redis is unavailable.
+ * The redis client is imported lazily so the Edge middleware bundle never
+ * evaluates ioredis (which is incompatible with the Edge runtime).
  */
 export async function getRateLimitHeaders(request: NextRequest): Promise<Record<string, string>> {
+  const { getRateLimitHeaders: getRedisRateLimitHeaders } = await import('@/lib/redis-rate-limit');
   return getRedisRateLimitHeaders(request);
 }
 
 /**
  * Check if request is within rate limits using Redis.
  * Supports per-IP for public endpoints, per-user for authenticated ones.
+ * The redis client is imported lazily for Edge-runtime compatibility.
  */
 export async function checkRateLimit(request: NextRequest): Promise<boolean> {
+  const { checkRateLimit: checkRedisRateLimit } = await import('@/lib/redis-rate-limit');
   return checkRedisRateLimit(request);
 }
 
@@ -303,7 +312,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse | u
   }
 
   // Generate and set correlation ID
-  const correlationId = request.headers.get('x-correlation-id') || crypto.randomUUID();
+  const correlationId = request.headers.get('x-correlation-id') || globalThis.crypto.randomUUID();
   request.headers.set('x-correlation-id', correlationId);
 
   // Apply rate limiting to API routes
