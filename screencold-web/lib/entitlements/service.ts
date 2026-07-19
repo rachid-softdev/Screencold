@@ -305,51 +305,25 @@ export class FeatureGateService {
   }
 
   /**
-   * Consume usage (atomic, prevents race conditions)
+   * Consume usage atomically.
+   *
+   * The limit is resolved first (plan config is stable, not racy), then the
+   * actual check-and-increment happens inside a single transaction with a
+   * row-level lock in the repository to prevent double-spend race conditions.
    */
   async consume(orgId: string, featureKey: string, amount = 1): Promise<ConsumeResult> {
-    // First check limit
     const limitValue = await this.getLimit(orgId, featureKey);
 
-    // Get current usage
-    const usage = await this.repo.getUsage(orgId, featureKey);
-    const used = usage?.used ?? 0;
-
-    // Check if unlimited
-    if (limitValue === null) {
-      const newUsage = await this.repo.incrementUsage(orgId, featureKey, amount);
-      return {
-        success: true,
-        feature: featureKey,
-        used: newUsage.used,
-        remaining: null,
-        resetAt: newUsage.resetAt,
-      };
-    }
-
-    // Check if limit would be exceeded
-    if (used + amount > limitValue) {
-      const periodEnd = usage?.periodEnd ?? new Date();
-      return {
-        success: false,
-        feature: featureKey,
-        used,
-        remaining: Math.max(0, limitValue - used),
-        resetAt: periodEnd,
-        error: 'LIMIT_REACHED',
-        limit: limitValue,
-      };
-    }
-
-    // Atomically increment
-    const newUsage = await this.repo.incrementUsage(orgId, featureKey, amount);
+    const result = await this.repo.consumeUsage(orgId, featureKey, amount, limitValue);
 
     return {
-      success: true,
+      success: result.success,
       feature: featureKey,
-      used: newUsage.used,
-      remaining: limitValue - newUsage.used,
-      resetAt: newUsage.resetAt,
+      used: result.used,
+      remaining: result.remaining,
+      resetAt: result.resetAt,
+      error: result.error as ConsumeResult['error'],
+      limit: result.limit ?? undefined,
     };
   }
 

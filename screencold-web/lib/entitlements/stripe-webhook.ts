@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { IEntitlementRepository } from './repository';
 import { getFeatureGateService } from './service';
+import { DowngradeService } from './downgrade';
 import { addMonths, startOfDay } from 'date-fns';
 
 // ============================================
@@ -157,9 +158,16 @@ export class StripeWebhookHandler {
     const existingSub = await this.repo.getSubscriptionByStripeId(stripeSubId);
 
     if (existingSub) {
-      // We need to find org by stripe sub - this is a bug in the repo
-      // For now, just log
-      console.log(`[StripeWebhook] Subscription ${stripeSubId} canceled, downgrading to FREE`);
+      // Real downgrade: move the org back to the FREE plan so paid entitlements
+      // are revoked. orgId is available on the subscription record, so there is
+      // no lookup bug — we just execute the downgrade.
+      const downgrade = new DowngradeService(this.repo);
+      const result = await downgrade.executeDowngrade(existingSub.orgId, 'FREE');
+      console.log(
+        `[StripeWebhook] Subscription ${stripeSubId} canceled, downgraded org ${existingSub.orgId} to FREE. Affected features: ${result.affectedFeatures.join(', ') || 'none'}`
+      );
+    } else {
+      console.log(`[StripeWebhook] Subscription ${stripeSubId} canceled, but no matching record found`);
     }
   }
 

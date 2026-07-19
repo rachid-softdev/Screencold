@@ -481,6 +481,79 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
     };
   }
 
+  /**
+   * Atomically consume usage within a transaction with a row-level lock
+   * (SELECT ... FOR UPDATE) to prevent the race condition where two concurrent
+   * requests both pass the limit check and then both increment, overshooting
+   * the plan limit (double-spend of credits).
+   *
+   * `limitValue` is the resolved plan limit (null = unlimited).
+   */
+  async consumeUsage(
+    orgId: string,
+    featureKey: string,
+    amount: number,
+    limitValue: number | null
+  ): Promise<{
+    success: boolean;
+    used: number;
+    remaining: number | null;
+    resetAt: Date;
+    limit: number | null;
+    error?: string;
+  }> {
+    const now = new Date();
+
+    return this.prisma.$transaction(async (tx) => {
+      // Lock the current usage row for the period so concurrent consumers serialize.
+      const usage = await tx.usageTracking.findFirst({
+        where: { orgId, featureKey, periodEnd: { gt: now } },
+        orderBy: { periodStart: 'desc' },
+        lock: { mode: 'update' },
+      });
+
+      if (limitValue !== null) {
+        const used = usage?.usageCount ?? 0;
+        if (used + amount > limitValue) {
+          return {
+            success: false,
+            used,
+            remaining: Math.max(0, limitValue - used),
+            resetAt: usage?.periodEnd ?? new Date(),
+            limit: limitValue,
+            error: 'LIMIT_REACHED',
+          };
+        }
+      }
+
+      if (usage) {
+        const updated = await tx.usageTracking.update({
+          where: { id: usage.id },
+          data: { usageCount: { increment: amount }, updatedAt: now },
+        });
+        return {
+          success: true,
+          used: updated.usageCount,
+          remaining: limitValue === null ? null : limitValue - updated.usageCount,
+          resetAt: updated.periodEnd,
+          limit: limitValue,
+        };
+      }
+
+      const periodEnd = addMonths(now, 1);
+      const created = await tx.usageTracking.create({
+        data: { orgId, featureKey, usageCount: amount, periodStart: now, periodEnd },
+      });
+      return {
+        success: true,
+        used: created.usageCount,
+        remaining: limitValue === null ? null : limitValue - created.usageCount,
+        resetAt: created.periodEnd,
+        limit: limitValue,
+      };
+    });
+  }
+
   async checkAndResetUsage(orgId: string, featureKey: string, periodEnd: Date): Promise<UsageInfo> {
     const now = new Date();
 

@@ -8,6 +8,7 @@ import Anthropic from "@anthropic-ai/sdk";
 // Initialize the client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || "",
+  timeout: 60_000,
 });
 
 /**
