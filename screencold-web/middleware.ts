@@ -57,38 +57,59 @@ export function addSecurityHeaders(response: NextResponse, _request: NextRequest
 }
 
 /**
- * Verify CSRF token for state-changing operations.
+ * CSRF protection via double-submit cookie pattern.
  *
- * Uses origin / referer header validation:
- * - Same-origin requests (Origin or Referer matching APP_URL) are trusted.
- * - For API routes without Origin, the Referer header is checked.
- * - NextAuth.js provides SameSite cookies for additional CSRF protection.
+ * A `csrf_token` cookie (not HttpOnly so the SPA can read it) is set on every
+ * API response. State-changing requests must echo that value back in the
+ * `X-CSRF-Token` header. Because an attacker's cross-site request cannot read
+ * or set the cookie value (SameSite + path scoping), they cannot supply the
+ * matching header — closing the Origin/Referer-spoofing loophole.
+ *
+ * As defense-in-depth we still require a same-origin Origin/Referer when no
+ * token is present (e.g. non-browser clients using API keys are exempt — they
+ * are authenticated separately).
  */
+export const CSRF_COOKIE_NAME = 'csrf_token';
+
+export function ensureCsrfCookie(response: NextResponse): void {
+  if (!response.cookies.get(CSRF_COOKIE_NAME)) {
+    const token = crypto.randomUUID();
+    response.cookies.set(CSRF_COOKIE_NAME, token, {
+      httpOnly: false,
+      sameSite: 'strict',
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24,
+    });
+  }
+}
+
 export async function verifyCsrfToken(request: NextRequest): Promise<boolean> {
   // Only check for mutation methods
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
     return true;
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  // API-key authenticated requests are verified by the signature, not cookies.
+  const authHeader = request.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer sk_')) {
+    return true;
+  }
 
+  const headerToken = request.headers.get('x-csrf-token');
+  const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
+
+  if (headerToken && cookieToken && headerToken === cookieToken) {
+    return true;
+  }
+
+  // Defense-in-depth: fall back to strict same-origin Origin/Referer check.
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
 
-  // Allow same-origin requests
-  if (origin === appUrl) {
+  if (origin === appUrl || (referer && referer.startsWith(appUrl))) {
     return true;
-  }
-
-  if (referer && referer.startsWith(appUrl)) {
-    return true;
-  }
-
-  // For API routes, check Origin header
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    if (!origin) {
-      return referer ? referer.startsWith(appUrl) : false;
-    }
   }
 
   return false;
@@ -118,8 +139,23 @@ export interface MiddlewareResult {
 // Hash function for API key validation.
 // crypto (node:crypto) is only available in the Node.js runtime, not the Edge
 // runtime used by Next.js middleware. Load it lazily so the Edge bundle never
-// imports node:crypto at module-eval time.
+// imports node:crypto at module-eval time. validateApiKey only runs from
+// Node.js API route handlers, so the dynamic import resolves there.
+// Uses a keyed HMAC (peppered SHA-256) instead of plain SHA-256 so that a
+// database leak does not expose brute-forceable / rainbow-table-able hashes.
+// Falls back to the legacy unpeppered SHA-256 for backward compatibility with
+// keys created before this change (so existing keys keep working).
+const API_KEY_PEPPER = process.env.API_KEY_PEPPER;
+
 async function hashKey(key: string): Promise<string> {
+  const { createHash, createHmac } = await import('crypto');
+  if (API_KEY_PEPPER) {
+    return createHmac('sha256', API_KEY_PEPPER).update(key).digest('hex');
+  }
+  return createHash('sha256').update(key).digest('hex');
+}
+
+async function legacyHashKey(key: string): Promise<string> {
   const { createHash } = await import('crypto');
   return createHash('sha256').update(key).digest('hex');
 }
@@ -134,6 +170,7 @@ async function validateApiKey(request: NextRequest): Promise<{ valid: boolean; u
 
   const apiKey = authHeader.replace('Bearer ', '');
   const hashedKey = await hashKey(apiKey);
+  const legacyHashedKey = API_KEY_PEPPER ? await legacyHashKey(apiKey) : null;
 
   // prisma is dynamically imported so it is never evaluated in the Edge runtime
   // (PrismaClient cannot run on Edge). API key validation runs in the Node.js
@@ -144,6 +181,26 @@ async function validateApiKey(request: NextRequest): Promise<{ valid: boolean; u
     where: { key: hashedKey },
     include: { user: true },
   });
+
+  // Backward-compat: existing keys stored with the old plain SHA-256 hash
+  if (!keyRecord && legacyHashedKey) {
+    const legacyRecord = await prisma.apiKey.findUnique({
+      where: { key: legacyHashedKey },
+      include: { user: true },
+    });
+
+    if (legacyRecord) {
+      // Re-hash with the pepper so future lookups are hardened.
+      await prisma.apiKey.update({
+        where: { id: legacyRecord.id },
+        data: { key: hashedKey },
+      });
+      return {
+        valid: true,
+        userId: legacyRecord.userId,
+      };
+    }
+  }
 
   if (!keyRecord) {
     return { valid: false, error: 'Invalid API key' };
@@ -345,6 +402,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse | u
   // Build response with headers
   const response = NextResponse.next();
   response.headers.set('x-correlation-id', correlationId);
+
+  // Ensure a CSRF double-submit cookie is present for API consumers
+  if (isApiRoute) {
+    ensureCsrfCookie(response);
+  }
 
   if (versionMatch) {
     addVersionHeaders(response, version);

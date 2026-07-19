@@ -8,7 +8,7 @@ import type {
   UsageInfo,
   FeatureConfig,
 } from '@screencold/types';
-import { subMonths } from 'date-fns';
+import { addMonths } from 'date-fns';
 
 // ============================================
 // Repository Interface
@@ -250,7 +250,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
 
   async createSubscription(orgId: string, planKey: string, stripeSubId?: string): Promise<void> {
     const periodStart = new Date();
-    const periodEnd = subMonths(periodStart, -1);
+    const periodEnd = addMonths(periodStart, 1);
 
     await this.prisma.subscription.create({
       data: {
@@ -434,7 +434,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
 
   async incrementUsage(orgId: string, featureKey: string, amount: number): Promise<UsageInfo> {
     const now = new Date();
-    const periodEnd = subMonths(now, -1);
+    const periodEnd = addMonths(now, 1);
 
     // Try to update existing record
     const updated = await this.prisma.usageTracking.updateMany({
@@ -486,7 +486,7 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
 
     // If period has ended, create a new tracking record
     if (periodEnd < now) {
-      const newPeriodEnd = subMonths(now, -1);
+      const newPeriodEnd = addMonths(now, 1);
 
       await this.prisma.usageTracking.create({
         data: {

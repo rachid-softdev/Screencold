@@ -1,5 +1,6 @@
 import { Queue, Worker, Job } from "bullmq";
 import Redis from "ioredis";
+import { CreditTransactionType } from "@prisma/client";
 import { createLogger, createChildLogger } from "./utils/logger";
 import { prisma } from "./db";
 import { s3Client, uploadScreenshots } from "./services/s3";
@@ -154,6 +155,11 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
 
     const startTime = Date.now();
 
+    // Holds the annotated screenshot buffer (generated after AI analysis).
+    // Declared here (before first use at uploadScreenshots) to avoid the
+    // JS hoisting bug where it was referenced before its declaration.
+    let annotatedScreenshotBuffer: Buffer | null = null;
+
     // Step 1: Capture screenshots
     jobLogger.info("Capturing website screenshots...");
     const captureResult: CaptureResult = await captureWebsite(url);
@@ -178,7 +184,6 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
 
     // Step 3: Analyze with AI (unless capture only mode)
     let analysisResult: AnalyzeResult | null = null;
-    let annotatedScreenshotBuffer: Buffer | null = null;
     if (!captureOnly) {
       jobLogger.info("Analyzing with AI with screenshots...");
       
@@ -412,7 +417,7 @@ async function refundCredit(userId: string, auditId: string): Promise<void> {
       data: {
         userId,
         amount: 1,
-        type: "audit_refund",
+        type: CreditTransactionType.REFUND,
         auditId,
       },
     }),

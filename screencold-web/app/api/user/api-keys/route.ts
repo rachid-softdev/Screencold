@@ -11,8 +11,15 @@ const createApiKeySchema = z.object({
   rateLimit: z.number().min(10).max(1000).optional(),
 });
 
-// Hash the API key for storage
+// Hash the API key for storage. Uses a keyed HMAC (peppered SHA-256) when
+// API_KEY_PEPPER is set, matching the verification logic in middleware.ts.
+// Existing keys hashed with plain SHA-256 are still accepted (see middleware).
+const API_KEY_PEPPER = process.env.API_KEY_PEPPER;
+
 function hashKey(key: string): string {
+  if (API_KEY_PEPPER) {
+    return crypto.createHmac('sha256', API_KEY_PEPPER).update(key).digest('hex');
+  }
   return crypto.createHash('sha256').update(key).digest('hex');
 }
 
