@@ -312,10 +312,11 @@ function EmailTemplatesPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-700">
+            <label htmlFor="templateName" className="block text-sm font-medium text-neutral-700">
               Nom du template
             </label>
             <Input
+              id="templateName"
               value={formData.name}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
@@ -327,10 +328,11 @@ function EmailTemplatesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">
+            <label htmlFor="templateDescription" className="block text-sm font-medium text-neutral-700">
               Description
             </label>
             <Input
+              id="templateDescription"
               value={formData.description}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
@@ -341,10 +343,11 @@ function EmailTemplatesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">
+            <label htmlFor="templateSubject" className="block text-sm font-medium text-neutral-700">
               Sujet
             </label>
             <Input
+              id="templateSubject"
               value={formData.subject}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, subject: e.target.value }))
@@ -356,8 +359,8 @@ function EmailTemplatesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">
-              Corps de l&apos;email
+            <label htmlFor="templateBody" className="block text-sm font-medium text-neutral-700">
+              Corps de l'email
             </label>
             <div className="mt-1 flex flex-wrap gap-2">
               {defaultVariables.map((v) => (
@@ -372,6 +375,7 @@ function EmailTemplatesPage() {
               ))}
             </div>
             <Textarea
+              id="templateBody"
               value={formData.body}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, body: e.target.value }))

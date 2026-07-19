@@ -140,6 +140,7 @@ function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Votre nom"
+                aria-label="Nom"
                 error={errors.name}
                 className="pl-10"
               />
@@ -150,6 +151,7 @@ function SettingsPage() {
                 type="email"
                 value={email}
                 placeholder="votre@email.com"
+                aria-label="Email"
                 className="pl-10"
                 disabled
               />

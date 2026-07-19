@@ -183,7 +183,7 @@ const authConfig: AuthOptions = {
     async jwt({ token, user, trigger, session }) {
       // Roles are the authoritative source of truth (UserRole table),
       // never the removed scalar User.role column.
-      const resolveRoles = async (userId: string): Promise<string[]> => {
+      const resolveRoles = async (userId: string): Promise<Array<"USER" | "ADMIN">> => {
         const dbUser = await prisma.user.findUnique({
           where: { id: userId },
           include: { userRoles: true },

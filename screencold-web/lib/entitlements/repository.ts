@@ -44,6 +44,19 @@ export interface IEntitlementRepository {
   getUsage(orgId: string, featureKey: string): Promise<UsageInfo | null>;
   getAllUsage(orgId: string): Promise<UsageInfo[]>;
   incrementUsage(orgId: string, featureKey: string, amount: number): Promise<UsageInfo>;
+  consumeUsage(
+    orgId: string,
+    featureKey: string,
+    amount: number,
+    limitValue: number | null
+  ): Promise<{
+    success: boolean;
+    used: number;
+    remaining: number | null;
+    resetAt: Date;
+    limit: number | null;
+    error?: string;
+  }>;
   checkAndResetUsage(orgId: string, featureKey: string, periodEnd: Date): Promise<UsageInfo>;
 
   // Stripe event (idempotency)
@@ -514,12 +527,23 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
     const now = new Date();
 
     return this.prisma.$transaction(async (tx) => {
-      // Lock the current usage row for the period so concurrent consumers serialize.
-      const usage = await tx.usageTracking.findFirst({
-        where: { orgId, featureKey, periodEnd: { gt: now } },
-        orderBy: { periodStart: 'desc' },
-        lock: { mode: 'update' },
-      });
+      // Lock the current usage row for the period so concurrent consumers
+      // serialize. Prisma 5.x does not support a per-query `lock` inside
+      // interactive transactions, so we take the row lock with raw SQL.
+      const [usage] = await tx.$queryRaw<Array<{
+        id: string;
+        usageCount: number;
+        periodEnd: Date;
+      }>>`
+        SELECT id, "usageCount", "periodEnd"
+        FROM "UsageTracking"
+        WHERE "orgId" = ${orgId}
+          AND "featureKey" = ${featureKey}
+          AND "periodEnd" > ${now}
+        ORDER BY "periodStart" DESC
+        LIMIT 1
+        FOR UPDATE
+      `;
 
       if (limitValue !== null) {
         const used = usage?.usageCount ?? 0;
