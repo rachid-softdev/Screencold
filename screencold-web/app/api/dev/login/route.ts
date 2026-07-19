@@ -26,12 +26,14 @@ export async function POST() {
 
   const devUser = await prisma.user.upsert({
     where: { email: DEV_EMAIL },
-    update: { password: passwordHash, role: "ADMIN" },
+    update: { password: passwordHash },
     create: {
       email: DEV_EMAIL,
       name: "Dev User",
       password: passwordHash,
-      role: "ADMIN",
+      userRoles: {
+        create: [{ role: "ADMIN" }],
+      },
     },
   });
 
