@@ -1,8 +1,12 @@
 export async function register() {
-  // OpenTelemetry is initialized when @opentelemetry packages are installed
-  // and OTEL_EXPORTER_OTLP_ENDPOINT env var is set
+  // OpenTelemetry is provided by the @screencold/telemetry workspace package.
+  // Enable by setting OTEL_ENABLED=true (and optionally OTEL_EXPORTER_OTLP_ENDPOINT).
   if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.OTEL_ENABLED === 'true') {
-    console.log('[instrumentation] OpenTelemetry configured but packages not yet installed');
-    console.log('[instrumentation] Run: pnpm add @opentelemetry/sdk-node @opentelemetry/exporter-trace-otlp-http @opentelemetry/resources @opentelemetry/semantic-conventions @opentelemetry/sdk-trace-base @opentelemetry/core @opentelemetry/instrumentation-http @opentelemetry/instrumentation-express');
+    try {
+      const { initializeTelemetry } = await import('@screencold/telemetry');
+      initializeTelemetry();
+    } catch (err) {
+      console.warn('[instrumentation] Failed to initialize OpenTelemetry:', err);
+    }
   }
 }

@@ -108,6 +108,7 @@ function RegisterPage() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Votre nom"
             error={errors.name}
+            aria-label="Nom complet"
             className="pl-10"
           />
         </div>
@@ -120,6 +121,7 @@ function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="votre@email.com"
             error={errors.email}
+            aria-label="Adresse email"
             className="pl-10"
           />
         </div>
@@ -133,6 +135,7 @@ function RegisterPage() {
             placeholder="••••••••"
             error={errors.password}
             helperText="Minimum 8 caractères"
+            aria-label="Mot de passe"
             className="pl-10"
           />
         </div>

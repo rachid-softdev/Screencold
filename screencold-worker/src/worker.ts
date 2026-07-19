@@ -20,6 +20,16 @@ import {
   recordJobError,
   getMetrics,
 } from "../lib/metrics";
+import { initializeTelemetry } from "@screencold/telemetry";
+
+// Initialize OpenTelemetry tracing (no-op unless OTEL_ENABLED=true).
+if (process.env.OTEL_ENABLED === "true") {
+  try {
+    initializeTelemetry();
+  } catch (err) {
+    console.warn("[worker] Failed to initialize OpenTelemetry:", err);
+  }
+}
 
 // Queue names
 const QUEUES = {

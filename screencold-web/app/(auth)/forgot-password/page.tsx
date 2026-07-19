@@ -102,6 +102,7 @@ function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="votre@email.com"
             error={error}
+            aria-label="Adresse email"
             className="pl-10"
           />
         </div>

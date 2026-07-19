@@ -143,6 +143,7 @@ function ResetPasswordPageContent() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Nouveau mot de passe"
             error={errors.password}
+            aria-label="Nouveau mot de passe"
             className="pl-10"
           />
         </div>
@@ -155,6 +156,7 @@ function ResetPasswordPageContent() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirmer le mot de passe"
             error={errors.confirm}
+            aria-label="Confirmer le mot de passe"
             className="pl-10"
           />
         </div>

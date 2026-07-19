@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { getCursorParams } from "@/lib/pagination";
 
 const VALID_ROLES = ["USER", "ADMIN"] as const;
 
@@ -12,21 +13,31 @@ const createUserSchema = z.object({
   roles: z.array(z.enum(VALID_ROLES)).optional(),
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await requireAdmin();
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        userRoles: { select: { role: true } },
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" },
+    const { take, skip, cursor } = getCursorParams(request, 50, 200);
+    const where = {};
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          userRoles: { select: { role: true } },
+          createdAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take,
+        ...(cursor ? { cursor, skip: 1 } : skip ? { skip } : {}),
+      }),
+      prisma.user.count({ where }),
+    ]);
+    return NextResponse.json({
+      users,
+      pagination: { take, count: users.length, total },
     });
-    return NextResponse.json({ users });
   } catch (e: unknown) {
     if (e instanceof Error && "status" in e) {
       return NextResponse.json({ error: e.message }, { status: (e as any).status });
@@ -49,7 +60,6 @@ export async function POST(request: Request) {
       data: {
         email,
         name,
-        role,
         userRoles: {
           create: userRoles.map((r) => ({ role: r })),
         },
@@ -58,7 +68,6 @@ export async function POST(request: Request) {
         id: true,
         email: true,
         name: true,
-        role: true,
         userRoles: { select: { role: true } },
       },
     });

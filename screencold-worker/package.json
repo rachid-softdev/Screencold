@@ -16,6 +16,7 @@
     "@aws-sdk/client-s3": "^3.565.0",
     "@prisma/client": "^5.14.0",
     "@screencold/db": "workspace:*",
+    "@screencold/telemetry": "workspace:*",
     "@screencold/types": "workspace:*",
     "bullmq": "^5.7.0",
     "cheerio": "^1.0.0-rc.12",

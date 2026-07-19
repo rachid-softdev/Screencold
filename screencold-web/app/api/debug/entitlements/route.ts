@@ -36,12 +36,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify admin role
+    // Verify admin role (modeled via the UserRole table)
     const userRecord = await prisma.user.findUnique({
       where: { id: token.id as string },
+      include: { userRoles: true },
     });
 
-    if (!userRecord || userRecord.role !== 'ADMIN') {
+    const isAdmin = userRecord?.userRoles.some((ur) => ur.role === 'ADMIN');
+    if (!userRecord || !isAdmin) {
       return NextResponse.json(
         { error: 'Forbidden: admin access required' },
         { status: 403 }

@@ -36,7 +36,6 @@ model User {
   creditsResetsAt      DateTime?
   googleId             String?   @unique
   emailVerified        DateTime?
-  role                 Role      @default(USER)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
@@ -56,12 +55,13 @@ model User {
   sentEmails           SentEmail[]
   userIntegrations     UserIntegration[]
 
-  @@index([email])
-  @@index([stripeCustomerId])
-  @@index([googleId])
+  // Role is modeled via the UserRole table (many-to-many with the Role enum),
+  // not a scalar column, to avoid two sources of truth.
 
   // CHECK constraints (applied via raw SQL migration)
   // credits >= 0 enforced at DB level
+  @@index([creditsResetsAt])
+  @@index([createdAt])
 }
 
 model UserRole {
@@ -198,6 +198,7 @@ model Audit {
   @@index([userId])
   @@index([status])
   @@index([userId, status])
+  @@index([createdAt])
 }
 
 // ============================================
@@ -319,7 +320,6 @@ model ApiKey {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([key])
 }
 
 // ============================================
@@ -429,6 +429,7 @@ model SentEmail {
   @@index([userId])
   @@index([status])
   @@index([sentAt])
+  @@index([auditId])
 }
 
 // ============================================
@@ -581,7 +582,6 @@ model Subscription {
 
   @@index([orgId])
   @@index([status])
-  @@index([stripeSubId])
 }
 
 // Entitlement overrides (user or org level)
@@ -668,7 +668,6 @@ model StripeEvent {
   createdAt DateTime @default(now())
 
   @@index([processed])
-  @@index([eventId])
 }
 
 // User-Organization mapping (for user-based entitlements)

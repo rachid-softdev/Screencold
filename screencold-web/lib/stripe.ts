@@ -160,19 +160,6 @@ export type WebhookEventType =
   | "invoice.paid"
   | "invoice.payment_failed";
 
-// Verify webhook signature
-export function verifyWebhookSignature(
-  payload: string | Buffer,
-  signature: string
-): Stripe.Event {
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    throw new Error("STRIPE_WEBHOOK_SECRET is not configured");
-  }
-
-  return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-}
-
 // Helper to format amount for display (cents to euros)
 export function formatAmount(amount: number): number {
   return amount / 100;

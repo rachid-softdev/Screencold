@@ -250,7 +250,7 @@ describe('POST /api/admin/users', () => {
     // Assert
     expect(response.status).toBe(201);
     expect(body.user.email).toBe('newuser@test.com');
-    expect(body.user.role).toBe('USER');
+    expect(body.user.userRoles).toEqual([{ role: 'USER' }]);
   });
 
   it('should create user with ADMIN role', async () => {

@@ -178,11 +178,16 @@ export default function ApiKeysPage() {
             ) : (
               <>
                 <h2 className="text-xl font-bold mb-4">Créer une clé API</h2>
+                <label htmlFor="api-key-name" className="block text-sm font-medium text-neutral-700 mb-1">
+                  Nom de la clé
+                </label>
                 <input
+                  id="api-key-name"
                   type="text"
                   placeholder="Nom de la clé (ex: Production)"
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
+                  aria-label="Nom de la clé API"
                   className="w-full p-2 border rounded-md mb-4"
                 />
                 <div className="flex gap-2 justify-end">

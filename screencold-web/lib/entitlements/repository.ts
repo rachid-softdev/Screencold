@@ -252,16 +252,25 @@ export class PrismaEntitlementRepository implements IEntitlementRepository {
     const periodStart = new Date();
     const periodEnd = addMonths(periodStart, 1);
 
-    await this.prisma.subscription.create({
-      data: {
-        orgId,
-        planKey,
-        status: stripeSubId ? 'active' : 'inactive',
-        stripeSubId,
-        currentPeriodStart: periodStart,
-        currentPeriodEnd: periodEnd,
-      },
-    });
+    // Idempotent per org: Stripe fires both `checkout.session.completed` and
+    // `customer.subscription.created` for the same checkout, and the inline
+    // webhook handler also upserts a Subscription row. Without this guard we
+    // would create duplicate subscription rows (a "double upgrade").
+    const existing = await this.prisma.subscription.findFirst({ where: { orgId } });
+    const data = {
+      planKey,
+      status: stripeSubId ? 'active' : 'inactive',
+      stripeSubId,
+      currentPeriodStart: periodStart,
+      currentPeriodEnd: periodEnd,
+    };
+
+    if (existing) {
+      await this.prisma.subscription.update({ where: { id: existing.id }, data });
+      return;
+    }
+
+    await this.prisma.subscription.create({ data: { orgId, ...data } });
   }
 
   // ============================================

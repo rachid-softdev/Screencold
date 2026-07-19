@@ -136,16 +136,18 @@ function ContactPage() {
               />
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-neutral-700">Message</label>
+                <label htmlFor="message" className="mb-1 block text-sm font-medium text-neutral-700">Message</label>
                 <textarea
+                  id="message"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   aria-invalid={errors.message ? "true" : undefined}
+                  aria-describedby={errors.message ? "message-error" : undefined}
                   rows={5}
                   className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-2 text-neutral-900 placeholder-neutral-400 focus:border-info-500 focus:outline-none focus:ring-2 focus:ring-info-500"
                   placeholder="Décrivez votre problème ou votre question..."
                 />
-                {errors.message && <p className="mt-1 text-sm text-error-600">{errors.message}</p>}
+                {errors.message && <p id="message-error" className="mt-1 text-sm text-error-600">{errors.message}</p>}
               </div>
 
               <Button type="submit" className="w-full" loading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>

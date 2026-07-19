@@ -96,7 +96,6 @@ type ExtendedSession = Session & {
 type ExtendedUser = User & {
   id: string;
   plan: string;
-  role: string;
   credits: number;
   roles?: string[];
 };
@@ -174,7 +173,6 @@ const authConfig: AuthOptions = {
           image: user.image,
           plan: user.plan,
           credits: user.credits,
-          role: user.role,
         } as ExtendedUser;
       },
     }),
@@ -183,26 +181,32 @@ const authConfig: AuthOptions = {
   callbacks: {
     // JWT callback - add custom fields to token
     async jwt({ token, user, trigger, session }) {
+      // Roles are the authoritative source of truth (UserRole table),
+      // never the removed scalar User.role column.
+      const resolveRoles = async (userId: string): Promise<string[]> => {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: userId },
+          include: { userRoles: true },
+        });
+        return dbUser?.userRoles.map((ur) => ur.role as "USER" | "ADMIN") ?? [];
+      };
+
       if (user) {
         // On sign in, add user data to token
         const extUser = user as ExtendedUser;
         token.id = extUser.id;
         token.plan = extUser.plan;
         token.credits = extUser.credits;
-        token.role = extUser.role as "USER" | "ADMIN";
-        token.roles = [extUser.role as "USER" | "ADMIN"];
+        const roles = await resolveRoles(extUser.id);
+        token.roles = roles;
+        token.role = roles.includes("ADMIN") ? "ADMIN" : "USER";
       }
 
       // Fetch roles from DB on token refresh
       if (!user && token.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          include: { userRoles: true },
-        });
-        if (dbUser) {
-          token.role = dbUser.role as "USER" | "ADMIN";
-          token.roles = dbUser.userRoles.map((ur) => ur.role as "USER" | "ADMIN");
-        }
+        const roles = await resolveRoles(token.id as string);
+        token.roles = roles;
+        token.role = roles.includes("ADMIN") ? "ADMIN" : "USER";
       }
 
       // Handle session update (e.g., after credits are used)

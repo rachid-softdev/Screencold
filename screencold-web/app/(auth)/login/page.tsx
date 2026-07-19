@@ -124,6 +124,7 @@ function LoginPageContent() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="votre@email.com"
             error={errors.email}
+            aria-label="Adresse email"
             className="pl-10"
           />
         </div>
@@ -136,6 +137,7 @@ function LoginPageContent() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
             error={errors.password}
+            aria-label="Mot de passe"
             className="pl-10"
           />
         </div>
