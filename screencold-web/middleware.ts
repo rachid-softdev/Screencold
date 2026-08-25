@@ -357,6 +357,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse | u
 
   const isApiRoute = API_ROUTES.some((prefix) => pathname.startsWith(prefix));
 
+  if (process.env.NODE_ENV === "production" && (pathname === "/dev" || pathname.startsWith("/dev/"))) {
+    return NextResponse.rewrite(new URL("/404", request.url));
+  }
+
   // Detect API version and apply versioning
   const version = getRequestVersion(request);
   const versionMatch = pathname.match(/\/api\/(v\d+)\//);
