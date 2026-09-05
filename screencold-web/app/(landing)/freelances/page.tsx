@@ -103,7 +103,7 @@ export default function FreelancesPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-neutral-900">Le calcul est simple</h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-neutral-600">
-            Exemple basé sur les hypothèses ci-dessous — vos résultats peuvent varier.
+            Ce retour sur investissement est construit sur les hypothèses transparentes ci-dessous.
           </p>
           <div className="mx-auto mt-10 max-w-2xl">
             <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
@@ -138,7 +138,7 @@ export default function FreelancesPage() {
                 </div>
               </div>
               <p className="mt-6 text-xs text-neutral-500">
-                Calcul indicatif de démonstration, non contractuel.
+                Hypothèses claires et modifiables — adaptez-les à votre activité.
               </p>
             </div>
           </div>
