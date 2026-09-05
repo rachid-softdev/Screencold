@@ -40,7 +40,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
           </p>
         );
 
-      case "heading":
+      case "heading": {
         const HeadingTag = `h${block.level}` as keyof JSX.IntrinsicElements;
         const headingClasses = {
           2: "text-3xl font-bold mt-12 mb-6 text-neutral-900",
@@ -52,12 +52,13 @@ export function ArticleContent({ content }: ArticleContentProps) {
             {block.content}
           </HeadingTag>
         );
+      }
 
       case "list":
         return (
           <ul key={index} className="mb-6 space-y-2 list-disc list-inside text-neutral-700">
             {block.items.map((item, itemIndex) => (
-              <li key={itemIndex} className="leading-relaxed">
+              <li key={`list-item-${index}-${itemIndex}`} className="leading-relaxed">
                 {item}
               </li>
             ))}

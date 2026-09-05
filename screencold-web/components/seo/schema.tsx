@@ -1,3 +1,19 @@
+import type { JSX } from "react";
+
+/**
+ * Safe JSON-LD script component - uses dangerouslySetInnerHTML which is required
+ * for JSON-LD structured data injection. This is safe because the content is
+ * JSON.stringify() output, not user-generated HTML.
+ */
+function JsonLdScript({ schema }: { schema: Record<string, unknown> }): JSX.Element {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 interface OrganizationSchemaProps {
   name?: string;
   url: string;
@@ -48,12 +64,7 @@ export function OrganizationSchema({
     ...(sameAs.length > 0 && { sameAs }),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }
 
 /**
@@ -83,12 +94,7 @@ export function ProductSchema({
     },
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }
 
 /**
@@ -126,12 +132,7 @@ export function ArticleSchema({
     },
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }
 
 /**
@@ -151,12 +152,7 @@ export function FAQSchema({ faqs }: FAQSchemaProps) {
     })),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }
 
 /**
@@ -179,12 +175,7 @@ export function BreadcrumbSchema({
     })),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }
 
 /**
@@ -206,12 +197,7 @@ export function WebSiteSchema({ url }: { url: string }) {
     },
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }
 
 /**
@@ -236,10 +222,5 @@ export function SoftwareApplicationSchema() {
     url: baseUrl,
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <JsonLdScript schema={schema} />;
 }

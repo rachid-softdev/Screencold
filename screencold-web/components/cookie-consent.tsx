@@ -82,6 +82,7 @@ export function CookieConsent() {
         <div
           className="fixed inset-0 z-40 bg-black/20"
           onClick={() => setShowSettings(false)}
+          role="presentation"
         />
       )}
 

@@ -121,6 +121,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           <div
             className="absolute inset-0 bg-black/50 lg:hidden"
             onClick={() => setMobileSidebarOpen(false)}
+            role="presentation"
           />
           <DashboardSidebar
             user={user}

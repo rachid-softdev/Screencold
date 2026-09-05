@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { forwardRef } from "react";
 import { clsx } from "clsx";
 import { Loader2 } from "lucide-react";

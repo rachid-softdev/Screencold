@@ -72,11 +72,14 @@ function Modal({ open, onClose, title, children, size = "md" }: ModalProps) {
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={handleBackdropClick}
+      role="presentation"
     >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 animate-in fade-in duration-200"
+        onClick={handleBackdropClick}
+        role="presentation"
+        tabIndex={-1}
         aria-hidden="true"
       />
 
@@ -101,7 +104,7 @@ function Modal({ open, onClose, title, children, size = "md" }: ModalProps) {
             >
               {title}
             </h2>
-            <button
+            <button type="button"
               onClick={onClose}
               className="p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
               aria-label="Fermer"

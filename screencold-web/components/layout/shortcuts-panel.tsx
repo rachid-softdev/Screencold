@@ -92,7 +92,7 @@ export function ShortcutsPanel({ open, onClose }: ShortcutsPanelProps) {
               </p>
             </div>
           </div>
-          <button
+          <button type="button"
             onClick={onClose}
             className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600"
             aria-label="Fermer"

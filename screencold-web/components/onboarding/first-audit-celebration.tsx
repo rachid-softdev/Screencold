@@ -28,7 +28,7 @@ export function FirstAuditCelebration({
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           {Array.from({ length: 50 }).map((_, i) => (
             <div
-              key={i}
+              key={`confetti-${i}`}
               className="absolute animate-bounce"
               style={{
                 left: `${Math.random() * 100}%`,
@@ -83,7 +83,7 @@ export function FirstAuditCelebration({
             </Button>
           </div>
 
-          <button
+          <button type="button"
             onClick={onClose}
             className="mt-4 text-sm text-neutral-500 hover:text-neutral-700"
           >

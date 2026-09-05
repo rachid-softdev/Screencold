@@ -74,7 +74,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
 
           return (
             <li key={id}>
-              <button
+              <button type="button"
                 onClick={() => handleClick(id)}
                 className={`block w-full text-left text-sm py-1.5 px-2 rounded transition-colors ${
                   isActive

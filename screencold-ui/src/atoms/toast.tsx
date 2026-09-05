@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { clsx } from "clsx";
@@ -70,7 +70,7 @@ function ToastItem({
     >
       {icons[toast.type]}
       <p className="text-sm text-gray-700 flex-1">{toast.message}</p>
-      <button
+      <button type="button"
         onClick={handleRemove}
         className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
         aria-label="Fermer"

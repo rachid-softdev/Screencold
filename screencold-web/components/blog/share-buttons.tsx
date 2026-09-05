@@ -26,13 +26,13 @@ export function ShareButtons({ title }: ShareButtonsProps) {
       <span className="text-sm text-neutral-500 mr-1">
         <Share2 className="w-4 h-4" />
       </span>
-      <button onClick={shareTwitter} className="p-2 text-neutral-400 hover:text-info-500 transition-colors rounded-full hover:bg-neutral-100" aria-label="Partager sur Twitter">
+      <button type="button" onClick={shareTwitter} className="p-2 text-neutral-400 hover:text-info-500 transition-colors rounded-full hover:bg-neutral-100" aria-label="Partager sur Twitter">
         <Twitter className="w-4 h-4" />
       </button>
-      <button onClick={shareLinkedin} className="p-2 text-neutral-400 hover:text-info-700 transition-colors rounded-full hover:bg-neutral-100" aria-label="Partager sur LinkedIn">
+      <button type="button" onClick={shareLinkedin} className="p-2 text-neutral-400 hover:text-info-700 transition-colors rounded-full hover:bg-neutral-100" aria-label="Partager sur LinkedIn">
         <Linkedin className="w-4 h-4" />
       </button>
-      <button onClick={copyLink} className="p-2 text-neutral-400 hover:text-neutral-700 transition-colors rounded-full hover:bg-neutral-100" aria-label="Copier le lien">
+      <button type="button" onClick={copyLink} className="p-2 text-neutral-400 hover:text-neutral-700 transition-colors rounded-full hover:bg-neutral-100" aria-label="Copier le lien">
         <Link className="w-4 h-4" />
       </button>
     </div>

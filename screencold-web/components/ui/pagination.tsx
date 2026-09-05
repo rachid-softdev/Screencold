@@ -37,30 +37,10 @@ export function Pagination({
   const isOffset = totalPages !== undefined;
   const activePage = currentPage ?? 1;
 
-  // Don't render for single-page results
-  if (isOffset && totalPages <= 1) return null;
-  if (!isOffset && !hasNextPage && !hasPreviousPage) return null;
-
   const canGoPrev = isOffset ? activePage > 1 : !!hasPreviousPage;
   const canGoNext = isOffset ? activePage < (totalPages ?? 0) : !!hasNextPage;
 
-  const handlePrev = () => {
-    if (isOffset) {
-      onPageChange?.(activePage - 1);
-    } else {
-      onPreviousPage?.();
-    }
-  };
-
-  const handleNext = () => {
-    if (isOffset) {
-      onPageChange?.(activePage + 1);
-    } else {
-      onNextPage?.();
-    }
-  };
-
-  // Build compact page range for offset mode
+  // Build compact page range for offset mode (must be before early returns, hooks rule)
   const pageNumbers = React.useMemo(() => {
     if (!isOffset || !totalPages) return [];
     const pages: (number | "ellipsis")[] = [];
@@ -85,6 +65,26 @@ export function Pagination({
     return `${totalItems} résultat${totalItems !== 1 ? "s" : ""}`;
   })();
 
+  // Don't render for single-page results
+  if (isOffset && totalPages <= 1) return null;
+  if (!isOffset && !hasNextPage && !hasPreviousPage) return null;
+
+  const handlePrev = () => {
+    if (isOffset) {
+      onPageChange?.(activePage - 1);
+    } else {
+      onPreviousPage?.();
+    }
+  };
+
+  const handleNext = () => {
+    if (isOffset) {
+      onPageChange?.(activePage + 1);
+    } else {
+      onNextPage?.();
+    }
+  };
+
   return (
     <nav aria-label="Pagination" className="flex items-center justify-between">
       <p className="text-sm text-neutral-500">{showingText}</p>
@@ -105,7 +105,7 @@ export function Pagination({
           pageNumbers.map((page, index) =>
             page === "ellipsis" ? (
               <span
-                key={`ellipsis-${index}`}
+                key={`ellipsis-${page}`}
                 className="px-1 text-sm text-neutral-400"
               >
                 ...

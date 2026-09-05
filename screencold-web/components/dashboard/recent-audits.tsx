@@ -55,6 +55,7 @@ const RecentAudits = memo(function RecentAudits({ audits }: RecentAuditsProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
+            aria-hidden="true"
           >
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <circle cx="9" cy="9" r="2" />
@@ -117,6 +118,7 @@ const RecentAudits = memo(function RecentAudits({ audits }: RecentAuditsProps) {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
+                    aria-hidden="true"
                   >
                     <rect x="2" y="3" width="20" height="14" rx="2" />
                     <line x1="8" y1="21" x2="16" y2="21" />

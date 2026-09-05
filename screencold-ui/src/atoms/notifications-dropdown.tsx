@@ -58,15 +58,17 @@ export function NotificationsDropdown({
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
+          <button type="button"
+            className="fixed inset-0 z-40 w-full h-full"
             onClick={() => setIsOpen(false)}
+            onKeyDown={(e) => { if (e.key === "Escape") setIsOpen(false); }}
+            aria-label="Fermer"
           />
           <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-gray-200 bg-white shadow-lg">
             <div className="flex items-center justify-between border-b border-gray-100 p-4">
               <h3 className="font-semibold text-gray-900">Notifications</h3>
               {unreadCount > 0 && (
-                <button
+                <button type="button"
                   onClick={onMarkAllRead}
                   className="text-xs text-blue-600 hover:text-blue-700"
                 >
@@ -82,9 +84,9 @@ export function NotificationsDropdown({
                 </div>
               ) : (
                 notifications.map((notification) => (
-                  <div
+                  <button type="button"
                     key={notification.id}
-                    className={`border-b border-gray-100 p-4 hover:bg-gray-50 ${
+                    className={`w-full text-left border-b border-gray-100 p-4 hover:bg-gray-50 ${
                       !notification.read ? "bg-blue-50/50" : ""
                     }`}
                     onClick={() => onMarkRead(notification.id)}
@@ -105,7 +107,7 @@ export function NotificationsDropdown({
                         <span className="h-2 w-2 rounded-full bg-blue-600 flex-shrink-0 mt-1" />
                       )}
                     </div>
-                  </div>
+                  </button>
                 ))
               )}
             </div>

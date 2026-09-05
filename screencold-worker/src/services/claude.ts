@@ -137,7 +137,7 @@ export async function analyzeWithAI(
       .join("\n");
 
     // Try to parse as JSON
-    let analysisData;
+    let analysisData: any;
     try {
       // Extract JSON from response (handle potential markdown code blocks)
       const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) ||

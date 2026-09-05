@@ -68,10 +68,12 @@ function CSVImportForm({ onSubmit, isLoading = false }: CSVImportFormProps) {
 
       {step === "upload" ? (
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+          <label htmlFor="csv-import" className="block text-sm font-medium text-neutral-700 mb-1.5">
             Import CSV
           </label>
-          <CSVUploader onUpload={handleFileUpload} isUploading={isLoading} />
+          <div id="csv-import">
+            <CSVUploader onUpload={handleFileUpload} isUploading={isLoading} />
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

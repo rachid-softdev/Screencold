@@ -99,10 +99,9 @@ function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
       {items.map((item, index) => {
         if (item.separator) {
           return (
-            <div
+            <hr
               key={`sep-${index}`}
-              className="my-1 h-px bg-gray-100"
-              role="separator"
+              className="my-1 border-t border-gray-200"
             />
           );
         }
@@ -111,7 +110,8 @@ function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
 
         return (
           <button
-            key={index}
+            type="button"
+            key={item.label}
             onClick={() => {
               if (item.onClick) item.onClick();
               setOpen(false);
@@ -136,9 +136,15 @@ function Dropdown({ trigger, items, align = "right" }: DropdownProps) {
 
   return (
     <div ref={containerRef} className="relative inline-block">
-      <div onClick={() => setOpen(!open)} className="cursor-pointer">
+      <button type="button"
+        onClick={() => setOpen(!open)}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(!open); } }}
+        className="w-full text-left bg-transparent border-none p-0 cursor-pointer"
+        aria-expanded={open}
+        aria-haspopup="menu"
+      >
         {trigger}
-      </div>
+      </button>
       {open && menu}
     </div>
   );

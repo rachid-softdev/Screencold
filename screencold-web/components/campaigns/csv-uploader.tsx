@@ -124,7 +124,7 @@ function CSVUploader({ onUpload, maxSize = 10, isUploading = false }: CSVUploade
               </p>
             </div>
           </div>
-          <button
+          <button type="button"
             onClick={handleClear}
             className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600"
           >
@@ -155,9 +155,9 @@ function CSVUploader({ onUpload, maxSize = 10, isUploading = false }: CSVUploade
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {preview.map((row, index) => (
-                  <tr key={index}>
+                  <tr key={`row-${index}`}>
                     {Object.values(row).map((value, i) => (
-                      <td key={i} className="px-4 py-2 text-neutral-700 whitespace-nowrap">
+                      <td key={`cell-${i}`} className="px-4 py-2 text-neutral-700 whitespace-nowrap">
                         {value || "—"}
                       </td>
                     ))}

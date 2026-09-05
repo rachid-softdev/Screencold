@@ -11,7 +11,8 @@ export interface FormGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function FormGroup({ className, label, error, helperText, children, id, ...props }: FormGroupProps) {
-  const inputId = id || React.useId();
+  const generatedId = React.useId();
+  const inputId = id || generatedId;
 
   return (
     <div className={clsx("w-full", className)} {...props}>

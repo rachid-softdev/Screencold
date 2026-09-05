@@ -3,7 +3,7 @@ import { encrypt, decrypt, isEncrypted } from "./encryption";
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+  var __prisma: PrismaClient | undefined;
 }
 
 const createPrismaClient = () => {
@@ -16,10 +16,10 @@ const createPrismaClient = () => {
 };
 
 // Base client (cached globally to prevent multiple instances in dev)
-const basePrisma = globalThis.prisma ?? createPrismaClient();
+const basePrisma = globalThis.__prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
-  globalThis.prisma = basePrisma;
+  globalThis.__prisma = basePrisma;
 }
 
 // ============================================

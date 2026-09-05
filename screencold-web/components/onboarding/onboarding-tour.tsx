@@ -89,7 +89,7 @@ export function OnboardingTour() {
           <span className="text-sm text-neutral-500">
             {currentStep + 1} / {steps.length}
           </span>
-          <button
+          <button type="button"
             onClick={handleComplete}
             className="rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
           >

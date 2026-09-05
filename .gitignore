@@ -53,6 +53,11 @@ packages/db/prisma/*.db-journal
 playwright-report/
 test-results/
 playwright/.cache/
+.playwright-cli/
+
+# Tooling artifacts
+.impeccable/
+.playwright-cli/
 
 # Docker
 .docker/
@@ -69,3 +74,6 @@ playwright/.cache/
 
 # Database backups
 backups/
+
+# Impeccable (QA critique reports)
+.impeccable/

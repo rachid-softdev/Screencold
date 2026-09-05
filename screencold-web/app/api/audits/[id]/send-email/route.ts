@@ -89,7 +89,7 @@ export async function POST(
     const gmailConnected = await isGmailConnected(userId);
     const shouldUseGmail = useGmail && gmailConnected;
 
-    let result;
+    let result: { success: boolean; error?: string; };
     let emailService: 'gmail' | 'resend' = 'resend';
 
     if (shouldUseGmail) {

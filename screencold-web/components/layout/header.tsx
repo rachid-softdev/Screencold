@@ -27,6 +27,7 @@ function Header() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              aria-hidden="true"
             >
               <rect x="2" y="3" width="20" height="14" rx="2" />
               <line x1="8" y1="21" x2="16" y2="21" />
@@ -59,7 +60,7 @@ function Header() {
           </Link>
 
           {/* Mobile Menu Button */}
-          <button
+          <button type="button"
             className="flex items-center justify-center p-2 text-neutral-600 md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menu"

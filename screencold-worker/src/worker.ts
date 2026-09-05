@@ -180,27 +180,17 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
 
     // Step 2: Upload screenshots to S3
     jobLogger.info("Uploading screenshots to S3...");
-    const screenshotUrls = await uploadScreenshots(userId, {
-      desktop: Buffer.from(captureResult.screenshots.desktop.path, "base64"),
-      mobile: captureResult.screenshots.mobile
-        ? Buffer.from(captureResult.screenshots.mobile.path, "base64")
-        : undefined,
-      // Use the generated annotated screenshot if available, otherwise fallback to desktop
-      annotated: annotatedScreenshotBuffer || 
-        (captureResult.screenshots.annotated 
-          ? Buffer.from(captureResult.screenshots.annotated.path, "base64")
-          : undefined),
-    });
+    let annotatedScreenshotBuffer: Buffer | null = null;
 
     // Step 3: Analyze with AI (unless capture only mode)
     let analysisResult: AnalyzeResult | null = null;
     if (!captureOnly) {
       jobLogger.info("Analyzing with AI with screenshots...");
-      
+
       // Extract base64 data from screenshots (already captured)
       const desktopBase64 = captureResult.screenshots.desktop.path;
       const mobileBase64 = captureResult.screenshots.mobile?.path;
-      
+
       analysisResult = await analyzeWithAI(
         captureResult.screenshots.desktop.url,
         {
@@ -214,12 +204,11 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
         throw new Error(analysisResult.error ?? "AI analysis failed");
       }
 
-      // Step 3.5: Generate visual annotations
+      // Generate visual annotations
       if (analysisResult.issues && analysisResult.issues.length > 0) {
         jobLogger.info("Generating visual annotations...", {
           issuesCount: analysisResult.issues.length,
         });
-        
         try {
           const desktopBuffer = Buffer.from(captureResult.screenshots.desktop.path, 'base64');
           annotatedScreenshotBuffer = await annotateScreenshot({
@@ -233,10 +222,21 @@ async function processAuditJob(job: Job<AuditJobData>): Promise<void> {
           jobLogger.warn("Failed to generate annotations, continuing without", {
             error: annotateError instanceof Error ? annotateError.message : 'Unknown',
           });
-          // Don't fail the job - continue without annotations
         }
       }
     }
+
+    const screenshotUrls = await uploadScreenshots(userId, {
+      desktop: Buffer.from(captureResult.screenshots.desktop.path, "base64"),
+      mobile: captureResult.screenshots.mobile
+        ? Buffer.from(captureResult.screenshots.mobile.path, "base64")
+        : undefined,
+      // Use the generated annotated screenshot if available, otherwise fallback to desktop
+      annotated: annotatedScreenshotBuffer || 
+        (captureResult.screenshots.annotated 
+          ? Buffer.from(captureResult.screenshots.annotated.path, "base64")
+          : undefined),
+    });
 
     // Calculate processing time
     const processingTime = Date.now() - startTime;

@@ -124,6 +124,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     return groups;
   }, [filtered]);
 
+  // Calculate flat index for keyboard navigation
+  const flatItems = useMemo(() => {
+    return grouped.flatMap((g) => g.items);
+  }, [grouped]);
+
   // Reset selected index when filtered results change
   useEffect(() => {
     setSelectedIndex(0);
@@ -140,11 +145,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       setSelectedIndex(0);
     }
   }, [open]);
-
-  // Calculate flat index for keyboard navigation
-  const flatItems = useMemo(() => {
-    return grouped.flatMap((g) => g.items);
-  }, [grouped]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -179,7 +179,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     if (selected) {
       selected.scrollIntoView({ block: "nearest" });
     }
-  }, [selectedIndex]);
+  });
 
   if (!mounted || !open) return null;
 
@@ -187,6 +187,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     <div
       className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]"
       onKeyDown={handleKeyDown}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Palette de commandes"
     >
       {/* Backdrop */}
       <div
@@ -239,7 +242,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   const flatIdx = flatItems.indexOf(item);
                   const isSelected = flatIdx === selectedIndex;
                   return (
-                    <button
+                    <button type="button"
                       key={item.id}
                       data-selected={isSelected}
                       onClick={item.action}

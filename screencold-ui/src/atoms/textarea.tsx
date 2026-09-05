@@ -12,8 +12,9 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, label, error, helperText, id, ["aria-label"]: ariaLabel, ...props }, ref) => {
-    const inputId = id || React.useId();
+  ({ className, label, error, helperText, id, "aria-label": ariaLabel, ...props }, ref) => {
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
     const hasError = !!error;
 
     return (

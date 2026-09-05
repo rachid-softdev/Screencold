@@ -191,10 +191,11 @@ function AuditForm({ onSubmit, isLoading }: { onSubmit?: (data: AuditFormData) =
 
       {/* Agency Type */}
       <div>
-        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+        <label htmlFor="agencyType" className="block text-sm font-medium text-neutral-700 mb-1.5">
           Type d&apos;agence
         </label>
         <select
+          id="agencyType"
           value={formData.agencyType}
           onChange={handleChange("agencyType")}
           className={clsx(

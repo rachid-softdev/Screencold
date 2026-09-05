@@ -91,6 +91,7 @@ function DashboardSidebar({ user, collapsed = false, onToggle, onOpenShortcuts }
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              aria-hidden="true"
             >
               <rect x="2" y="3" width="20" height="14" rx="2" />
               <line x1="8" y1="21" x2="16" y2="21" />
@@ -102,7 +103,7 @@ function DashboardSidebar({ user, collapsed = false, onToggle, onOpenShortcuts }
           )}
         </Link>
         {onToggle && (
-          <button
+          <button type="button"
             onClick={onToggle}
             className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
             aria-label={collapsed ? "Développer" : "Réduire"}
@@ -143,7 +144,7 @@ function DashboardSidebar({ user, collapsed = false, onToggle, onOpenShortcuts }
       {/* Shortcut Reference */}
       {onOpenShortcuts && !collapsed && (
         <div className="border-t border-neutral-100 px-3 py-2">
-          <button
+          <button type="button"
             onClick={onOpenShortcuts}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-600"
           >
@@ -159,7 +160,7 @@ function DashboardSidebar({ user, collapsed = false, onToggle, onOpenShortcuts }
       {/* Collapsed shortcut button */}
       {onOpenShortcuts && collapsed && (
         <div className="border-t border-neutral-100 px-2 py-2">
-          <button
+          <button type="button"
             onClick={onOpenShortcuts}
             className="flex w-full items-center justify-center rounded-lg px-2 py-2 text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-600"
             aria-label="Raccourcis clavier"
