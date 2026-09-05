@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from '@screencold/ui';
+import { Button } from "@screencold/ui";
 import { ArrowRight, Search, BarChart3, Mail } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -42,14 +42,13 @@ const benefits = [
   {
     icon: <Mail className="h-6 w-6" />,
     title: "Emails personnalisés",
-    description:
-      "Chaque email mentionne des problèmes concrets observés sur le site du prospect.",
+    description: "Chaque email mentionne des problèmes concrets observés sur le site du prospect.",
   },
   {
     icon: <BarChart3 className="h-6 w-6" />,
-    title: "Taux de réponse x3",
+    title: "Recommandations concrètes",
     description:
-      "Les emails personnalisés avec preuves visuelles génèrent 3x plus de réponses.",
+      "Chaque rapport liste les problèmes observés, classés par priorité, avec des recommandations actionnables.",
   },
 ];
 
@@ -61,14 +60,11 @@ export default function AgencesSEOPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Agence SEO : signez plus de clients avec{" "}
-            <span className="text-info-600">
-              des audits automatisés
-            </span>
+            <span className="text-info-600">des audits automatisés</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-600">
-            Analysez les sites de vos prospects en 30 secondes, générez des
-            emails de prospection personnalisés, et augmentez votre taux de
-            réponse de 40%.
+            Analysez les sites de vos prospects en 30 secondes et générez des emails de prospection
+            personnalisés à partir des points faibles détectés.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/register">
@@ -120,33 +116,36 @@ export default function AgencesSEOPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-info-100 text-info-600">
                   {benefit.icon}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-neutral-900">
-                  {benefit.title}
-                </h3>
-                <p className="mt-2 text-sm text-neutral-600">
-                  {benefit.description}
-                </p>
+                <h3 className="mt-4 text-lg font-semibold text-neutral-900">{benefit.title}</h3>
+                <p className="mt-2 text-sm text-neutral-600">{benefit.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof */}
+      {/* Getting started */}
       <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-xl bg-white p-8 shadow-sm">
-            <p className="text-lg text-neutral-700 italic">
-              &ldquo;ScreenCold m'a fait gagner des heures chaque semaine. Mes
-              audits sont maintenant automatiques et mon taux de réponse a
-              augmenté de 40%.&rdquo;
-            </p>
-            <div className="mt-4">
-              <p className="font-semibold text-neutral-900">Thomas B.</p>
-              <p className="text-sm text-neutral-500">
-                Commercial, Agence SEO — Paris
-              </p>
-            </div>
+            <h2 className="text-xl font-semibold text-neutral-900">
+              Commencer en quelques minutes
+            </h2>
+            <ul className="mt-4 space-y-3 text-neutral-700">
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 text-success-600">✓</span>
+                Créez votre compte : 5 crédits offerts, sans carte bancaire.
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 text-success-600">✓</span>
+                Collez l&apos;URL d&apos;un site et recevez audit + email personnalisé en 30
+                secondes.
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 text-success-600">✓</span>
+                Passez à un plan payant uniquement si l&apos;outil vous convient.
+              </li>
+            </ul>
           </div>
         </div>
       </section>
@@ -154,12 +153,10 @@ export default function AgencesSEOPage() {
       {/* CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-neutral-900">
-            Prêt à scaler votre prospection ?
-          </h2>
+          <h2 className="text-3xl font-bold text-neutral-900">Prêt à scaler votre prospection ?</h2>
           <p className="mt-4 text-lg text-neutral-600">
-            Rejoignez les agences SEO qui utilisent ScreenCold pour signer plus
-            de clients.
+            Commencez gratuitement pour tester sur vos propres prospects : 5 crédits offerts, sans
+            carte bancaire.
           </p>
           <div className="mt-8">
             <Link href="/register">

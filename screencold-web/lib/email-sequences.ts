@@ -46,18 +46,19 @@ L'équipe ScreenCold`,
     delayDays: 1,
   },
   {
-    subject: "Comment {{customer}} a augmenté son taux de réponse de 40%",
+    subject: "Astuce : mentionnez des preuves visuelles dans vos emails",
     body: `Bonjour {{name}},
 
-Thomas, commercial dans une agence web, utilise ScreenCold depuis 3 mois.
+Un email de prospection est plus convaincant quand il s'appuie sur des observations concrètes du site du prospect.
 
-Résultat : son taux de réponse aux emails de prospection a augmenté de 40%.
+Notre recommandation :
+1. Auditez le site avec ScreenCold
+2. Reprenez 2 ou 3 problèmes identifiés dans votre audit
+3. Rédigez un email court qui cite ces problèmes précis
 
-Son secret ? Il envoie des emails ultra-personnalisés basés sur les problèmes concrets identifiés par notre IA.
+Le prospect voit que vous vous êtes intéressé à SON site, pas à un template générique.
 
-"Avant, je passais 20 minutes à analyser chaque site. Maintenant, c'est 30 secondes."
-
-Découvrez comment ScreenCold peut transformer votre prospection.
+Voir vos audits : {{dashboardUrl}}
 
 L'équipe ScreenCold`,
     delayDays: 3,
@@ -68,14 +69,14 @@ L'équipe ScreenCold`,
 
 Vous avez utilisé {{creditsUsed}} de vos {{totalCredits}} crédits.
 
-Avec le plan Starter (29€/mois), vous obtenez :
+Avec le plan Starter (49€/mois), vous obtenez :
 - 50 crédits/mois
 - Export CSV
-- Support prioritaire
+- Templates d'emails
 
-Avec le plan Pro (79€/mois) :
-- 200 crédits/mois
-- Campagnes illimitées
+Avec le plan Pro (149€/mois) :
+- 500 crédits/mois
+- Batch processing
 - Accès API
 
 Voir les tarifs : {{pricingUrl}}
@@ -87,7 +88,7 @@ L'équipe ScreenCold`,
 
 export function renderEmail(
   template: EmailTemplate,
-  variables: Record<string, string>
+  variables: Record<string, string>,
 ): { subject: string; body: string } {
   let subject = template.subject;
   let body = template.body;

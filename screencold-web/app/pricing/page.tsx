@@ -3,19 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { Check, Zap, ArrowRight, Star, Users } from "lucide-react";
-import { Button, Badge, Header } from '@screencold/ui';
+import { Button, Badge, Header } from "@screencold/ui";
 import { OrganizationSchema, FAQSchema } from "@/components/seo/schema";
 import { PLANS, type PlanInfo } from "@/lib/plans";
 
-const planOrder: (keyof typeof PLANS)[] = ['FREE', 'STARTER', 'PRO', 'AGENCY'];
+const planOrder: (keyof typeof PLANS)[] = ["FREE", "STARTER", "PRO", "AGENCY"];
 
 const planFeatures: Record<string, string[]> = {
-  FREE: [
-    "5 crédits/mois",
-    "1 utilisateur",
-    "Audits basiques",
-    "Email de prospection",
-  ],
+  FREE: ["5 crédits/mois", "1 utilisateur", "Audits basiques", "Email de prospection"],
   STARTER: [
     "50 crédits/mois",
     "1 utilisateur",
@@ -64,16 +59,15 @@ const faqs = [
   },
 ];
 
-const testimonials = [
+const assurances = [
   {
-    quote: "ScreenCold m'a fait gagner des heures chaque semaine. Mes audits sont maintenant automatiques !",
-    author: "Marie L.",
-    role: "Fondatrice, Agence SEO",
+    title: "Essai gratuit 14 jours",
+    description:
+      "Tous les plans incluent un essai gratuit de 14 jours, sans carte bancaire requise.",
   },
   {
-    quote: "Le qualité des emails générés est impressionnante. Mon taux de réponse a augmenté de 40%.",
-    author: "Thomas B.",
-    role: "Commercial, Agence Web",
+    title: "Sans engagement",
+    description: "Changez de plan ou annulez à tout moment, sans préavis ni frais cachés.",
   },
 ];
 
@@ -106,30 +100,34 @@ function PricingPage() {
             Trouvez le plan idéal pour votre agency
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-600">
-            Des audits de site automatisés aux emails de prospection personnalisés,
-            ScreenCold vous fait gagner du temps et augmenter vos conversions.
+            Des audits de site automatisés aux emails de prospection personnalisés, ScreenCold vous
+            fait gagner du temps et augmenter vos conversions.
           </p>
-          
+
           {/* Billing Toggle */}
           <div className="mt-8 flex items-center justify-center gap-4">
-            <span className={`text-sm font-medium ${!isAnnual ? 'text-neutral-900' : 'text-neutral-500'}`}>
+            <span
+              className={`text-sm font-medium ${!isAnnual ? "text-neutral-900" : "text-neutral-500"}`}
+            >
               Mensuel
             </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isAnnual ? 'bg-info-600' : 'bg-neutral-200'
+                isAnnual ? "bg-info-600" : "bg-neutral-200"
               }`}
               role="switch"
               aria-checked={isAnnual}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isAnnual ? 'translate-x-6' : 'translate-x-1'
+                  isAnnual ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
-            <span className={`text-sm font-medium ${isAnnual ? 'text-neutral-900' : 'text-neutral-500'}`}>
+            <span
+              className={`text-sm font-medium ${isAnnual ? "text-neutral-900" : "text-neutral-500"}`}
+            >
               Annuel
             </span>
             {isAnnual && (
@@ -146,7 +144,7 @@ function PricingPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {planOrder.map((planKey) => {
             const plan = PLANS[planKey as keyof typeof PLANS];
-            const isPopular = planKey === 'STARTER';
+            const isPopular = planKey === "STARTER";
             const price = getPrice(plan);
             const features = planFeatures[planKey];
 
@@ -172,9 +170,7 @@ function PricingPage() {
                 <p className="mt-1 text-sm text-neutral-500">{plan.description}</p>
 
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-neutral-900">
-                    {price}€
-                  </span>
+                  <span className="text-4xl font-bold text-neutral-900">{price}€</span>
                   <span className="text-neutral-500">/mois</span>
                   {isAnnual && plan.monthlyPrice > 0 && (
                     <span className="ml-2 text-sm text-success-600">
@@ -193,11 +189,12 @@ function PricingPage() {
                 </ul>
 
                 <Link href="/register" className="mt-6 block">
-                  <Button
-                    className="w-full"
-                    variant={isPopular ? "default" : "secondary"}
-                  >
-                    {planKey === 'AGENCY' ? 'Contacter les ventes' : isAnnual ? 'Essai gratuit 14 jours' : 'Commencer'}
+                  <Button className="w-full" variant={isPopular ? "default" : "secondary"}>
+                    {planKey === "AGENCY"
+                      ? "Contacter les ventes"
+                      : isAnnual
+                        ? "Essai gratuit 14 jours"
+                        : "Commencer"}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -211,32 +208,24 @@ function PricingPage() {
         </p>
       </section>
 
-      {/* Social Proof */}
+      {/* Trust line */}
       <section className="py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm font-medium text-neutral-500">
-            Utilisé par 500+ agences et freelances
+            Essai gratuit 14 jours · Sans carte bancaire · Sans engagement
           </p>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Assurances */}
       <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-neutral-900">
-            Ce que disent nos clients
-          </h2>
+          <h2 className="text-center text-2xl font-bold text-neutral-900">Commencer sans risque</h2>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="rounded-xl bg-white p-6 shadow-sm"
-              >
-                <p className="text-neutral-600">&ldquo;{testimonial.quote}&rdquo;</p>
-                <div className="mt-4">
-                  <p className="font-medium text-neutral-900">{testimonial.author}</p>
-                  <p className="text-sm text-neutral-500">{testimonial.role}</p>
-                </div>
+            {assurances.map((assurance, index) => (
+              <div key={index} className="rounded-xl bg-white p-6 shadow-sm">
+                <h3 className="font-medium text-neutral-900">{assurance.title}</h3>
+                <p className="mt-2 text-neutral-600">{assurance.description}</p>
               </div>
             ))}
           </div>
@@ -256,18 +245,10 @@ function PricingPage() {
                   <th className="py-4 text-left text-sm font-medium text-neutral-900">
                     Fonctionnalite
                   </th>
-                  <th className="py-4 text-center text-sm font-medium text-neutral-900">
-                    Gratuit
-                  </th>
-                  <th className="py-4 text-center text-sm font-medium text-neutral-900">
-                    Starter
-                  </th>
-                  <th className="py-4 text-center text-sm font-medium text-neutral-900">
-                    Pro
-                  </th>
-                  <th className="py-4 text-center text-sm font-medium text-neutral-900">
-                    Agency
-                  </th>
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900">Gratuit</th>
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900">Starter</th>
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900">Pro</th>
+                  <th className="py-4 text-center text-sm font-medium text-neutral-900">Agency</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -341,9 +322,7 @@ function PricingPage() {
       {/* FAQs */}
       <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-neutral-900">
-            Questions fréquentes
-          </h2>
+          <h2 className="text-center text-2xl font-bold text-neutral-900">Questions fréquentes</h2>
           <div className="mt-10 space-y-6">
             {faqs.map((faq, index) => (
               <div key={index} className="rounded-xl bg-white p-6 shadow-sm">
@@ -362,8 +341,7 @@ function PricingPage() {
             Prêt à transformer votre prospection ?
           </h2>
           <p className="mt-4 text-neutral-600">
-            Commencez gratuitement et découvrez comment ScreenCold peut vous faire
-            gagner du temps.
+            Commencez gratuitement et découvrez comment ScreenCold peut vous faire gagner du temps.
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Link href="/register">
@@ -401,19 +379,17 @@ function PricingPage() {
               </div>
               <span className="text-lg font-bold text-neutral-900">ScreenCold</span>
             </div>
-            <p className="text-sm text-neutral-500">
-              2026 ScreenCold. Tous droits réservés.
-            </p>
+            <p className="text-sm text-neutral-500">2026 ScreenCold. Tous droits réservés.</p>
           </div>
         </div>
       </footer>
 
       {/* SEO Schema */}
-      <OrganizationSchema 
-        url={process.env.NEXT_PUBLIC_APP_URL || 'https://screencold.com'} 
+      <OrganizationSchema
+        url={process.env.NEXT_PUBLIC_APP_URL || "https://screencold.com"}
         description="ScreenCold automatise les audits de sites web et génère des emails de prospection personnalisés par IA."
       />
-      <FAQSchema faqs={faqs.map(f => ({ question: f.q, answer: f.a }))} />
+      <FAQSchema faqs={faqs.map((f) => ({ question: f.q, answer: f.a }))} />
     </div>
   );
 }

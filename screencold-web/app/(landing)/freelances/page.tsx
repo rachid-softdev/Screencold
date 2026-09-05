@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from '@screencold/ui';
+import { Button } from "@screencold/ui";
 import { ArrowRight, Zap, Clock, TrendingUp } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "ScreenCold pour les freelances",
-    description:
-      "Automatisez votre prospection B2B en tant que freelance.",
+    description: "Automatisez votre prospection B2B en tant que freelance.",
     url: "/freelances",
     siteName: "ScreenCold",
     locale: "fr_FR",
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
 const benefits = [
   {
     icon: <Clock className="h-6 w-6" />,
-    title: "Gagnez 10h par semaine",
+    title: "Gagnez du temps chaque jour",
     description:
       "Automatisez l'analyse de vos prospects et la rédaction de vos emails. Concentrez-vous sur la vente.",
   },
@@ -41,9 +40,9 @@ const benefits = [
   },
   {
     icon: <TrendingUp className="h-6 w-6" />,
-    title: "Taux de réponse x3",
+    title: "Emails plus personnalisés",
     description:
-      "Les emails personnalisés avec preuves visuelles génèrent 3x plus de réponses que les emails génériques.",
+      "Chaque email mentionne des problèmes concrets observés sur le site du prospect, appuyés par des preuves visuelles.",
   },
 ];
 
@@ -54,15 +53,11 @@ export default function FreelancesPage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
-            Freelances : prospectez{" "}
-            <span className="text-info-600">
-              sans vous ruiner en temps
-            </span>
+            Freelances : prospectez <span className="text-info-600">sans vous ruiner en temps</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-600">
-            En tant que freelance, votre temps est précieux. ScreenCold
-            automatise l'analyse de vos prospects et la rédaction de vos emails
-            de prospection.
+            En tant que freelance, votre temps est précieux. ScreenCold automatise l'analyse de vos
+            prospects et la rédaction de vos emails de prospection.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/register">
@@ -73,7 +68,7 @@ export default function FreelancesPage() {
             </Link>
             <Link href="/pricing">
               <Button variant="secondary" size="lg">
-                Voir les tarifs (dès 29€/mois)
+                Voir les tarifs
               </Button>
             </Link>
           </div>
@@ -87,7 +82,7 @@ export default function FreelancesPage() {
       <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-neutral-900">
-            Pourquoi les freelances choisissent ScreenCold
+            Pourquoi ScreenCold pour les freelances
           </h2>
           <div className="mt-16 grid gap-8 sm:grid-cols-3">
             {benefits.map((benefit, i) => (
@@ -95,12 +90,8 @@ export default function FreelancesPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-info-100 text-info-600">
                   {benefit.icon}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-neutral-900">
-                  {benefit.title}
-                </h3>
-                <p className="mt-2 text-sm text-neutral-600">
-                  {benefit.description}
-                </p>
+                <h3 className="mt-4 text-lg font-semibold text-neutral-900">{benefit.title}</h3>
+                <p className="mt-2 text-sm text-neutral-600">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -110,14 +101,15 @@ export default function FreelancesPage() {
       {/* ROI */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-neutral-900">
-            Le calcul est simple
-          </h2>
+          <h2 className="text-center text-3xl font-bold text-neutral-900">Le calcul est simple</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-neutral-600">
+            Exemple basé sur les hypothèses ci-dessous — vos résultats peuvent varier.
+          </p>
           <div className="mx-auto mt-10 max-w-2xl">
             <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-600">Temps gagné par audit</span>
+                  <span className="text-neutral-600">Hypothèse — temps gagné par audit</span>
                   <span className="font-bold text-neutral-900">20 minutes</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -125,34 +117,29 @@ export default function FreelancesPage() {
                   <span className="font-bold text-neutral-900">50</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-600">Temps économisé</span>
-                  <span className="font-bold text-success-600">
-                    16 heures / mois
-                  </span>
+                  <span className="text-neutral-600">Temps économisé (calcul)</span>
+                  <span className="font-bold text-success-600">16 heures / mois</span>
                 </div>
                 <div className="border-t border-neutral-200 pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-neutral-600">Coût du plan Starter</span>
-                    <span className="font-bold text-neutral-900">29€ / mois</span>
+                    <span className="font-bold text-neutral-900">49€ / mois</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-600">
-                      Coût horaire si 50€/h
-                    </span>
+                    <span className="text-neutral-600">Hypothèse — coût horaire à 50€/h</span>
                     <span className="font-bold text-neutral-900">800€ / mois</span>
                   </div>
                 </div>
                 <div className="border-t border-neutral-200 pt-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-neutral-900">
-                      ROI estimé
-                    </span>
-                    <span className="text-2xl font-bold text-success-600">
-                      x27
-                    </span>
+                    <span className="font-semibold text-neutral-900">ROI de l&apos;exemple</span>
+                    <span className="text-2xl font-bold text-success-600">x16</span>
                   </div>
                 </div>
               </div>
+              <p className="mt-6 text-xs text-neutral-500">
+                Calcul indicatif de démonstration, non contractuel.
+              </p>
             </div>
           </div>
         </div>
@@ -161,12 +148,10 @@ export default function FreelancesPage() {
       {/* CTA */}
       <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-neutral-900">
-            Prêt à booster votre activité ?
-          </h2>
+          <h2 className="text-3xl font-bold text-neutral-900">Prêt à booster votre activité ?</h2>
           <p className="mt-4 text-lg text-neutral-600">
-            Rejoignez les freelances qui utilisent ScreenCold pour prospecter
-            efficacement.
+            Commencez gratuitement avec 5 crédits offerts, sans carte bancaire, et testez sur vos
+            propres prospects.
           </p>
           <div className="mt-8">
             <Link href="/register">

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from '@screencold/ui';
+import { Button } from "@screencold/ui";
 import { ArrowRight, Palette, Eye, Mail } from "lucide-react";
 
 export const metadata: Metadata = {
-  title:
-    "ScreenCold pour les web designers — Audits UX automatisés et prospection",
+  title: "ScreenCold pour les web designers — Audits UX automatisés et prospection",
   description:
     "Identifiez les problèmes UX de vos prospects et générez des emails de prospection personnalisés. Transformez vos audits en opportunités commerciales.",
   keywords: [
@@ -56,14 +55,11 @@ export default function WebDesignersPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold text-neutral-900 sm:text-5xl lg:text-6xl">
             Web designers : transformez vos audits UX en{" "}
-            <span className="text-info-600">
-              opportunités commerciales
-            </span>
+            <span className="text-info-600">opportunités commerciales</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-600">
-            Identifiez les problèmes UX de vos prospects en 30 secondes.
-            Générez des emails personnalisés avec des preuvis visuelles
-            concrètes.
+            Identifiez les problèmes UX de vos prospects en 30 secondes. Générez des emails
+            personnalisés avec des preuves visuelles concrètes.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/register">
@@ -88,7 +84,7 @@ export default function WebDesignersPage() {
       <section className="bg-neutral-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-neutral-900">
-            Pourquoi les web designers adorent ScreenCold
+            Pourquoi ScreenCold pour les web designers
           </h2>
           <div className="mt-16 grid gap-8 sm:grid-cols-3">
             {benefits.map((benefit, i) => (
@@ -96,12 +92,8 @@ export default function WebDesignersPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 text-purple-600">
                   {benefit.icon}
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-neutral-900">
-                  {benefit.title}
-                </h3>
-                <p className="mt-2 text-sm text-neutral-600">
-                  {benefit.description}
-                </p>
+                <h3 className="mt-4 text-lg font-semibold text-neutral-900">{benefit.title}</h3>
+                <p className="mt-2 text-sm text-neutral-600">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -122,31 +114,27 @@ export default function WebDesignersPage() {
               <div className="flex items-center gap-3">
                 <div className="h-3 w-3 rounded-full bg-error-500" />
                 <span className="text-sm text-neutral-700">
-                  <strong>CTA non visible</strong> — Le bouton principal est
-                  noyé dans la page
+                  <strong>CTA non visible</strong> — Le bouton principal est noyé dans la page
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="h-3 w-3 rounded-full bg-orange-500" />
                 <span className="text-sm text-neutral-700">
-                  <strong>Hiérarchie visuelle</strong> — Trop de éléments au
-                  même niveau
+                  <strong>Hiérarchie visuelle</strong> — Trop de éléments au même niveau
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="h-3 w-3 rounded-full bg-info-500" />
                 <span className="text-sm text-neutral-700">
-                  <strong>Espacement incohérent</strong> — Marges et paddings
-                  non uniformes
+                  <strong>Espacement incohérent</strong> — Marges et paddings non uniformes
                 </span>
               </div>
             </div>
             <div className="mt-6 rounded-lg bg-neutral-50 p-4">
               <p className="text-sm text-neutral-600 italic">
-                &ldquo;Bonjour, j'ai remarqué que votre page d'accueil manque
-                de hiérarchie visuelle. Le CTA principal n'est pas assez visible
-                et les espacements sont incohérents. J'ai préparé 3
-                recommandations concrètes...&rdquo;
+                &ldquo;Bonjour, j'ai remarqué que votre page d'accueil manque de hiérarchie
+                visuelle. Le CTA principal n'est pas assez visible et les espacements sont
+                incohérents. J'ai préparé 3 recommandations concrètes...&rdquo;
               </p>
             </div>
           </div>
@@ -160,8 +148,8 @@ export default function WebDesignersPage() {
             Prêt à décrocher plus de missions ?
           </h2>
           <p className="mt-4 text-lg text-neutral-600">
-            Rejoignez les web designers qui utilisent ScreenCold pour leur
-            prospection.
+            Commencez gratuitement : 5 crédits pour tester sur vos propres prospects, sans carte
+            bancaire.
           </p>
           <div className="mt-8">
             <Link href="/register">

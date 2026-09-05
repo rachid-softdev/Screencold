@@ -32,15 +32,15 @@ interface FAQSchemaProps {
  * Organization Schema - JSON-LD for structured data
  */
 export function OrganizationSchema({
-  name = 'ScreenCold',
+  name = "ScreenCold",
   url,
   logo,
   description,
   sameAs = [],
 }: OrganizationSchemaProps) {
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
+    "@context": "https://schema.org",
+    "@type": "Organization",
     name,
     url,
     ...(logo && { logo }),
@@ -63,23 +63,23 @@ export function ProductSchema({
   name,
   description,
   price,
-  priceCurrency = 'EUR',
-  brand = 'ScreenCold',
+  priceCurrency = "EUR",
+  brand = "ScreenCold",
 }: ProductSchemaProps) {
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+    "@context": "https://schema.org",
+    "@type": "Product",
     name,
     description,
     brand: {
-      '@type': 'Brand',
+      "@type": "Brand",
       name: brand,
     },
     offers: {
-      '@type': 'Offer',
+      "@type": "Offer",
       price,
       priceCurrency,
-      availability: 'https://schema.org/InStock',
+      availability: "https://schema.org/InStock",
     },
   };
 
@@ -99,28 +99,28 @@ export function ArticleSchema({
   description,
   datePublished,
   dateModified,
-  author = 'ScreenCold Team',
+  author = "ScreenCold Team",
   image,
   url,
 }: ArticleSchemaProps) {
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
+    "@context": "https://schema.org",
+    "@type": "Article",
     headline,
     description,
     ...(dateModified && { dateModified }),
     datePublished,
     author: {
-      '@type': 'Person',
+      "@type": "Person",
       name: author,
     },
     ...(image && { image }),
     url,
     publisher: {
-      '@type': 'Organization',
-      name: 'ScreenCold',
+      "@type": "Organization",
+      name: "ScreenCold",
       logo: {
-        '@type': 'ImageObject',
+        "@type": "ImageObject",
         url: `${url}/logo.png`,
       },
     },
@@ -139,13 +139,13 @@ export function ArticleSchema({
  */
 export function FAQSchema({ faqs }: FAQSchemaProps) {
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
     mainEntity: faqs.map((faq) => ({
-      '@type': 'Question',
+      "@type": "Question",
       name: faq.question,
       acceptedAnswer: {
-        '@type': 'Answer',
+        "@type": "Answer",
         text: faq.answer,
       },
     })),
@@ -169,10 +169,10 @@ export function BreadcrumbSchema({
   url: string;
 }) {
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
+      "@type": "ListItem",
       position: index + 1,
       name: item.name,
       item: item.url,
@@ -192,17 +192,17 @@ export function BreadcrumbSchema({
  */
 export function WebSiteSchema({ url }: { url: string }) {
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'ScreenCold',
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "ScreenCold",
     url,
     potentialAction: {
-      '@type': 'SearchAction',
+      "@type": "SearchAction",
       target: {
-        '@type': 'EntryPoint',
+        "@type": "EntryPoint",
         urlTemplate: `${url}/blog?search={search_term_string}`,
       },
-      'query-input': 'required name=search_term_string',
+      "query-input": "required name=search_term_string",
     },
   };
 
@@ -218,27 +218,21 @@ export function WebSiteSchema({ url }: { url: string }) {
  * SoftwareApplication Schema
  */
 export function SoftwareApplicationSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://screencold.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://screencold.com";
   const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'ScreenCold',
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "ScreenCold",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
     offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'EUR',
-      availability: 'https://schema.org/InStock',
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "EUR",
+      availability: "https://schema.org/InStock",
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '127',
-      bestRating: '5',
-      worstRating: '1',
-    },
-    description: 'Automate your B2B prospecting with AI-powered website audits and personalized outreach emails.',
+    description:
+      "Automate your B2B prospecting with AI-powered website audits and personalized outreach emails.",
     url: baseUrl,
   };
 
